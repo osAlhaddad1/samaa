@@ -85,6 +85,7 @@ main{padding-block:20px 110px}
 .banner h2{font-size:24px;margin:2px 0}
 .banner p{margin:0;font-size:14px;opacity:.95;max-width:40ch}
 .banner.locked{background:var(--lock)!important;color:var(--lock-ink);box-shadow:0 4px 0 var(--lock-d)}
+.soon .mini{width:12px;height:12px;vertical-align:-2px}
 .soon{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:color-mix(in srgb,var(--lock-ink) 18%,transparent);padding:4px 8px;border-radius:999px;white-space:nowrap}
 .path{display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px 0 6px;position:relative}
 .node-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
@@ -676,7 +677,7 @@ function liveStreak(){
 let ctx = null, bodyIn = null, master = null;
 async function ensureCtx(){
   if (!ctx){
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint:'interactive' });
     // a little "wooden body": low resonance + soft top end
     const res = ctx.createBiquadFilter(); res.type = 'peaking'; res.frequency.value = 210; res.Q.value = 1.2; res.gain.value = 5;
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3800;
@@ -712,7 +713,7 @@ function pluckBuffer(m){
 }
 function playNote(m, when, dur){
   const src = ctx.createBufferSource(); src.buffer = pluckBuffer(m);
-  const g = ctx.createGain(); g.gain.setValueAtTime(0.55, when); g.gain.setTargetAtTime(0, when + dur, 0.07);
+  const g = ctx.createGain(); g.gain.setValueAtTime(0.55, when); g.gain.setTargetAtTime(0, when + dur, 0.05);
   src.connect(g).connect(bodyIn); src.start(when); src.stop(when + dur + 0.5);
 }
 /* Plays notes in order. The mic ignores everything until the sound has died down. */
@@ -721,7 +722,7 @@ async function playSeq(notes, noteDur = 0.9){
   const t0 = ctx.currentTime + 0.06;
   notes.forEach((m, i) => playNote(m, t0 + i * noteDur, i === notes.length - 1 ? Math.max(noteDur, 1.1) : noteDur * 0.96));
   const total = (notes.length - 1) * noteDur + Math.max(noteDur, 1.1) + 0.15;
-  Mic.muteFor(total * 1000 + 250);
+  Mic.muteFor(total * 1000 + 120);   // the note has faded to ~2% by then
   await sleep(total * 1000);
 }
 async function sfx(ok){
@@ -738,86 +739,175 @@ async function sfx(ok){
   Mic.muteFor(400);
 }
 
-/* ---------- pitch detection (YIN) ---------- */
-const yinD = new Float32Array(2048);
-function yin(buf, sr, thr = 0.12){
-  const W = 1024, tauMin = Math.floor(sr / 1000), tauMax = Math.min(Math.floor(sr / 60), buf.length - W - 1);
+/* ---------- pitch detection ----------
+   How a pluck becomes a note, in order:
+   1. audio-thread capture: an AudioWorklet hands over 512 samples (~11 ms) at a time, so analysis runs
+      ~90×/s and is not tied to screen refresh (falls back to an AnalyserNode + animation frames)
+   2. band-pass 60 Hz–1.5 kHz before anything else: drops hum, rumble, hiss and most consonant noise
+   3. a room-noise gate on the newest 21 ms, and a pluck detector (full level within ~5 ms)
+   4. YIN on a 2× downsampled window: 4× less work per frame
+   5. octave guard: if the dip at twice the period is far deeper, the fundamental was weak (low courses)
+   6. clarity-weighted median over the last ~60 ms, steady within a third of a semitone
+   7. hysteresis between neighbouring notes / quarter tones, so the reading doesn't flicker
+   8. adaptive confirmation: a strong, clear pluck is confirmed in ~70 ms, a borderline one in ~150 ms
+   9. pluck-decay check: a string fades after the pluck, a voice swells, so voices are refused
+   10. Samaa's own notes are muted precisely, and the tuner needle is smoothed */
+const yinD = new Float32Array(1024);
+function yin(x, sr, thr = 0.12){
+  const W = 512, tauMin = Math.max(2, Math.floor(sr / 1000)), tauMax = Math.min(Math.floor(sr / 60), x.length - W - 1);
   let run = 0; yinD[0] = 1;
   for (let tau = 1; tau <= tauMax; tau++){
     let s = 0;
-    for (let i = 0; i < W; i++){ const x = buf[i] - buf[i + tau]; s += x * x; }
+    for (let i = 0; i < W; i++){ const d = x[i] - x[i + tau]; s += d * d; }
     run += s; yinD[tau] = run ? s * tau / run : 1;
   }
   let tau = -1;
   for (let t = tauMin; t <= tauMax; t++){
-    if (yinD[t] < thr){ while (t + 1 <= tauMax && yinD[t+1] < yinD[t]) t++; tau = t; break; }
+    if (yinD[t] < thr){ while (t + 1 <= tauMax && yinD[t + 1] < yinD[t]) t++; tau = t; break; }
   }
-  if (tau < 0) return -1;
-  const x0 = yinD[tau-1], x1 = yinD[tau], x2 = tau < tauMax ? yinD[tau+1] : x1;
+  if (tau < 0) return null;
+  // octave guard
+  const t2 = tau * 2;
+  if (t2 + 2 <= tauMax){
+    let best = t2; for (let j = t2 - 2; j <= t2 + 2; j++) if (yinD[j] < yinD[best]) best = j;
+    if (yinD[tau] > 0.04 && yinD[best] < yinD[tau] * 0.4) tau = best;   // only when the first match was a weak one
+  }
+  const x0 = yinD[tau - 1], x1 = yinD[tau], x2 = tau < tauMax ? yinD[tau + 1] : x1;
   const den = x0 + x2 - 2 * x1;
-  return sr / (den ? tau + (x0 - x2) / (2 * den) : tau);
+  return { f:sr / (den ? tau + (x0 - x2) / (2 * den) : tau), clarity:1 - x1 };
 }
+
+/* RBJ biquad, run in JS on each incoming chunk (so the band-pass is identical everywhere) */
+function biquad(type, f, sr, q = 0.707){
+  const w = 2 * Math.PI * f / sr, cs = Math.cos(w), al = Math.sin(w) / (2 * q);
+  const b = type === 'lp' ? [(1 - cs) / 2, 1 - cs, (1 - cs) / 2] : [(1 + cs) / 2, -(1 + cs), (1 + cs) / 2];
+  const a0 = 1 + al, a1 = -2 * cs, a2 = 1 - al;
+  const B0 = b[0] / a0, B1 = b[1] / a0, B2 = b[2] / a0, A1 = a1 / a0, A2 = a2 / a0;
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+  return buf => { for (let i = 0; i < buf.length; i++){ const x = buf[i], y = B0 * x + B1 * x1 + B2 * x2 - A1 * y1 - A2 * y2; x2 = x1; x1 = x; y2 = y1; y1 = y; buf[i] = y; } };
+}
+const TAP_WORKLET = `class SamaaTap extends AudioWorkletProcessor{
+  constructor(){ super(); this.b = new Float32Array(512); this.n = 0; }
+  process(inputs){ const ch = inputs[0] && inputs[0][0];
+    if (ch){ this.b.set(ch, this.n); this.n += ch.length; if (this.n >= 512){ this.port.postMessage(this.b.slice(0)); this.n = 0; } }
+    return true; } }
+registerProcessor('samaa-tap', SamaaTap);`;
 
 const Mic = {
   running:false, error:null, subs:new Set(), muteUntil:0, hist:[], cur:null,
-  cand:null, candSince:0, lastEmit:null, silentSince:0, stableMs:220, grid:1, floor:0.002, attackT:-1e9,
+  cand:null, candSince:0, lastEmit:null, silentSince:0, stableMs:150, grid:1, floor:0.002, attackT:-1e9, attackPeak:0,
+  N:4096, ring:null, dec:new Float32Array(1024),
   on(fn){ this.subs.add(fn); return () => this.subs.delete(fn); },
   emit(e){ for (const fn of [...this.subs]) fn(e); },
   muteFor(ms){ this.muteUntil = Math.max(this.muteUntil, performance.now() + ms); this.reset(); },
-  reset(){ this.hist = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; },
+  reset(){ this.hist = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; this.attackPeak = 0; },
   async start(){
     if (this.running) return true;
     try {
       await ensureCtx();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:{ channelCount:1, echoCancellation:false, noiseSuppression:false, autoGainControl:false, latency:0 } });
       const src = ctx.createMediaStreamSource(stream);
-      this.an = ctx.createAnalyser(); this.an.fftSize = 4096; src.connect(this.an);
-      this.buf = new Float32Array(this.an.fftSize);
-      this.running = true; this.error = null;
+      this.ring = new Float32Array(this.N);
+      if (ctx.audioWorklet && window.AudioWorkletNode){
+        const lp = src;   // the band-pass runs in feed()
+        try {
+          const url = URL.createObjectURL(new Blob([TAP_WORKLET], { type:'application/javascript' }));
+          await ctx.audioWorklet.addModule(url);
+          const node = new AudioWorkletNode(ctx, 'samaa-tap');
+          const sink = ctx.createGain(); sink.gain.value = 0;          // keeps the node running, silently
+          lp.connect(node); node.connect(sink).connect(ctx.destination);
+          node.port.onmessage = ev => this.feed(ev.data, performance.now());
+          this.running = true; this.error = null; this.mode = 'worklet';
+          return true;
+        } catch(e){ /* fall back to the analyser below */ }
+      }
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 60; hp.Q.value = 0.7;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1500; lp.Q.value = 0.7;
+      this.an = ctx.createAnalyser(); this.an.fftSize = this.N; src.connect(hp).connect(lp).connect(this.an);
+      this.buf = new Float32Array(this.N);
+      this.running = true; this.error = null; this.mode = 'frames';
       const loop = () => { this.tick(); requestAnimationFrame(loop); };
       requestAnimationFrame(loop);
       return true;
     } catch (e){ this.error = e; return false; }
   },
+  feed(chunk, t){
+    if (!this.bp){ const h = biquad('hp', 60, ctx.sampleRate), l = biquad('lp', 1500, ctx.sampleRate); this.bp = b => { h(b); l(b); }; }
+    this.bp(chunk);
+    const r = this.ring || (this.ring = new Float32Array(this.N));
+    r.copyWithin(0, chunk.length); r.set(chunk, this.N - chunk.length);
+    this.analyse(r, t, chunk.length);
+  },
   tick(){
-    if (S.settings.tap) return;
-    const t = performance.now();
     this.an.getFloatTimeDomainData(this.buf);
-    let rms = 0; for (let i = 0; i < this.buf.length; i++) rms += this.buf[i] * this.buf[i];
-    rms = Math.sqrt(rms / this.buf.length);
-    // Noise filter. 1) a level gate above the room's own noise floor; 2) the sound must be clearly
-    // pitched (strict YIN threshold); 3) the pitch must hold steady for ~100 ms, which a plucked
-    // string does and speech (constantly gliding) does not.
+    this.analyse(this.buf, performance.now(), Math.round(ctx.sampleRate / 60));
+  },
+  analyse(x, t, hop){
+    if (S.settings.tap) return;
+    const N = x.length, sr = ctx.sampleRate;
+    let rms = 0; for (let i = N - 1024; i < N; i++) rms += x[i] * x[i];
+    rms = Math.sqrt(rms / 1024);                                    // newest ~21 ms
     const sens = S.settings.sens;                                   // 1 (strict) .. 10 (picks up quiet plucks)
     const gate = Math.max(0.01 * Math.pow(10, (5 - sens) / 4), this.floor * 4);
-    const f = (rms > gate && t >= this.muteUntil) ? yin(this.buf.subarray(this.buf.length - 2048), ctx.sampleRate, 0.07 + sens * 0.01) : -1;
-    // 4) it must start with a pluck. On a smooth loudness envelope, a plucked string jumps to full
-    //    level within ~5 ms; a voice swells over tens of ms. The steady pitch must follow within 400 ms.
-    if (t >= this.muteUntil){
-      const sr = ctx.sampleRate, x = this.buf, N = x.length, k = Math.exp(-1 / (0.012 * sr));
-      const env = this.env || (this.env = new Float32Array(N));
+    const muted = t < this.muteUntil;
+    // pluck detector, scanning only audio that arrived since the last frame
+    if (!muted){
+      const k = Math.exp(-1 / (0.012 * sr)), env = this.env || (this.env = new Float32Array(N));
       let v = 0; for (let i = 0; i < N; i++){ const a = Math.abs(x[i]); v = a > v ? a : v * k; env[i] = v; }
       const w = Math.round(0.005 * sr), look = Math.round(0.02 * sr);
-      for (let i = Math.round(0.015 * sr); i + w + look < N; i += 32){
-        const hi = env[i + w];
-        if (hi > gate * 2 && hi > (env[i] > gate * 2 ? 1.6 : 3) * env[i]){   // from quiet, or a new pluck over a ringing string
-          let peak = hi; for (let j = i + w; j < i + w + look; j += 16) peak = Math.max(peak, env[j]);
-          if (hi >= 0.7 * peak && t - this.attackT > 60){ this.attackT = t; this.hist = []; this.cand = null; this.lastEmit = null; }   // a new pluck starts a new note
+      const from = Math.max(Math.round(0.015 * sr), N - hop - 2 * w - look - 32);
+      for (let i = from; i + 2 * w + look < N; i += 32){
+        // compare with the loudest point of the previous 20 ms, so a low string's per-cycle pulses aren't read as plucks
+        let before = env[i]; for (let j = Math.max(0, i - look); j < i; j += 16) before = Math.max(before, env[j]);
+        if (env[i + w] > gate * 2 && env[i + w] > (before > gate * 2 ? 1.6 : 3) * before){   // from quiet, or a new pluck over a ringing string
+          // rise time: from where the level starts climbing, how close to its peak is it 5 ms later?
+          let o = i; while (o < i + w && env[o + 1] <= env[i] * 1.2) o++;
+          let hi = 0; for (let j = o; j <= o + w; j += 8) hi = Math.max(hi, env[j]);      // loudest point in the first 5 ms
+          let peak = hi; for (let j = o; j < o + w + look; j += 16) peak = Math.max(peak, env[j]);
+          // plucks reach 0.6–1.0 of their peak in 5 ms; voices stay under 0.3
+          if (hi >= 0.45 * peak && t - this.attackT > 60){ this.attackT = t; this.attackPeak = rms; this.hist = []; this.cand = null; this.lastEmit = null; }
           break;
         }
       }
     }
-    if (f < 0 && rms < 0.2) this.floor = rms < this.floor ? this.floor * 0.9 + rms * 0.1 : this.floor * 0.995 + rms * 0.005;
-    if (f > 60 && f < 900 && t - this.attackT < 2500){
+    let r = null;
+    if (!muted && rms > gate){
+      const d = this.dec;
+      for (let i = 0, o = N - 2048; i < 1024; i++) d[i] = (x[o + 2 * i] + x[o + 2 * i + 1]) * 0.5;
+      r = yin(d, sr / 2, 0.07 + sens * 0.01);
+    }
+    if (!r && rms < 0.2) this.floor = rms < this.floor ? this.floor * 0.9 + rms * 0.1 : this.floor * 0.995 + rms * 0.005;
+    if (r && r.f > 60 && r.f < 900 && t - this.attackT < 2500){
       this.silentSince = 0;
-      this.hist.push(ftom(f)); if (this.hist.length > 6) this.hist.shift();
-      const sorted = [...this.hist].sort((a, b) => a - b), med = sorted[sorted.length >> 1];
-      const steady = this.hist.length >= 6 && sorted[sorted.length - 2] - sorted[1] < 0.3;
-      this.cur = steady ? { midi:med, freq:mtof(med), rms } : null;
-      if (!steady){ this.cand = null; this.emit({ type:'frame', cur:null }); return; }
-      const r = Math.round(med / this.grid) * this.grid;     // snap to semitones, or quarter tones in maqam routes
-      if (r !== this.cand){ this.cand = r; this.candSince = t; }
-      else if (t - this.candSince >= this.stableMs && this.candSince - this.attackT < 400 && (this.lastEmit === null || Math.abs(r - this.lastEmit) >= this.grid)){ this.lastEmit = r; this.emit({ type:'note', midi:med }); }
+      if (t - this.attackT < 60) this.attackPeak = Math.max(this.attackPeak, rms);
+      // octave fold: a low course flipping between its fundamental and 2nd harmonic is still one note
+      let m = ftom(r.f);
+      const ref = this.hist.length ? this.hist[this.hist.length - 1].m : null;
+      if (ref !== null){ const k = Math.round((m - ref) / 12); if (k && Math.abs(m - 12 * k - ref) < 0.4) m -= 12 * k; }
+      this.hist.push({ m, c:r.clarity, t });
+      while (this.hist.length && t - this.hist[0].t > 65) this.hist.shift();
+      const h = this.hist, sorted = h.map(e => e.m).sort((a, b) => a - b);
+      const span = h.length ? t - h[0].t : 0;
+      const clear = h.length && h.reduce((s, e) => s + e.c, 0) / h.length > 0.92;
+      const spread = sorted.length >= 5 ? sorted[sorted.length - 2] - sorted[1] : sorted[sorted.length - 1] - sorted[0];   // ignore one outlier each side once there are enough
+      const steady = (clear ? h.length >= 3 && span >= 20 : h.length >= 4 && span >= 30) && spread < 0.3;
+      if (!steady){ this.cur = null; this.cand = null; this.emit({ type:'frame', cur:null }); return; }
+      // clarity-weighted median
+      const byM = [...h].sort((a, b) => a.m - b.m), total = h.reduce((s, e) => s + e.c, 0);
+      let acc = 0, med = byM[0].m; for (const e of byM){ acc += e.c; if (acc >= total / 2){ med = e.m; break; } }
+      const clarity = total / h.length;
+      this.cur = { midi:med, freq:mtof(med), rms };
+      let q = Math.round(med / this.grid) * this.grid;
+      if (this.cand !== null && Math.abs(med - this.cand) < 0.65 * this.grid) q = this.cand;   // hysteresis
+      if (q !== this.cand){ this.cand = q; this.candSince = t; }
+      const need = clarity > 0.92 && rms > gate * 3 ? this.stableMs * 0.3 : this.stableMs;
+      const fading = t - this.attackT < 60 || rms <= this.attackPeak * 1.25;
+      // a new pluck, or a new pitch on a still-sounding string (another course, or a slide on the fretless neck)
+      const fresh = this.candSince - this.attackT < 400 || (this.lastEmit !== null && Math.abs(q - this.lastEmit) >= this.grid);
+      if (t - this.candSince >= need && fresh && fading
+          && (this.lastEmit === null || Math.abs(q - this.lastEmit) >= this.grid)){
+        this.lastEmit = q; this.emit({ type:'note', midi:med });
+      }
     } else {
       // only real quiet ends a sounding note; an unpitched moment (the pluck itself) does not
       if (rms >= gate) this.silentSince = 0; else if (!this.silentSince) this.silentSince = t;
@@ -845,6 +935,8 @@ const ex = {
     const n = seq(2, minStep, maxStep, pool);
     return { type:'direction', notes:n, answer: n[1] > n[0] ? 'up' : 'down' };
   },
+  directionN:(n) => ({ type:'direction', notes:n, answer: n[1] > n[0] ? 'up' : 'down' }),
+  contourN(n){ const d = (a, b) => b > a ? 'up' : 'down'; return { type:'contour', notes:n, answer:`${d(n[0], n[1])}-${d(n[1], n[2])}` }; },
   contour(minStep, maxStep, pool = SCALE){
     const n = seq(3, minStep, maxStep, pool);
     const d = (a, b) => b > a ? 'up' : 'down';
@@ -886,113 +978,171 @@ function seq(len, minStep = 1, maxStep = 1, pool = SCALE){
 }
 const times = (n, fn) => Array.from({ length:n }, fn);
 
-const LEVEL1 = { id:1, title:'One note', desc:'Hear one note, find it on your oud. All in Ajam (the major scale) on C.', c:'--primary', lessons:[
+/* ---------- taqsim phrases ----------
+   Short phrases that follow each maqam's sayr (its traditional melodic path): the core moves on the
+   first jins, the climb to the ghammaz (the second "home"), the upper jins, and the typical descents and
+   qaflas, including the notes a taqsim borrows on the way down (Rast's B♭, Nahawand's B and B♭, the
+   note under the tonic). Exercises draw their notes from these phrases, without saying so.
+   midi: 48 = C3, .5 = quarter tone. */
+const MOTIFS = {
+  ajam:     [[48,50,52,53,55], [55,53,52,50,48], [48,52,55,52,48], [52,53,55,57,55], [60,59,57,55], [55,57,59,60], [53,52,50,48], [50,52,53,52,50,48]],
+  rast:     [[48,53,51.5,50,48], [48,50,51.5,53,55], [55,53,51.5,50,48], [51.5,53,55,53,51.5,50,48], [55,57,58.5,60,58.5,57,55],
+             [60,58,57,55,53,51.5,50,48], [50,51.5,50,48,46.5,48], [57,55,53,51.5,53,50,48]],
+  bayati:   [[50,51.5,53,55,53,51.5,50], [55,53,51.5,50], [53,55,57,55,53,51.5,50], [55,57,58,60,58,57,55],
+             [62,60,58,57,55,53,51.5,50], [51.5,53,51.5,50,48,50], [50,53,51.5,55,53,51.5,50]],
+  hijaz:    [[50,51,54,55,54,51,50], [55,54,51,50], [54,55,57,58,57,55,54,51,50], [55,57,58,60,58,57,55],
+             [62,60,58,57,55,54,51,50], [51,50,48,50], [50,54,51,55,54,51,50]],
+  nahawand: [[48,50,51,53,55,53,51,50,48], [55,56,59,60,59,56,55], [60,58,56,55,53,51,50,48], [51,50,48,47,48],
+             [53,55,56,55,53,51,50], [48,51,50,53,51,55], [55,53,51,50,48]],
+  kurd:     [[50,51,53,55,53,51,50], [55,57,58,60,58,57,55], [58,57,55,53,51,50], [53,51,50,48,50],
+             [62,60,58,57,55,53,51,50], [51,53,51,50], [50,53,51,55,53,51,50]],
+  saba:     [[50,51.5,53,54,53,51.5,50], [53,54,57,58,57,54,53], [54,53,51.5,50], [53,51.5,50,48,50],
+             [58,57,54,53,51.5,50], [51.5,53,54,53,51.5,53,51.5,50]],
+  sikah:    [[51.5,53,55,53,51.5], [55,57,58.5,60,58.5,57,55], [55,53,51.5,50,48,50,51.5], [53,51.5,50,51.5],
+             [60,58.5,57,55,53,51.5], [51.5,55,53,51.5]],
+};
+/* a window of `len` notes from the phrases, optionally filtered; null if none fits */
+function taqsim(key, len, ok){
+  ok = ok || (() => true);
+  const pool = [];
+  for (const m of MOTIFS[key]) for (let s = 0; s + len <= m.length; s++){ const w = m.slice(s, s + len); if (ok(w)) pool.push(w); }
+  return pool.length ? pick(pool) : null;
+}
+const phrase = (key, len, ok, fallback) => (Math.random() < 0.85 && taqsim(key, len, ok)) || fallback();
+const stepPair = w => Math.abs(w[1] - w[0]) <= 2, skipPair = w => Math.abs(w[1] - w[0]) >= 3;
+/* single notes, one per exercise, walking through a phrase in order */
+const phraseNotes = (key, n, ok) => (taqsim(key, n, ok) || shuffle(SCALE).slice(0, n)).map(m => ex.echo([m]));
+
+const LEVEL1 = { id:1, key:'L1', title:'One note', desc:'Hear one note, find it on your oud. All in Ajam (the major scale) on C.', c:'--primary', lessons:[
     { id:'1-1', title:'Tune your oud', gen:() => [
       ex.intro('Meet Samaa', `<p>Samaa listens through your microphone and tells you which note you are playing.</p><p>First, tune your strings, lowest to highest: ${oudStrings().map(s => west(s.m)).join(' · ')}. You can switch tunings in your profile. Pluck one string, let it ring, and turn the peg until the needle sits in the middle.</p>`),
       ...oudStrings().map(ex.tune) ] },
     { id:'1-2', title:'High or low', gen:() => [
       ex.intro('Hear the direction first', `<p>Before you can play a note back, you need to hear where it sits. You will hear two notes. Which one is higher?</p><p>Big jumps first. They get closer as you go.</p>`),
-      ...times(3, () => ex.compare(6, 9)), ...times(3, () => ex.compare(3, 5)),
-      ex.echo([48]), ex.echo([55]) ] },
+      ...times(3, () => ex.compare(6, 9)), ...times(2, () => ex.compare(3, 5)), ex.echo([48]) ] },
     { id:'1-3', title:'Echo Do Re Mi', gen:() => [
-      ...times(2, () => ex.compare(1, 3)),
-      ...shuffle([48, 50, 52, 48, 52, 50]).map(m => ex.echo([m])) ] },
-    { id:'1-4', title:'The whole scale', gen:() => [
+      ex.compare(1, 3), ...phraseNotes('ajam', 5, w => w.every(m => m <= 52)).concat(phraseNotes('ajam', 5)).slice(0, 5) ] },
+    { id:'1-4', title:'Fa Sol La Si', gen:() => [
+      ...times(2, () => ex.compare(1, 2)), ...phraseNotes('ajam', 4, w => w.every(m => m >= 53)) ] },
+    { id:'1-5', title:'The whole scale', gen:() => [
       ex.intro('Hear it against Do', `<p>A note is easier to name when you hear it next to home. Samaa plays <b>Do (C)</b> first, then the mystery note.</p>`),
-      ...times(3, () => ex.name(SCALE)),
-      ...shuffle(SCALE).slice(0, 5).map(m => ex.echo([m])) ] },
+      ...times(2, () => ex.name(SCALE)), ...phraseNotes('ajam', 4) ] },
 ]};
 
 /* ---------- maqamat: each one is its own route through Levels 2 and 3 ----------
-   scale: midi notes, .5 = quarter tone. jins: size of the first jins (the lower building block).
+   scale: midi notes, .5 = quarter tone. jins: size of the first jins. gh: index of the ghammaz in the scale.
    foil: the jins a learner most easily confuses it with; sig: [the maqam's signature note, the foil's note]. */
 const MAQAMAT = [
-  { id:'rast', name:'Rast', ar:'راست', c:'--amber', tonic:'C', scale:[48,50,51.5,53,55,57,58.5,60], jins:4, quarter:true, start:true,
+  { id:'rast', name:'Rast', ar:'راست', c:'--amber', tonic:'C', scale:[48,50,51.5,53,55,57,58.5,60], jins:4, gh:4, quarter:true, start:true,
     foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51.5,52],
     about:'The “head” of the maqamat. Its third note, Sikah (E½♭), sits halfway between E♭ and E. That in-between sound is the heart of Arabic music.',
     sigText:'Listen for the third note. In Rast it is Sikah (E½♭), a quarter tone lower than the E of Ajam.' },
-  { id:'bayati', name:'Bayati', ar:'بياتي', c:'--violet', tonic:'D', scale:[50,51.5,53,55,57,58,60,62], jins:4, quarter:true,
+  { id:'bayati', name:'Bayati', ar:'بياتي', c:'--violet', tonic:'D', scale:[50,51.5,53,55,57,58,60,62], jins:4, gh:3, quarter:true,
     foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[51.5,51],
     about:'Warm and everywhere: folk songs, mawwal and recitation. Its second note, E½♭, is three quarter tones above D.',
     sigText:'Listen to the first step. Bayati climbs three quarter tones (D to E½♭). Kurd climbs only a half step (D to E♭).' },
-  { id:'hijaz', name:'Hijaz', ar:'حجاز', c:'--coral', tonic:'D', scale:[50,51,54,55,57,58,60,62], jins:4,
+  { id:'hijaz', name:'Hijaz', ar:'حجاز', c:'--coral', tonic:'D', scale:[50,51,54,55,57,58,60,62], jins:4, gh:3,
     foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[54,53],
     about:'The wide gap between E♭ and F♯ gives Hijaz its unmistakable color. No quarter tones here.',
     sigText:'Listen for the big step in the middle, E♭ to F♯. In Kurd that step is E♭ to F, much smaller.' },
-  { id:'nahawand', name:'Nahawand', ar:'نهاوند', c:'--plum', tonic:'C', scale:[48,50,51,53,55,56,58,60], jins:4,
+  { id:'nahawand', name:'Nahawand', ar:'نهاوند', c:'--plum', tonic:'C', scale:[48,50,51,53,55,56,58,60], jins:4, gh:4,
     foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51,52],
     about:'Lyrical and romantic, close to the Western minor scale. A good first maqam without quarter tones.',
     sigText:'Listen to the third note. Nahawand has E♭, Ajam has E natural.' },
-  { id:'kurd', name:'Kurd', ar:'كرد', c:'--sky', tonic:'D', scale:[50,51,53,55,57,58,60,62], jins:4,
+  { id:'kurd', name:'Kurd', ar:'كرد', c:'--sky', tonic:'D', scale:[50,51,53,55,57,58,60,62], jins:4, gh:3,
     foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[51,51.5],
     about:'Dark and plain: a half step right above the tonic, D to E♭.',
     sigText:'Listen to the first step. Kurd moves a half step (D to E♭). Bayati moves three quarter tones (D to E½♭).' },
-  { id:'saba', name:'Saba', ar:'صبا', c:'--olive', tonic:'D', scale:[50,51.5,53,54,57,58,60,61], jins:4, quarter:true, spell:{12:'G♭', 2:'D♭'},
+  { id:'saba', name:'Saba', ar:'صبا', c:'--olive', tonic:'D', scale:[50,51.5,53,54,57,58,60,61], jins:4, gh:2, quarter:true, spell:{12:'G♭', 2:'D♭'},
     foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[54,55],
     about:'The most sorrowful maqam. Its fourth note drops to G♭, so the scale never feels settled.',
     sigText:'Listen to the fourth note. Saba falls to G♭. Bayati reaches a full G.' },
-  { id:'sikah', name:'Sikah', ar:'سيكاه', c:'--primary', tonic:'E½♭', scale:[51.5,53,55,57,58.5,60,62,63.5], jins:3, quarter:true,
+  { id:'sikah', name:'Sikah', ar:'سيكاه', c:'--primary', tonic:'E½♭', scale:[51.5,53,55,57,58.5,60,62,63.5], jins:3, gh:2, quarter:true,
     foil:{ name:'Busalik', ar:'بوسليك', notes:[52,53,55] }, sig:[51.5,52],
     about:'It starts on the quarter-tone note itself, E½♭. Bright and floating, common in religious song.',
     sigText:'Listen to the very first note. Sikah starts on E½♭, a quarter tone lower than the E of Busalik.' },
 ];
 const MAQ = Object.fromEntries(MAQAMAT.map(m => [m.id, m]));
 function setCtx(mqId){ const mq = mqId && MAQ[mqId]; GRID = mq ? 0.5 : 1; SPELL = (mq && mq.spell) || {}; Mic.grid = GRID; }
+/* every note a maqam's exercises can ask for (scale, foil, and the notes its phrases borrow) */
+const maqamNotes = mq => [...new Set([...mq.scale, ...mq.foil.notes, ...mq.sig, ...MOTIFS[mq.id].flat()])].sort((a, b) => a - b);
 
+/* 5 lessons per level, 6 graded exercises each = 30 per level, then a mastery test */
 function route(mq){
-  const sc = mq.scale, jn = sc.slice(0, mq.jins);
+  const sc = mq.scale, jn = sc.slice(0, mq.jins), tonic = sc[0], gh = sc[mq.gh], k = mq.id;
+  const inJins = w => w.every(m => jn.includes(m));
+  const pair = ok => ex.echo(phrase(k, 2, ok, () => seq(2, 1, ok === skipPair ? 3 : 1, sc)));
+  const three = (ok, dur) => ex.echo(phrase(k, 3, ok, () => seq(3, 1, 2, ok ? jn : sc)), { dur });
+  const endsHome = w => w[w.length - 1] === tonic;
   const two = [
     { title:`Meet ${mq.name}`, gen:() => [
       ex.intro(`Maqam ${mq.name} · ${mq.ar}`, `<p>${mq.about}</p><p>Listen to the scale first. Every exercise on this route stays inside ${mq.name}.</p>`),
-      ex.scale(sc), ...times(3, () => ex.jins(mq)), ...shuffle(jn).map(m => ex.echo([m])) ] },
+      ex.scale(sc), ...times(2, () => ex.jins(mq)), ...(taqsim(k, 4, inJins) || shuffle(jn)).slice(0, 4).map(m => ex.echo([m])) ] },
     { title:'The signature note', gen:() => [
       ex.intro(`What makes it ${mq.name}`, `<p>${mq.sigText}</p>`),
-      ...times(3, () => ex.sig(mq)), ex.echo(jn, { dur:0.8 }), ...times(3, () => ex.echo(seq(2, 1, 1, jn))) ] },
-    { title:'Steps', gen:() => [ ...times(2, () => ex.direction(1, 1, sc)), ...times(5, () => ex.echo(seq(2, 1, 1, sc))) ] },
-    { title:'Skips', gen:() => [ ex.jins(mq), ...times(5, () => ex.echo(seq(2, 2, 4, sc))), ex.sig(mq) ] },
+      ...times(3, () => ex.sig(mq)), ex.echo(jn, { dur:0.8 }), ...times(2, () => pair(w => stepPair(w) && inJins(w))) ] },
+    { title:'Steps', gen:() => [ ex.directionN(phrase(k, 2, stepPair, () => seq(2, 1, 1, sc))), ...times(5, () => pair(stepPair)) ] },
+    { title:'Skips', gen:() => [ ex.jins(mq), ...times(4, () => pair(skipPair)), ex.sig(mq) ] },
+    { title:'The ghammaz', gen:() => [
+      ex.intro('The second home', `<p>Every maqam has a second resting note, the <b>ghammaz</b>. In ${mq.name} it is <b>${name(gh)}</b>. Phrases climb to it, rest there, and come back to ${mq.tonic}.</p>`),
+      ex.echo([tonic, gh]), ex.echo([gh, tonic]), ...times(4, () => pair(w => w.includes(gh) || w.includes(tonic))) ] },
   ];
-  const three = [
+  const threeL = [
     { title:'Inside the first jins', gen:() => [
       ex.intro('Jins: the building block', `<p>A maqam is built from small groups of 3 to 5 notes called <b>ajnas</b> (one is a <b>jins</b>). The first jins sets the mood.</p><p>Hum each phrase once before you play it.</p>`),
-      ...times(2, () => ex.contour(1, 1, jn)), ...times(5, () => ex.echo(seq(3, 1, 1, jn), { dur:0.75 })) ] },
-    { title:'Across the scale', gen:() => [ ...times(2, () => ex.contour(1, 2, sc)), ...times(6, () => ex.echo(seq(3, 1, 3, sc), { dur:0.7 })) ] },
+      ex.contourN(phrase(k, 3, inJins, () => seq(3, 1, 1, jn))), ...times(5, () => three(inJins, 0.75)) ] },
+    { title:'Across the scale', gen:() => [ ex.contourN(phrase(k, 3, null, () => seq(3, 1, 2, sc))), ...times(5, () => three(null, 0.7)) ] },
+    { title:'Four notes', gen:() => times(6, () => ex.echo(phrase(k, 4, null, () => seq(4, 1, 2, sc)), { dur:0.6 })) },
     { title:'Qafla: back home', gen:() => [
       ex.intro('Qafla', `<p>A <b>qafla</b> is the cadence that brings a phrase home. Every phrase here ends on the tonic, ${mq.tonic}.</p>`),
-      ...times(5, () => ex.echo(qafla(4, sc), { dur:0.6 })), ...times(2, () => ex.jins(mq)) ] },
+      ...times(5, () => ex.echo(phrase(k, 4, endsHome, () => qafla(4, sc)), { dur:0.6 })), ex.jins(mq) ] },
     { title:'Speed round', gen:() => [
       ex.intro('Speed round', `<p>Fast ${mq.name} phrases and only <b>one replay</b>. Listen hard the first time.</p>`),
-      ...times(6, () => ex.echo(seq(4, 1, 3, sc), { dur:0.45, replays:1, slow:false })) ] },
+      ...times(6, () => ex.echo(phrase(k, 4, null, () => seq(4, 1, 3, sc)), { dur:0.45, replays:1, slow:false })) ] },
   ];
   const lv = (n, title, desc, list) => {
-    const level = { id:n, title, desc, c:mq.c, mq:mq.id };
+    const level = { id:n, key:`${mq.id}-${n}`, title, desc, c:mq.c, mq:mq.id };
     level.lessons = list.map((ls, i) => ({ ...ls, id:`${mq.id}-${n}-${i+1}`, mq:mq.id, gen:() => ls.gen().map(e => ({ ...e, mq:mq.id })) }));
     return level;
   };
   return [
-    lv(2, `Two notes in ${mq.name}`, 'Intervals and the signature note of the maqam.', two),
-    lv(3, `${mq.name} phrases`, 'Three and four notes, ending in a qafla.', three),
+    lv(2, `Two notes in ${mq.name}`, 'Intervals, the signature note and the ghammaz.', two),
+    lv(3, `${mq.name} phrases`, 'Three and four notes, ending in a qafla.', threeL),
   ];
 }
 const ROUTES = Object.fromEntries(MAQAMAT.map(m => [m.id, route(m)]));
+/* mastery test: 12 exercises drawn from the level's lessons, no hints; 90% on the first try to pass */
+function addTest(level){
+  level.test = { id:`${level.key}-test`, title:'Mastery test', test:true, mq:level.mq,
+    gen:() => {
+      const per = level.lessons.filter(l => l.id !== '1-1').map(l => shuffle(l.gen().filter(e => !['intro', 'scale', 'tune'].includes(e.type))));
+      const out = []; for (let r = 0; out.length < 12 && r < 6; r++) for (const p of per) if (p[r] && out.length < 12) out.push(p[r]);
+      return shuffle(out).map(e => ({ ...e, test:true }));
+    } };
+}
+addTest(LEVEL1); MAQAMAT.forEach(m => ROUTES[m.id].forEach(addTest));
 const SOON = [
   { id:4, title:'Modulation', desc:'Move from one maqam to its sisters, the way a taqsim does.' },
   { id:5, title:'Rhythm and iqa\'', desc:'Phrases over Maqsum, Wahda and Samai.' },
   { id:6, title:'Taqsim phrases', desc:'Longer free phrases taken from real taqasim.' },
   { id:7, title:'Call and response', desc:'Answer long phrases, the way a takht does.' },
 ];
-const withLevel = lv => lv.lessons.map((ls, i) => ({ ...ls, level:lv, idx:i }));
+const withLevel = lv => [...lv.lessons.map((ls, i) => ({ ...ls, level:lv, idx:i })), { ...lv.test, level:lv, idx:lv.lessons.length }];
 const ALL = [...withLevel(LEVEL1), ...MAQAMAT.flatMap(m => ROUTES[m.id].flatMap(withLevel))];
 const byId = id => ALL.find(x => x.id === id);
 const isDone = id => (S.done[id] || 0) > 0;
-const level1Done = () => LEVEL1.lessons.every(l => isDone(l.id));
-const routeIds = mqId => ROUTES[mqId].flatMap(lv => lv.lessons.map(l => l.id));
+const mastered = lv => isDone(lv.test.id);
+const level1Done = () => mastered(LEVEL1);
+const levelIds = lv => [...lv.lessons.map(l => l.id), lv.test.id];
+const routeIds = mqId => ROUTES[mqId].flatMap(levelIds);
 function unlocked(id){
-  const ls = byId(id);
-  if (!ls.mq) return ls.idx === 0 || isDone(LEVEL1.lessons[ls.idx - 1].id);
-  const ids = routeIds(ls.mq), i = ids.indexOf(id);
-  return i === 0 ? level1Done() : isDone(ids[i - 1]);
+  const ls = byId(id), lv = ls.level;
+  if (ls.test) return lv.lessons.every(l => isDone(l.id));
+  if (ls.idx > 0) return isDone(lv.lessons[ls.idx - 1].id);
+  if (!lv.mq) return true;
+  return lv.id === 2 ? level1Done() : mastered(ROUTES[lv.mq][0]);
 }
-const currentId = () => { const p = [...LEVEL1.lessons.map(l => l.id), ...routeIds(S.maqam)]; return p.find(id => !isDone(id)) || p[p.length - 1]; };
+const currentId = () => { const p = [...levelIds(LEVEL1), ...routeIds(S.maqam)]; return p.find(id => !isDone(id)) || p[p.length - 1]; };
 
 /* ---------- shell ---------- */
 let tab = 'learn', viewCleanup = null;
@@ -1039,7 +1189,8 @@ function checkQuests(){
 }
 const BADGES = [
   { id:'tuned', name:'Tuned up', desc:'Tune all six courses of your oud', icon:'i-tuner', c:'--primary', goal:1, val:() => +isDone('1-1') },
-  { id:'level1', name:'First steps', desc:'Finish Level 1', icon:'i-star', c:'--sky', goal:4, val:() => LEVEL1.lessons.filter(l => isDone(l.id)).length },
+  { id:'level1', name:'First steps', desc:'Pass the Level 1 mastery test', icon:'i-star', c:'--sky', goal:1, val:() => +level1Done() },
+  { id:'master', name:'Maqam master', desc:'Master three levels', icon:'i-trophy', c:'--amber', goal:3, val:() => [LEVEL1, ...MAQAMAT.flatMap(m => ROUTES[m.id])].filter(mastered).length },
   { id:'streak', name:'On fire', desc:'Reach a 7-day streak', icon:'i-fire', c:'--amber', goal:7, val:() => S.bestStreak },
   { id:'xp', name:'Sharp ear', desc:'Earn 500 XP', icon:'i-bolt', c:'--violet', goal:500, val:() => S.xp },
   { id:'perfect', name:'Flawless', desc:'Finish 5 lessons with no mistakes', icon:'i-check', c:'--primary', goal:5, val:() => S.perfects },
@@ -1282,7 +1433,7 @@ function onboarding(step){
         <button class="opt" data-v="skip" aria-pressed="${OB.level === 'skip'}"><span class="qi" style="--c:var(--plum)">${icon('i-map')}</span><span>I can already find single notes<small>Skip Level 1 and pick a maqam route.</small></span></button>
       </div><button class="btn wide" id="obNext">Continue</button>`);
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => { OB.level = b.dataset.v; document.querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed', x === b)); });
-    $('#obNext').onclick = () => { if (OB.level === 'skip') LEVEL1.lessons.forEach(l => { S.done[l.id] = S.done[l.id] || 1; }); save(); next(); };
+    $('#obNext').onclick = () => { if (OB.level === 'skip') levelIds(LEVEL1).forEach(id => { S.done[id] = S.done[id] || 1; }); save(); next(); };
   } else if (step === 2){
     showAuth(`${dots}<h2 style="font-size:28px">Pick a daily goal</h2><p class="form-note" style="text-align:left">A lesson earns 10 to 15 XP. Small and daily beats long and rare.</p>
       <div class="opt-list">${GOALS.map(([v, l]) => `<button class="opt" data-v="${v}" aria-pressed="${S.goal === v}"><span class="qi" style="--c:var(--violet)">${icon('i-bolt')}</span><span>${l}<small>${v} XP a day · about ${Math.max(1, Math.round(v / 12))} lesson${v > 12 ? 's' : ''}</small></span></button>`).join('')}</div>
@@ -1313,7 +1464,10 @@ async function micCheck(done){
   $('#calSkip').onclick = () => { stop = true; done(); };
   S.settings.tap = false;
   if (!await Mic.start()){ $('#calMsg').textContent = 'The microphone is blocked. Allow it in your browser settings, or skip and use on-screen keys.'; return; }
-  const lvl = () => { const b = Mic.buf; Mic.an.getFloatTimeDomainData(b); let r = 0; for (let i = 0; i < b.length; i++) r += b[i] * b[i]; return Math.sqrt(r / b.length); };
+  const lvl = () => {   // level of the newest ~21 ms, from whichever capture mode is running
+    let b = Mic.ring; if (Mic.mode === 'frames'){ Mic.an.getFloatTimeDomainData(Mic.buf); b = Mic.buf; }
+    let r = 0; for (let i = b.length - 1024; i < b.length; i++) r += b[i] * b[i]; return Math.sqrt(r / 1024);
+  };
   const meter = r => { const el = $('#calLvl'); if (el) el.style.width = `${Math.min(100, r * 400)}%`; };
   const mark = id => { const el = $(id); if (el){ el.classList.add('done'); el.querySelector('.qi').innerHTML = icon('i-check'); } };
   // 1. room noise
@@ -1402,20 +1556,19 @@ function renderLearn(){
     html += `<section class="level" style="${c}">
       <div class="banner ${lv.soon ? 'locked' : ''}" style="background:var(--c)">
         <div><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name} ${mq.ar}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p></div>
-        ${lv.soon ? `<span class="soon">Coming soon</span>` : ''}
+        ${lv.soon ? `<span class="soon">Coming soon</span>` : lv.test && mastered(lv) ? `<span class="soon" style="background:rgb(255 255 255 / .22)">${icon('i-trophy', 'mini')} Mastered</span>` : ''}
       </div><div class="path">`;
-    const items = lv.lessons || times(3, (_, i) => ({ id:`${lv.id}-${i+1}`, soon:true }));
+    const items = lv.lessons ? [...lv.lessons, lv.test] : times(3, (_, i) => ({ id:`${lv.id}-${i+1}`, soon:true }));
     items.forEach((ls, i) => {
       const open = !ls.soon && unlocked(ls.id), done = !ls.soon && isDone(ls.id), here = ls.id === cur && !ls.soon;
-      const ico = ls.soon || !open ? 'i-lock' : done ? 'i-check' : i === 0 && lv.id === 1 ? 'i-tuner' : 'i-star';
+      const ico = ls.soon || !open ? (ls.test ? 'i-trophy' : 'i-lock') : ls.test ? 'i-trophy' : done ? 'i-check' : i === 0 && lv.id === 1 ? 'i-tuner' : 'i-star';
       html += `<div class="node-wrap" style="transform:translateX(${OFF[i % 8]}px)">
         ${here ? `<span class="start-tag">${done ? 'AGAIN' : 'START'}</span>` : ''}
-        <button class="node ${open ? '' : 'locked'} ${here ? 'current' : ''}" data-lesson="${ls.soon ? '' : ls.id}" ${open ? '' : 'aria-disabled="true"'} aria-label="${ls.title || 'Locked lesson'}">${icon(ico)}</button>
+        <button class="node ${open ? '' : 'locked'} ${here ? 'current' : ''}" ${ls.test && open ? 'style="--c:var(--amber);--c-d:var(--amber-d)"' : ''} data-lesson="${ls.soon ? '' : ls.id}" ${open ? '' : 'aria-disabled="true"'} aria-label="${ls.title || 'Locked lesson'}">${icon(ico)}</button>
         ${done && S.done[ls.id] > 1 ? `<span class="done-count">×${S.done[ls.id]}</span>` : ''}
         ${ls.title ? `<span class="node-label">${ls.title}</span>` : ''}
       </div>`;
     });
-    if (!lv.soon) html += `<div class="node-wrap"><button class="node ${lv.lessons.every(l => isDone(l.id)) ? '' : 'locked'}" style="--c:var(--amber);--c-d:var(--amber-d)" aria-label="Level ${lv.id} reward" data-chest="${lv.mq || ''}:${lv.id}">${icon('i-chest')}</button></div>`;
     html += `</div></section>`;
   }
   $('#view').innerHTML = html;
@@ -1426,15 +1579,6 @@ function renderLearn(){
   document.querySelectorAll('[data-maqam]').forEach(b => b.onclick = () => {
     S.maqam = b.dataset.maqam; save(); renderLearn();
     document.querySelector('.pick')?.scrollIntoView({ block:'start' });
-  });
-  document.querySelectorAll('[data-chest]').forEach(b => b.onclick = () => {
-    const [mq, n] = b.dataset.chest.split(':');
-    const lv = mq ? ROUTES[mq][n - 2] : LEVEL1;
-    const key = b.dataset.chest, full = lv.lessons.every(l => isDone(l.id)), fresh = full && !S.chests.includes(key);
-    if (fresh){ S.chests.push(key); S.pearls += 40; save(); renderStats(); sfx(true); }
-    openModal(full
-      ? `<h3>${fresh ? 'You opened the chest!' : `Level ${lv.id} complete`}</h3>${fresh ? `<p class="wallet">${icon('i-pearl')}+40 pearls</p>` : ''}<p>You finished “${lv.title}”. Replay any lesson to keep the skill sharp.</p><button class="btn wide" onclick="closeModal()">Nice</button>`
-      : `<h3>Level chest</h3><p>Finish every lesson in Level ${lv.id} to open it and get 40 pearls.</p><button class="btn wide" onclick="closeModal()">Got it</button>`);
   });
   const curNode = document.querySelector('.node.current');
   if (curNode && ALL.findIndex(x => x.id === cur) > 0) curNode.scrollIntoView({ block:'center' });
@@ -1456,9 +1600,18 @@ function maqamPicker(){
 function lessonCard(id){
   if (!id) { openModal(`<h3>Coming soon</h3><p>We are building Levels 4 to 7: modulation, rhythm, taqsim phrases and call and response.</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
   const ls = byId(id);
-  if (!unlocked(id)){ openModal(`<h3>${ls.title}</h3><p>${ls.mq && !level1Done() ? 'Finish Level 1 to open the maqam routes.' : 'Finish the lesson before this one to unlock it.'}</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
-  openModal(`<h3>${ls.title}</h3><p>Level ${ls.level.id}${ls.mq ? ` · Maqam ${MAQ[ls.mq].name}` : ''} · Lesson ${ls.idx + 1} of ${ls.level.lessons.length}</p>
-    <button class="btn wide" id="go">${isDone(id) ? `Practice +${5 * xpMult()} XP` : `Start +${10 * xpMult()} XP`}</button>`, ls.level.c);
+  if (!unlocked(id)){
+    const why = ls.test ? `Pass all ${ls.level.lessons.length} lessons of this level first.`
+      : ls.idx === 0 && ls.mq ? `Pass the mastery test of ${ls.level.id === 2 ? 'Level 1' : `Level 2 in ${MAQ[ls.mq].name}`} to open this level.`
+      : 'Pass the lesson before this one to unlock it.';
+    openModal(`<h3>${ls.title}</h3><p>${why}</p><button class="btn wide" onclick="closeModal()">OK</button>`); return;
+  }
+  const where = `Level ${ls.level.id}${ls.mq ? ` · Maqam ${MAQ[ls.mq].name}` : ''}`;
+  openModal(ls.test
+    ? `<h3>Mastery test</h3><p>${where} · 12 exercises from the whole level, no hints. Get <b>90%</b> right on the first try to master the level${mastered(ls.level) ? '' : ' and unlock the next one'}.</p>
+       <button class="btn wide" id="go">${mastered(ls.level) ? 'Take it again' : 'Start the test'}</button>`
+    : `<h3>${ls.title}</h3><p>${where} · Lesson ${ls.idx + 1} of ${ls.level.lessons.length} · 6 exercises. ${id === '1-1' ? '' : 'Pass with 80% right on the first try.'}</p>
+       <button class="btn wide" id="go">${isDone(id) ? `Practice +${5 * xpMult()} XP` : `Start +${10 * xpMult()} XP`}</button>`, ls.test ? '--amber' : ls.level.c);
   $('#go').onclick = () => { closeModal(); startLesson(id); };
 }
 
@@ -1470,7 +1623,7 @@ function startLesson(id, practice = false){
     queue = shuffle(tricky().flatMap(t => [ex.echo([t.m]), ex.echo([t.m])].map(e => ({ ...e, mq:t.mq || undefined }))));
     ls = { id:'tricky', title:'Tricky notes', level:{ c:'--coral' } };
   } else if (practice){
-    const pool = ALL.filter(x => isDone(x.id) && x.id !== '1-1');
+    const pool = ALL.filter(x => isDone(x.id) && x.id !== '1-1' && !x.test);
     const src = pool.length ? pool : [ALL[1]];
     queue = shuffle(src.flatMap(x => x.gen()).filter(e => e.type !== 'intro' && e.type !== 'scale')).slice(0, 8);
     ls = { id:'practice', title:'Practice', level:{ c:'--sky' } };
@@ -1478,7 +1631,7 @@ function startLesson(id, practice = false){
     ls = ALL.find(x => x.id === id);
     queue = ls.gen();
   }
-  L = { ls, practice, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0 };
+  L = { ls, practice, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0, firstOk:0 };
   $('#lesson').hidden = false; document.body.style.overflow = 'hidden';
   renderEx();
 }
@@ -1503,6 +1656,7 @@ function renderEx(){
   if (L.idx >= L.queue.length) return complete();
   const e = L.queue[L.idx];
   setCtx(e.mq);
+  L.curSlip = false;
   setProgress();
   $('#lbody').className = 'wrap center';
   ({ intro:exIntro, scale:exScale, jins:exChoice, tune:exTune, echo:exEcho, compare:exChoice, same:exChoice, direction:exChoice, contour:exChoice, name:exChoice })[e.type](e, $('#lbody'));
@@ -1515,6 +1669,7 @@ function verdict(ok, detail, replay){
   sfx(ok);
   L.answered++;
   if (ok){
+    if (!e.retry && !L.curSlip) L.firstOk++;   // mastery counts first-try answers only
     L.done++; L.combo = (L.combo || 0) + 1;
     const q = today(); q.combo = Math.max(q.combo, L.combo);
     if (L.combo === 5) checkQuests();
@@ -1542,7 +1697,10 @@ function complete(){
   const secs = Math.round((Date.now() - L.t0) / 1000);
   const acc = L.answered ? Math.round(100 * (L.answered - L.wrong - L.slips) / L.answered) : 100;
   const again = !L.practice && isDone(L.ls.id), perfect = L.wrong === 0 && L.slips === 0, mult = xpMult();
-  const xp = (L.practice || again ? 5 : 10 + (perfect ? 5 : 0)) * mult;
+  const rate = L.total ? L.firstOk / L.total : 1, need = L.ls.test ? 0.9 : 0.8;
+  const passed = L.practice || L.ls.id === '1-1' || rate >= need;
+  const newlyMastered = L.ls.test && passed && !again;
+  const xp = (L.practice || again || !passed ? 5 : L.ls.test ? 30 : 10 + (perfect ? 5 : 0)) * mult;
   const pearls = L.practice ? 5 : 10 + (perfect ? 5 : 0);
   S.xp += xp; S.pearls += pearls; S.lessons = (S.lessons || 0) + 1;
   if (perfect && !L.practice) S.perfects++;
@@ -1555,23 +1713,29 @@ function complete(){
     S.bestStreak = Math.max(S.bestStreak, S.streak);
     if (S.streak % 7 === 0){ S.pearls += 25; setTimeout(() => toast(`${S.streak}-day streak bonus`, '+25'), 900); }
   }
-  if (!L.practice) S.done[L.ls.id] = (S.done[L.ls.id] || 0) + 1;
+  if (!L.practice && passed) S.done[L.ls.id] = (S.done[L.ls.id] || 0) + 1;
+  if (newlyMastered){ S.pearls += 40; setTimeout(() => toast(`Level ${L.ls.level.id} mastered`, '+40', 'i-trophy'), 700); }
   save();
   $('#bar').style.width = '100%';
   $('#lbody').className = 'wrap complete';
-  $('#lbody').innerHTML = `${mascot(undefined, 'bounce')}
-    <h2>${L.practice ? 'Practice complete!' : 'Lesson complete!'}</h2>
-    <p>${L.practice ? 'Your ear is staying sharp.' : perfect ? 'A perfect lesson. Your ear is waking up.' : 'Your ear gets sharper every time.'}</p>
+  const pct = Math.round(rate * 100), firstTry = `${L.firstOk} of ${L.total} right on the first try (${pct}%)`;
+  $('#lbody').innerHTML = `${mascot(undefined, passed ? 'bounce' : '')}
+    <h2 style="${passed ? '' : 'color:var(--coral)'}">${!passed ? 'Almost there' : L.practice ? 'Practice complete!' : L.ls.test ? `Level ${L.ls.level.id} mastered!` : 'Lesson passed!'}</h2>
+    <p>${!passed ? `${firstTry}. You need ${need * 100}% to pass${L.ls.test ? ' the mastery test' : ''}. Each try trains your ear.`
+      : L.practice ? 'Your ear is staying sharp.' : L.ls.test ? `${firstTry}. You've truly got this level.` : perfect ? 'A perfect lesson. Your ear is waking up.' : `${firstTry}. Your ear gets sharper every time.`}</p>
     <div class="result-tiles">
       <div class="rt" style="--c:var(--violet)"><b>${icon('i-bolt')}${xp}</b><span>XP${mult > 1 ? ' ×2' : ''}</span></div>
       <div class="rt" style="--c:var(--pearl)"><b>${icon('i-pearl')}${pearls}</b><span>Pearls</span></div>
-      <div class="rt" style="--c:var(--primary)"><b>${acc}%</b><span>Accuracy</span></div>
+      <div class="rt" style="--c:var(${passed ? '--primary' : '--coral'})"><b>${L.practice ? acc : pct}%</b><span>${L.practice ? 'Accuracy' : 'First try'}</span></div>
       <div class="rt" style="--c:var(--sky)"><b>${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</b><span>Time</span></div>
     </div>`;
-  footer(`<span></span><button class="btn" id="fin">Continue</button>`);
-  sfx(true);
+  const retryId = L.ls.id;
+  footer(passed ? `<span></span><button class="btn" id="fin">Continue</button>`
+    : `<button class="btn ghost" id="fin">Later</button><button class="btn" id="again">Try again</button>`);
+  sfx(passed);
   setTimeout(() => { checkQuests(); checkBadges(); }, 500);
   $('#fin').onclick = extended ? streakScreen : endLesson;
+  if ($('#again')) $('#again').onclick = () => { if (L.cleanup) L.cleanup(); startLesson(retryId); };
 }
 function streakScreen(){
   $('#lbody').innerHTML = `<div class="streak-hero">${icon('i-fire')}<b>${S.streak}</b></div>
@@ -1608,7 +1772,7 @@ function keysHtml(){
   const e = L && L.queue[L.idx];
   if (e && e.mq){
     // maqam routes: the maqam's notes plus the foil notes, so quarter tones can be told apart
-    const mq = MAQ[e.mq], notes = [...new Set([...mq.scale, ...mq.foil.notes, ...mq.sig])].sort((a, b) => a - b);
+    const mq = MAQ[e.mq], notes = maqamNotes(mq);
     return `<div class="pad">${notes.map(m => `<button class="pk" data-m="${m}">${name(m)}<small>${ARL[qOf(m)] || ''}</small></button>`).join('')}</div>`;
   }
   const whites = [48,50,52,53,55,57,59,60], blacks = [[49,0],[51,1],[54,3],[56,4],[58,5]];
@@ -1648,7 +1812,7 @@ function exEcho(e, body){
   const n = e.notes.length;
   // No failing here: wrong notes only steer you (higher / lower) until you find the right one.
   let slot = 0, slotMiss = 0, mistakes = 0, replaysLeft = e.replays, finished = false, hinted = false, revealed = false;
-  Mic.stableMs = e.dur < 0.6 ? 160 : 220;
+  Mic.stableMs = e.dur < 0.6 ? 110 : 150;
   const render = () => {
     if (L.cleanup){ L.cleanup(); L.cleanup = null; }
     body.innerHTML = `<div class="ex-grid"><div class="ex-main">
@@ -1662,7 +1826,7 @@ function exEcho(e, body){
       <div class="slots">${e.notes.map((m, i) => `<div class="slot ${i < slot ? 'ok' : i === slot ? 'active' : ''}" data-i="${i}">${i < slot ? name(m) : '?'}</div>`).join('')}</div>
       <p class="hint" id="hint" aria-live="polite"></p>
       </div><div class="ex-side">${inputPanel()}</div></div>`;
-    footer(`<button class="btn ghost" id="skip">Can't play now</button><button class="link" id="reveal" ${mistakes >= 3 && !revealed ? '' : 'hidden'}>Show me the note</button>`);
+    footer(`<button class="btn ghost" id="skip">Can't play now</button><button class="link" id="reveal" ${mistakes >= 3 && !revealed && !e.test ? '' : 'hidden'}>Show me the note</button>`);
     $('#skip').onclick = skipEx;
     $('#reveal').onclick = reveal;
     showReplays();
@@ -1713,7 +1877,7 @@ function exEcho(e, body){
       const nx = document.querySelector(`.slot[data-i="${slot}"]`); if (nx) nx.classList.add('active');
       if (slot === n){
         finished = true;
-        if (mistakes){ L.slips++; L.combo = 0; }   // found it, but not first try: no "in a row" credit
+        if (mistakes){ L.slips++; L.combo = 0; L.curSlip = true; }   // found it, but not first try: no "in a row" credit
         const what = n > 1 ? e.notes.map(name).join(' – ') : `That was ${name(target)} (${sub(target)})`;
         verdict(true, mistakes ? `${what}. Found it after ${mistakes + 1} tries.` : what);
       }
@@ -1726,7 +1890,7 @@ function exEcho(e, body){
     $('#hint').className = 'hint bad';
     const gap = Math.max(GRID, Math.round(Math.abs(d) / GRID) * GRID);
     $('#hint').textContent = `You played ${name(m)}. That's ${gapText(gap)} too ${d > 0 ? 'high' : 'low'}. Go ${dir}`;
-    if (mistakes >= 3 && !revealed) $('#reveal').hidden = false;
+    if (mistakes >= 3 && !revealed && !e.test) $('#reveal').hidden = false;
   };
   render();
   setTimeout(() => { if (L && L.queue[L.idx] === e) listen(e.dur, false); }, 350);
@@ -1786,12 +1950,14 @@ function gaugeSvg(){
       <line x1="100" y1="105" x2="100" y2="28" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
     </g><circle cx="100" cy="105" r="8" fill="var(--ink)"/></svg>`;
 }
+let needleS = null;
 function setNeedle(cents){
   const n = $('#needle'); if (!n) return;
-  if (cents == null){ n.style.opacity = .25; return; }
-  const c = Math.max(-50, Math.min(50, cents));
+  if (cents == null){ n.style.opacity = .25; needleS = null; return; }
+  needleS = needleS == null ? cents : needleS * 0.6 + cents * 0.4;   // smoothed, so the needle doesn't jitter
+  const c = Math.max(-50, Math.min(50, needleS));
   n.style.opacity = 1; n.style.transform = `rotate(${c / 50 * 60}deg)`;
-  n.querySelector('line').setAttribute('stroke', Math.abs(cents) <= 15 ? 'var(--primary)' : 'var(--ink)');
+  n.querySelector('line').setAttribute('stroke', Math.abs(needleS) <= 15 ? 'var(--primary)' : 'var(--ink)');
 }
 
 /* ----- exercise: listening choices ----- */
@@ -1915,7 +2081,7 @@ function xpChart(){
     ${days.map((x, i) => `<div class="bar-col ${i === 6 ? 'today' : ''}"><em>${x.v || ''}</em><i style="height:${Math.max(4, x.v / max * H)}px"></i><em>${i === 6 ? 'Today' : 'SMTWTFS'[x.d.getDay()]}</em></div>`).join('')}</div>`;
 }
 function renderProfile(){
-  const doneCount = ALL.filter(x => isDone(x.id)).length;
+  const doneCount = ALL.filter(x => !x.test && isDone(x.id)).length;
   const explored = MAQAMAT.filter(m => routeIds(m.id).some(isDone)).length;
   const since = new Date(`${S.joined}T12:00`).toLocaleDateString(undefined, { month:'long', year:'numeric' });
   const week = times(7, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return S.daily[dayKey(d)] || 0; }).reduce((a, b) => a + b, 0);

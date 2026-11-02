@@ -7,7 +7,10 @@ maqamat (Rast, Bayati, Hijaz, Nahawand, Kurd, Saba, Sikah), quarter tones includ
 
 ## Features
 
-- Pitch detection tuned for the oud: ignores speech and room noise, reacts to plucked notes
+- Pitch detection tuned for the oud: audio-thread capture, band-pass filtering, pluck and decay checks,
+  octave guard and hysteresis. A pluck registers in about 140 ms; speech and room noise are ignored
+- 30 exercises per level, an 80% first-try pass mark per lesson, and a 90% mastery test to finish each level
+- Phrases follow the sayr of each maqam, as heard in taqasim
 - Quarter-tone aware matching and note names (Rast, Dukah, Sikah, Jaharkah, Nawa…)
 - Levels, daily quests, XP, streaks with streak freezes, pearls and a shop
 - Accounts with cloud-saved progress, a weekly league, and guest mode
