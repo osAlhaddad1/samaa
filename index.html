@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Samaa Ear Trainer</title>
+<meta name="description" content="Learn to play the oud by ear: hear a note, play it back, and get guided higher or lower until you hit it. Lessons in the Arabic maqamat.">
+<meta name="theme-color" content="#12A182">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one centered learning column, chunky tactile buttons, a winding lesson path per level. */
+:root{
+  --bg:#F3F7F6; --surface:#FFFFFF; --line:#DCE5E3; --ink:#1B2928; --muted:#667976;
+  --primary:#12A182; --primary-d:#0B7A62; --sky:#2F8AE8; --sky-d:#1E66B3;
+  --amber:#F2A22B; --amber-d:#C27A0C; --coral:#E5504A; --coral-d:#B13430;
+  --violet:#8A5CF0; --violet-d:#6439C8; --wood:#B9773F; --wood-d:#7A4A22;
+  --plum:#B8478F; --plum-d:#8C2E6B; --olive:#6E9420; --olive-d:#527013; --pearl:#1C9DC2; --pearl-d:#13748F;
+  --ok-soft:#D7F4EA; --ok-ink:#0B7A62; --bad-soft:#FCE2E0; --bad-ink:#B13430;
+  --lock:#E3E9E8; --lock-d:#C7D0CE; --lock-ink:#98A6A3; --key-black:#1B2928;
+  --f-display:"Baloo Bhaijaan 2","Nunito",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#101817; --surface:#192423; --line:#2A3836; --ink:#E8F1EF; --muted:#8EA19D;
+  --ok-soft:#14372E; --ok-ink:#5FD9B5; --pearl:#4CC3E6; --pearl-d:#2A8FB0; --bad-soft:#3B1E1D; --bad-ink:#FF8F89;
+  --lock:#263230; --lock-d:#1A2422; --lock-ink:#5F716E; --key-black:#060B0A; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#101817; --surface:#192423; --line:#2A3836; --ink:#E8F1EF; --muted:#8EA19D;
+  --ok-soft:#14372E; --ok-ink:#5FD9B5; --pearl:#4CC3E6; --pearl-d:#2A8FB0; --bad-soft:#3B1E1D; --bad-ink:#FF8F89;
+  --lock:#263230; --lock-d:#1A2422; --lock-ink:#5F716E; --key-black:#060B0A; color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.45 var(--f-body);-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.15;text-wrap:balance}
+.wrap{max-width:600px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+[hidden]{display:none!important}
+
+/* chunky buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border-radius:var(--r);
+  background:var(--primary);color:#fff;box-shadow:0 4px 0 var(--primary-d);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:15px;transition:transform .06s,box-shadow .06s,filter .15s}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 0 0 var(--primary-d)}
+.btn:hover:not(:disabled){filter:brightness(1.05)}
+.btn:disabled{background:var(--lock);color:var(--lock-ink);box-shadow:0 4px 0 var(--lock-d);cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--muted);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.ghost:active{box-shadow:0 0 0 var(--line)}
+.btn.bad{background:var(--coral);box-shadow:0 4px 0 var(--coral-d)}
+.btn.wide{width:100%}
+.link{color:var(--sky);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:13px;padding:8px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:2px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--primary)}
+.brand small{font-size:15px;color:var(--muted);font-weight:700}
+.stats{display:flex;gap:14px;font-weight:800}
+.stat{display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
+.stat svg{width:22px;height:22px}
+.stat.fire{color:var(--amber)} .stat.xp{color:var(--violet)} .stat.heart{color:var(--coral)}
+.stat.dim{color:var(--lock-ink)}
+
+main{padding-block:20px 110px}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav .wrap{display:flex;justify-content:space-around;height:64px;align-items:center}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 16px;border-radius:12px;border:2px solid transparent}
+.nav button svg{width:26px;height:26px}
+.nav button[aria-current="page"]{color:var(--sky);background:color-mix(in srgb,var(--sky) 12%,transparent);border-color:color-mix(in srgb,var(--sky) 40%,transparent)}
+
+/* path */
+.level{margin-bottom:36px}
+.banner{border-radius:var(--r);padding:16px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 4px 0 var(--c-d)}
+.banner .eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.banner h2{font-size:24px;margin:2px 0}
+.banner p{margin:0;font-size:14px;opacity:.95;max-width:40ch}
+.banner.locked{background:var(--lock)!important;color:var(--lock-ink);box-shadow:0 4px 0 var(--lock-d)}
+.soon{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:color-mix(in srgb,var(--lock-ink) 18%,transparent);padding:4px 8px;border-radius:999px;white-space:nowrap}
+.path{display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px 0 6px;position:relative}
+.node-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.node{width:76px;height:70px;border-radius:50%;background:var(--c);box-shadow:0 7px 0 var(--c-d);display:grid;place-items:center;color:#fff;transition:transform .06s,box-shadow .06s}
+.node svg{width:34px;height:34px}
+.node:active:not(:disabled){transform:translateY(6px);box-shadow:0 1px 0 var(--c-d)}
+.node.locked{background:var(--lock);box-shadow:0 7px 0 var(--lock-d);color:var(--lock-ink);cursor:not-allowed}
+.node.current{outline:6px solid color-mix(in srgb,var(--c) 28%,transparent);outline-offset:6px}
+.node-label{margin-top:12px;font-size:13px;font-weight:800;color:var(--muted);text-align:center}
+.start-tag{position:absolute;top:-38px;background:var(--surface);color:var(--c);border:2px solid var(--line);font-weight:800;font-size:13px;letter-spacing:.1em;padding:5px 12px;border-radius:12px;animation:bob 1.4s ease-in-out infinite;white-space:nowrap}
+.start-tag::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:var(--surface);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.done-count{position:absolute;right:-6px;top:-4px;background:var(--amber);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:1px 6px;box-shadow:0 2px 0 var(--amber-d)}
+.practice-card{display:flex;gap:14px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:28px}
+.practice-card p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.practice-card>div{flex:1;min-width:0}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgb(0 0 0 / .45);display:grid;place-items:end center;padding:16px}
+@media (min-width:640px){.modal{place-items:center}}
+.card{width:100%;max-width:420px;background:var(--surface);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:14px;border:2px solid var(--line);margin-bottom:env(safe-area-inset-bottom,0px)}
+.card.colored{background:var(--c);color:#fff;border:0}
+.card.colored .btn{background:#fff;color:var(--c);box-shadow:0 4px 0 rgb(0 0 0 / .18)}
+.card h3{font-size:24px}
+.card p{margin:0}
+.card .row{display:flex;gap:10px;flex-wrap:wrap}
+.card .row .btn{flex:1}
+
+/* lesson */
+.lesson{position:fixed;inset:0;z-index:10;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.lesson .wrap{max-width:1000px}
+.lhead .wrap{display:flex;align-items:center;gap:14px;height:clamp(48px,8vh,64px)}
+.kbd-hint{display:none;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.kbd-hint kbd{font:800 11px var(--f-body);border:2px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:1px 5px;margin:0 2px;color:var(--ink)}
+@media (min-width:900px) and (hover:hover){.kbd-hint{display:inline}}
+.x{width:36px;height:36px;display:grid;place-items:center;color:var(--lock-ink);border-radius:10px}
+.x svg{width:26px;height:26px}
+.bar{flex:1;height:16px;background:var(--lock);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--primary);border-radius:999px;transition:width .35s cubic-bezier(.3,1.4,.6,1);position:relative}
+.bar i::after{content:"";position:absolute;left:8px;right:8px;top:3px;height:4px;border-radius:9px;background:rgb(255 255 255 / .3)}
+.lbody{flex:1;overflow-y:auto}
+.lbody .wrap{padding-block:clamp(6px,1.6vh,14px) clamp(10px,2vh,24px);display:flex;flex-direction:column;gap:clamp(8px,1.8vh,18px);min-height:100%}
+.ex-title{font-size:clamp(20px,3.4vh,26px)}
+/* exercise grid: prompt and input side by side on laptops so nothing scrolls */
+.ex-grid{display:flex;flex-direction:column;gap:clamp(10px,2vh,18px)}
+.ex-main{display:flex;flex-direction:column;gap:clamp(8px,1.6vh,16px);min-width:0}
+.ex-side{min-width:0}
+@media (min-width:900px){
+  .ex-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center;flex:1}
+  .lbody .wrap.center{justify-content:center}
+}
+.ex-sub{margin:-8px 0 0;color:var(--muted)}
+.listen-row{display:flex;gap:14px;align-items:flex-end;justify-content:center;padding:8px 0}
+.speak{width:clamp(80px,15vh,120px);height:clamp(80px,15vh,120px);border-radius:24px;background:var(--sky);box-shadow:0 6px 0 var(--sky-d);color:#fff;display:grid;place-items:center;transition:transform .06s,box-shadow .06s}
+.speak svg{width:46%;height:46%}
+.speak.small{width:clamp(52px,9vh,72px);height:clamp(52px,9vh,72px);border-radius:18px}
+.speak.small svg{width:34px;height:34px}
+.speak:active:not(:disabled){transform:translateY(6px);box-shadow:0 0 0 var(--sky-d)}
+.speak:disabled{background:var(--lock);box-shadow:0 6px 0 var(--lock-d);color:var(--lock-ink)}
+.speak.playing{animation:pulse .5s ease-in-out infinite alternate}
+@keyframes pulse{to{filter:brightness(1.15)}}
+.replays{margin:0;text-align:center;color:var(--muted);font-size:14px;font-weight:700;min-height:20px}
+.slots{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.slot{width:62px;height:62px;border-radius:16px;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--lock-ink);background:var(--surface)}
+.slot.active{border:2px solid var(--sky);color:var(--sky)}
+.slot.ok{border:2px solid var(--primary);background:var(--ok-soft);color:var(--ok-ink)}
+.slot.shake{animation:shake .35s;border-color:var(--coral);color:var(--coral)}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.listen{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.listen-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.mic-chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--lock-ink)}
+.dot.on{background:var(--coral);animation:pulse .6s infinite alternate}
+.heard{display:flex;align-items:baseline;gap:10px;min-height:44px}
+.heard b{font-family:var(--f-display);font-size:34px;font-weight:800}
+.heard span{color:var(--muted);font-size:14px}
+.meter{position:relative;height:42px}
+.meter .track{position:absolute;left:0;right:0;top:18px;height:8px;border-radius:9px;background:linear-gradient(90deg,var(--coral),var(--amber) 35%,var(--primary) 46%,var(--primary) 54%,var(--amber) 65%,var(--coral))}
+.meter .mid{position:absolute;left:50%;top:8px;width:3px;height:28px;margin-left:-1.5px;background:var(--ink);border-radius:2px}
+.meter .mark{position:absolute;top:10px;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:var(--surface);border:4px solid var(--ink);transition:left .08s linear}
+.meter-labels{display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.hint{margin:0;font-weight:700;min-height:24px;color:var(--ink)}
+.hint.bad{color:var(--bad-ink)}
+.choices{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.choice{min-height:64px;border:2px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:0 4px 0 var(--line);font-weight:800;font-size:18px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.choice small{font-weight:700;font-size:13px;color:var(--muted)}
+.choice{position:relative}
+.choice .kbd-hint{position:absolute;top:6px;right:8px}
+.choice[aria-pressed="true"]{border-color:var(--sky);background:color-mix(in srgb,var(--sky) 12%,var(--surface));box-shadow:0 4px 0 var(--sky);color:var(--sky)}
+.choice:active{transform:translateY(4px);box-shadow:0 0 0 var(--line)}
+.choice:disabled{cursor:default}
+.lfoot{border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);transition:background .2s}
+.lfoot .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;padding-block:clamp(10px,2vh,16px);flex-wrap:wrap}
+.lfoot.ok{background:var(--ok-soft);border-color:transparent}
+.lfoot.bad{background:var(--bad-soft);border-color:transparent}
+.verdict{display:flex;gap:12px;align-items:center;flex:1 1 260px;min-width:0}
+.verdict .badge{width:52px;height:52px;flex:none;border-radius:50%;background:var(--surface);display:grid;place-items:center}
+.verdict .badge svg{width:30px;height:30px}
+.verdict h3{font-size:22px}
+.lfoot.ok h3,.lfoot.ok .badge{color:var(--ok-ink)}
+.lfoot.bad h3,.lfoot.bad .badge{color:var(--bad-ink)}
+.verdict p{margin:2px 0 0;font-weight:700}
+.lfoot.ok .verdict p{color:var(--ok-ink)} .lfoot.bad .verdict p{color:var(--bad-ink)}
+.lfoot .btn{min-width:150px}
+@media (max-width:480px){.lfoot .btn{flex:1}}
+
+/* keyboard fallback */
+.keys{position:relative;height:clamp(110px,19vh,150px);display:flex;user-select:none;touch-action:manipulation}
+.wk{flex:1;border:2px solid var(--line);border-radius:0 0 10px 10px;background:var(--surface);box-shadow:0 4px 0 var(--line);margin:0 1px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-weight:800;font-size:13px;color:var(--muted)}
+.bk{position:absolute;top:0;width:8%;height:60%;background:var(--key-black);border:2px solid var(--line);border-top:0;border-radius:0 0 8px 8px;z-index:2;box-shadow:0 3px 0 rgb(0 0 0 / .5)}
+.wk:active,.wk.hit{background:color-mix(in srgb,var(--sky) 22%,var(--surface))}
+.bk:active,.bk.hit{background:var(--sky)}
+
+/* maqam note pad (on-screen input with quarter tones) */
+.pad{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:8px}
+.pk{border:2px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 4px 0 var(--line);padding:10px 4px;font-weight:800;font-size:16px}
+.pk small{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.pk:active,.pk.hit{transform:translateY(4px);box-shadow:0 0 0 var(--line);border-color:var(--sky)}
+
+/* maqam picker */
+.pick{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:18px}
+.pick h2{font-size:24px}
+.pick>p{margin:4px 0 0;color:var(--muted)}
+.mq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:14px}
+.mq{border:2px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:0 4px 0 var(--line);padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px}
+.mq[aria-pressed="true"]{border-color:var(--c);box-shadow:0 4px 0 var(--c);background:color-mix(in srgb,var(--c) 9%,var(--surface))}
+.mq:active{transform:translateY(4px);box-shadow:0 0 0 var(--line)}
+.mq-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.mq b{font-size:17px}
+.mq .ar{font-family:var(--f-display);font-size:22px;color:var(--c);font-weight:800;line-height:1}
+.mq .meta{font-size:12px;color:var(--muted);font-weight:700;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.pbar{height:6px;background:var(--lock);border-radius:9px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--c)}
+.scale-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.scale-chips .slot{width:auto;min-width:62px;padding:6px 8px;flex-direction:column;display:flex;align-items:center;justify-content:center;line-height:1.1;border-style:solid;color:var(--ink)}
+.scale-chips .slot small{font-size:11px;color:var(--muted);font-family:var(--f-body)}
+.scale-chips .slot.lit{background:var(--sky);border-color:var(--sky);color:#fff}
+.scale-chips .slot.lit small{color:#fff}
+
+/* top-bar stat buttons, toasts */
+button.stat{padding:6px 5px;border-radius:10px}
+button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
+.stat.pearl{color:var(--pearl)}
+.x2{font-size:10px;font-weight:900;background:var(--violet);color:#fff;border-radius:6px;padding:1px 4px;margin-left:2px}
+@media (max-width:460px){.brand .word,.brand small{display:none}.stats{gap:4px}.stat svg{width:20px;height:20px}}
+.toasts{position:fixed;top:calc(70px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;gap:8px;width:min(calc(100vw - 32px),380px);pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 14px;box-shadow:0 8px 24px rgb(0 0 0 / .2);font-weight:800;animation:tin .3s ease-out}
+.toast svg{width:24px;height:24px;flex:none;color:var(--pearl)}
+.toast span{flex:1;min-width:0}
+.toast b{color:var(--pearl);white-space:nowrap}
+@keyframes tin{from{transform:translateY(-12px);opacity:0}}
+.combo{display:inline-block;margin-left:8px;font-family:var(--f-body);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--amber);color:#fff;padding:3px 8px;border-radius:999px;vertical-align:middle}
+
+/* learn: today panel + quests */
+.today-row{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.today-row .practice-card{margin:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-head a,.panel-head .link{padding:0}
+.notice{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:var(--r);background:color-mix(in srgb,var(--sky) 14%,var(--surface));border:2px solid color-mix(in srgb,var(--sky) 40%,transparent);font-weight:700}
+.notice svg{width:24px;height:24px;color:var(--sky);flex:none}
+.quests{display:flex;flex-direction:column;gap:14px;margin-top:12px}
+.quest{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center}
+.qi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.qi svg{width:24px;height:24px}
+.quest b{font-size:15px;display:block}
+.qbar{height:16px;border-radius:9px;background:var(--lock);overflow:hidden;margin-top:5px;position:relative}
+.qbar i{display:block;height:100%;background:var(--c);border-radius:9px;transition:width .4s}
+.qbar em{position:absolute;inset:0;font-size:11px;font-style:normal;font-weight:800;display:grid;place-items:center;color:var(--ink);font-variant-numeric:tabular-nums}
+.reward{display:flex;align-items:center;gap:3px;font-weight:800;color:var(--pearl);font-size:15px;font-variant-numeric:tabular-nums}
+.reward svg{width:20px;height:20px}
+.quest.done .reward{color:var(--primary)}
+.quest.done .qi{background:var(--primary);color:#fff}
+
+/* profile */
+.hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.avatar{width:116px;height:116px;border-radius:50%;background:color-mix(in srgb,var(--amber) 20%,var(--surface));border:4px solid var(--amber);display:grid;place-items:center;flex:none;position:relative}
+.avatar .mascot{width:94px;height:94px}
+.avatar button{position:absolute;right:-4px;bottom:-2px;width:36px;height:36px;border-radius:50%;background:var(--sky);color:#fff;display:grid;place-items:center;box-shadow:0 3px 0 var(--sky-d)}
+.avatar button svg{width:20px;height:20px}
+.hero-info{flex:1;min-width:190px;display:flex;flex-direction:column;gap:6px}
+.name-input{font:800 28px/1.1 var(--f-display);color:var(--ink);background:transparent;border:2px dashed transparent;border-radius:10px;padding:2px 6px;margin-left:-8px;width:100%}
+.name-input:hover,.name-input:focus{border-color:var(--line);outline:none}
+.hero-info p{margin:0;color:var(--muted);font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--lock);color:var(--muted)}
+@media (min-width:520px){.tiles.t3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.week span{font-size:12px;font-weight:800;color:var(--muted)}
+.wd{width:36px;height:36px;margin:4px auto 0;border-radius:50%;display:grid;place-items:center;background:var(--lock);color:var(--lock-ink)}
+.wd svg{width:20px;height:20px}
+.wd.on{background:var(--amber);color:#fff}
+.wd.frz{background:var(--sky);color:#fff}
+.wd.today{outline:3px dashed var(--amber);outline-offset:2px}
+.streak-big{display:flex;align-items:center;gap:14px}
+.streak-big svg{width:58px;height:58px;color:var(--amber);flex:none}
+.streak-big b{font:800 46px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.streak-big p{margin:0;color:var(--muted);font-weight:800}
+.muted-line{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:700;margin:0}
+.muted-line svg{width:20px;height:20px;color:var(--sky);flex:none}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:160px;align-items:end;position:relative}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%;position:relative;z-index:1}
+.bar-col i{width:100%;max-width:36px;border-radius:8px 8px 4px 4px;background:var(--violet)}
+.bar-col.today i{background:var(--amber)}
+.bar-col em{font-style:normal;font-size:12px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;height:16px;line-height:16px}
+.goal-line{position:absolute;left:0;right:0;border-top:2px dashed var(--muted);opacity:.55}
+.goal-line span{position:absolute;right:0;top:-18px;font-size:11px;font-weight:800;color:var(--muted)}
+.badges{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.bdg{display:flex;gap:12px;align-items:center;padding:12px;border:2px solid var(--line);border-radius:var(--r)}
+.bi{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:var(--c);color:#fff;box-shadow:0 4px 0 var(--c-d);flex:none}
+.bi svg{width:30px;height:30px}
+.bdg.locked .bi{background:var(--lock);color:var(--lock-ink);box-shadow:0 4px 0 var(--lock-d)}
+.bdg>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.bdg p{margin:0;font-size:13px;color:var(--muted)}
+.bdg .qbar{height:10px;margin:0}
+
+/* shop */
+.shop-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.wallet{display:flex;align-items:center;gap:6px;font:800 26px var(--f-display);color:var(--pearl);font-variant-numeric:tabular-nums}
+.wallet svg{width:30px;height:30px}
+.items{display:flex;flex-direction:column;gap:12px}
+.item{display:flex;gap:14px;align-items:center;padding:14px;border:2px solid var(--line);border-radius:var(--r);background:var(--surface);flex-wrap:wrap}
+.ii{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);flex:none}
+.ii svg{width:36px;height:36px}
+.item>div{flex:1;min-width:150px}
+.item p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.price{min-width:116px}
+.price svg,.gear .btn svg,#refill svg{width:18px;height:18px}
+.gear-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gear{border:2px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.gear .mascot{width:92px;height:92px}
+.gear.worn{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,var(--surface))}
+.gear .btn{width:100%;min-height:42px;font-size:13px;padding:0 10px}
+.hearts-row{display:flex;gap:6px;color:var(--coral)}
+.hearts-row svg{width:34px;height:34px}
+.hearts-row .empty{color:var(--lock)}
+.streak-hero{position:relative;width:150px;height:150px;color:var(--amber)}
+.streak-hero svg{width:150px;height:150px}
+.streak-hero b{position:absolute;left:0;right:0;top:58%;transform:translateY(-50%);color:#fff;font:800 44px/1 var(--f-display);text-align:center}
+@media (max-width:480px){.result-tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+/* end-of-lesson screens scale with the window height */
+.complete .mascot{width:clamp(72px,15vh,150px);height:clamp(72px,15vh,150px)}
+.complete h2{font-size:clamp(24px,4.5vh,34px)}
+.complete p{margin:0}
+.rt b{padding:clamp(6px,1.6vh,12px) 4px}
+.streak-hero{width:clamp(90px,19vh,150px);height:clamp(90px,19vh,150px)}
+.streak-hero svg{width:100%;height:100%}
+.tip .mascot{width:clamp(64px,12vh,96px);height:clamp(64px,12vh,96px)}
+/* short phone screens (iPhone SE and similar): compact exercise layout */
+@media (max-width:899px) and (max-height:760px){
+  .speak{width:64px;height:64px;border-radius:18px;box-shadow:0 4px 0 var(--sky-d)}
+  .speak.small{width:48px;height:48px;border-radius:14px}
+  .listen-row{padding:0}
+  .replays{font-size:12px;min-height:0}
+  .slot{width:46px;height:46px;font-size:17px;border-radius:12px}
+  .listen{padding:10px 12px;gap:6px}
+  .heard{min-height:30px} .heard b{font-size:24px}
+  .meter{height:34px} .meter .track{top:14px} .meter .mid{top:5px} .meter .mark{top:7px}
+  .keys{height:96px}
+  .pad{grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px}
+  .pk{padding:5px 2px;font-size:14px;border-radius:10px} .pk small{font-size:10px}
+  .gauge{max-width:min(260px,31vh)}
+  .ex-sub{font-size:13px}
+  .hint{font-size:14px;min-height:0}
+  .lfoot .btn{min-height:44px}
+  .verdict .badge{width:40px;height:40px} .verdict h3{font-size:18px} .verdict p{font-size:14px}
+  .ex-main .listen-row + .replays{margin-top:-4px}
+}
+/* five tabs fit a phone */
+.nav button{padding:6px 10px}
+@media (max-width:380px){.nav button{font-size:10px;padding:6px 6px;letter-spacing:.04em}}
+
+/* welcome, sign-in, onboarding */
+.auth{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;display:flex;justify-content:center;align-items:flex-start;padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+@media (min-height:700px){.auth{align-items:center}}
+.auth-card{width:100%;max-width:440px;display:flex;flex-direction:column;gap:16px}
+.auth-hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.auth-hero .mascot{width:clamp(96px,18vh,150px);height:clamp(96px,18vh,150px)}
+.auth-hero h1{font-size:clamp(34px,6vh,44px);color:var(--primary)}
+.auth-hero h1 small{font-size:.6em;color:var(--muted)}
+.auth-hero p{margin:0;color:var(--muted);font-weight:700;font-size:17px;max-width:32ch}
+.perks{display:flex;flex-direction:column;gap:10px;margin:4px 0}
+.perk{display:flex;gap:12px;align-items:center;font-weight:700}
+.perk .qi{flex:none}
+.form{display:flex;flex-direction:column;gap:12px}
+.form label{font-weight:800;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.form input{font:600 16px var(--f-body);color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:13px 14px;width:100%}
+.form input:focus{border-color:var(--sky);outline:none}
+.form-err{margin:0;color:var(--bad-ink);font-weight:700;min-height:1.2em}
+.form-note{margin:0;color:var(--muted);font-size:14px;text-align:center}
+.back{align-self:flex-start;display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:800;padding:6px 0}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:8px;border-radius:9px;background:var(--lock)}
+.steps i.on{background:var(--primary)}
+.opt-list{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;border:2px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:0 4px 0 var(--line);padding:14px 16px;font-weight:800}
+.opt small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.opt[aria-pressed="true"]{border-color:var(--sky);box-shadow:0 4px 0 var(--sky);background:color-mix(in srgb,var(--sky) 10%,var(--surface))}
+.opt .qi{flex:none}
+.cal-meter{height:14px;border-radius:9px;background:var(--lock);overflow:hidden}
+.cal-meter i{display:block;height:100%;width:0;background:var(--sky);transition:width .08s}
+.cal-step{display:flex;gap:12px;align-items:center;font-weight:700}
+.cal-step .qi{flex:none}
+.cal-step.done .qi{background:var(--primary);color:#fff}
+
+/* banners, league, ear map, account */
+.banner-cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:var(--r);background:color-mix(in srgb,var(--primary) 12%,var(--surface));border:2px solid color-mix(in srgb,var(--primary) 40%,transparent)}
+.banner-cta>div{flex:1;min-width:180px}
+.banner-cta p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.league-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.rows{display:flex;flex-direction:column}
+.lrow{display:grid;grid-template-columns:36px 40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 6px;border-bottom:2px solid var(--line)}
+.lrow:last-child{border-bottom:0}
+.lrow.me{background:color-mix(in srgb,var(--sky) 12%,transparent);border-radius:12px}
+.lrow .rank{font:800 18px var(--f-display);text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
+.lrow .rank.top{color:var(--amber)}
+.ini{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--c)}
+.lrow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .xpv{font-weight:800;color:var(--violet);font-variant-numeric:tabular-nums}
+.ear-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.ear{border-radius:12px;padding:8px;text-align:center;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.ear b{display:block;font-size:17px}
+.ear span{font-size:12px;font-weight:800;color:var(--c)}
+.ear small{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:5px;vertical-align:-1px}
+.acct{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.acct>div{flex:1;min-width:180px}
+.acct p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--primary)}
+.sync.off{color:var(--muted)} .sync.err{color:var(--bad-ink)}
+
+/* tuner + gauge */
+.gauge{display:block;width:100%;max-width:min(340px,46vh);margin:0 auto}
+.gauge .needle{transition:transform .1s linear}
+.big-note{text-align:center}
+.big-note b{font-family:var(--f-display);font-size:72px;font-weight:800;line-height:1}
+.big-note p{margin:4px 0 0;color:var(--muted);font-weight:700}
+.big-note .ar{font-family:var(--f-display);font-size:20px;color:var(--ink)}
+.strings{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.str{border:2px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 3px 0 var(--line);padding:8px 2px;text-align:center;font-weight:800}
+.str small{display:block;color:var(--muted);font-size:11px}
+.str.near{border-color:var(--primary);color:var(--ok-ink);background:var(--ok-soft)}
+.hold{height:10px;border-radius:9px;background:var(--lock);overflow:hidden}
+.hold i{display:block;height:100%;width:0;background:var(--primary);transition:width .1s}
+
+/* panels */
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:18px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{border:2px solid var(--line);border-radius:var(--r);padding:14px;display:flex;gap:10px;align-items:center;background:var(--surface)}
+.tile svg{width:28px;height:28px;flex:none}
+.tile b{display:block;font-size:22px;font-family:var(--f-display);font-variant-numeric:tabular-nums;line-height:1.1}
+.tile span{font-size:13px;color:var(--muted);font-weight:700}
+.field{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:2px solid var(--line);flex-wrap:wrap}
+.field:first-of-type{border-top:0}
+.field label{font-weight:800}
+.field p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{padding:8px 12px;font-weight:800;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--sky);color:#fff}
+input[type=range]{accent-color:var(--sky);width:160px}
+.section-title{font-size:28px;margin-bottom:14px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.goal{height:14px;border-radius:9px;background:var(--lock);overflow:hidden}
+.goal i{display:block;height:100%;background:var(--amber)}
+
+/* complete */
+.complete{align-items:center;text-align:center;justify-content:center}
+.complete h2{font-size:34px;color:var(--amber)}
+.result-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+.rt{border:2px solid var(--c);border-radius:var(--r);overflow:hidden;background:var(--c)}
+.rt span{display:block;color:#fff;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px}
+.rt b{display:flex;align-items:center;justify-content:center;gap:4px;background:var(--surface);color:var(--c);font-size:22px;padding:12px 4px;border-radius:12px 12px 0 0;font-variant-numeric:tabular-nums}
+.mascot{width:150px;height:150px}
+.mascot.bounce{animation:hop .9s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-10px) rotate(-3deg)}}
+.tip{display:flex;gap:14px;align-items:flex-start}
+.tip .mascot{width:96px;height:96px;flex:none}
+.bubble{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative;flex:1;min-width:0}
+.bubble p{margin:0 0 8px} .bubble p:last-child{margin:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <div class="brand"><svg width="30" height="30" viewBox="0 0 120 120" aria-hidden="true"><use href="#oud-mini"/></svg><span class="word">Samaa</span> <small>سماع</small></div>
+  <div class="stats" id="stats"></div>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="nav" aria-label="Sections"><div class="wrap">
+  <button data-tab="learn" aria-current="page"><svg viewBox="0 0 24 24"><use href="#i-home"/></svg>Learn</button>
+  <button data-tab="league"><svg viewBox="0 0 24 24"><use href="#i-trophy"/></svg>League</button>
+  <button data-tab="tuner"><svg viewBox="0 0 24 24"><use href="#i-tuner"/></svg>Tuner</button>
+  <button data-tab="shop"><svg viewBox="0 0 24 24"><use href="#i-shop"/></svg>Shop</button>
+  <button data-tab="profile"><svg viewBox="0 0 24 24"><use href="#i-user"/></svg>Profile</button>
+</div></nav>
+
+<div id="modal" class="modal" hidden></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<section class="auth" id="auth" hidden aria-label="Welcome"><div class="auth-card" id="authCard"></div></section>
+
+<section class="lesson" id="lesson" hidden aria-label="Lesson">
+  <div class="lhead"><div class="wrap">
+    <button class="x" id="quit" aria-label="Quit lesson"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+    <div class="bar" role="progressbar" aria-label="Lesson progress"><i id="bar"></i></div>
+    <span class="kbd-hint"><kbd>Space</kbd> replay <kbd>Enter</kbd> continue</span>
+  </div></div>
+  <div class="lbody"><div class="wrap" id="lbody"></div></div>
+  <div class="lfoot" id="lfoot"><div class="wrap" id="lfootIn"></div></div>
+</section>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-fire" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 3.5 5.5 6 5.5 11.5A5.5 5.5 0 0 1 12 22a5.5 5.5 0 0 1-5.5-5.5c0-2.7 1.5-4.2 2.6-5.3.3 1.5 1 2.5 2 2.8C10.6 10.5 11 5.5 12 2Z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 2 4 13.5h6.5L9 22l11-12.5h-6.7L13.5 2Z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-8.5-5.2-8.5-11.2A4.8 4.8 0 0 1 12 6.6a4.8 4.8 0 0 1 8.5 3.2C20.5 15.8 12 21 12 21Z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></symbol>
+    <symbol id="i-tuner" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M4 17a8 8 0 1 1 16 0M12 17l4-6"/><circle cx="12" cy="17" r="2" fill="currentColor"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2" fill="currentColor"/><path fill="currentColor" d="M3.5 21a8.5 8.5 0 0 1 17 0Z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="3" stroke-linecap="round" d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.5 5 5 10-11"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="m12 2.5 2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.6 6.6-.8L12 2.5Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="2.6" d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="i-speaker" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9.5h4l5-4.5v14l-5-4.5H3z"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></symbol>
+    <symbol id="i-slow" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9.5h4l5-4.5v14l-5-4.5H3z"/><text x="14" y="16" font-size="9" font-weight="900" fill="currentColor" font-family="sans-serif">½</text></symbol>
+    <symbol id="i-ear" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M7 9a5 5 0 0 1 10 0c0 3-3 4-3 7a3 3 0 0 1-5 2.2M10 9.5a2 2 0 0 1 4 0"/></symbol>
+    <symbol id="i-chest" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="2" fill="currentColor"/><path fill="currentColor" opacity=".7" d="M3 9a6 6 0 0 1 6-5h6a6 6 0 0 1 6 5Z"/><rect x="10.5" y="11" width="3" height="4" rx="1" fill="#fff"/></symbol>
+    <symbol id="i-pearl" viewBox="0 0 24 24"><circle cx="12" cy="12.5" r="8.5" fill="currentColor"/><circle cx="9" cy="9.5" r="2.6" fill="#fff" opacity=".75"/><circle cx="15.5" cy="16" r="1.2" fill="#fff" opacity=".4"/></symbol>
+    <symbol id="i-freeze" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.5 4l2.5 2.5L14.5 4M9.5 20l2.5-2.5 2.5 2.5"/></symbol>
+    <symbol id="i-shop" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 8h15l-1.2 12a1.5 1.5 0 0 1-1.5 1.3H7.2a1.5 1.5 0 0 1-1.5-1.3Z"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 3h10v6a5 5 0 0 1-10 0Z"/><path fill="none" stroke="currentColor" stroke-width="2" d="M7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4"/><rect x="10.5" y="13" width="3" height="5" fill="currentColor"/><rect x="7.5" y="18" width="9" height="3" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20Z" opacity=".35"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20ZM9 4v13.5M15 6.5V20"/></symbol>
+    <symbol id="oud-mini" viewBox="0 0 120 120">
+      <rect x="53" y="2" width="14" height="28" rx="4" fill="var(--wood-d)"/>
+      <path d="M60 22c30 0 44 30 40 56-4 26-22 36-40 36S24 104 20 78C16 52 30 22 60 22Z" fill="var(--wood)"/>
+      <path d="M60 22c-14 4-22 30-22 56s8 32 22 36c-18 0-36-10-40-36C16 52 30 22 60 22Z" fill="var(--wood-d)" opacity=".28"/>
+      <circle cx="60" cy="84" r="9" fill="var(--wood-d)"/>
+      <circle cx="47" cy="58" r="7" fill="#fff"/><circle cx="73" cy="58" r="7" fill="#fff"/>
+      <circle cx="48.5" cy="59" r="3.6" fill="#1B2928"/><circle cx="74.5" cy="59" r="3.6" fill="#1B2928"/>
+      <rect x="50" y="102" width="20" height="4" rx="2" fill="var(--wood-d)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const icon = (id, cls='') => `<svg viewBox="0 0 24 24" class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- notes ---------- */
+/* Notes live on a quarter-tone grid: q = quarter steps above C (0..23). Arabic names are the
+   traditional note names of the Rast-on-C system (Rast, Dukah, Sikah, Jaharkah, Nawa…). */
+const WEST = {0:'C',2:'C♯',4:'D',6:'E♭',7:'E½♭',8:'E',10:'F',12:'F♯',14:'G',16:'A♭',18:'A',20:'B♭',21:'B½♭',22:'B'};
+const ARN  = {0:'راست',2:'زركلاه',4:'دوكاه',6:'كرد',7:'سيكاه',8:'بوسليك',10:'جهاركاه',12:'حجاز',14:'نوا',16:'حصار',18:'حسيني',20:'عجم',21:'أوج',22:'ماهور'};
+const ARL  = {0:'Rast',2:'Zirkulah',4:'Dukah',6:'Kurd',7:'Sikah',8:'Busalik',10:'Jaharkah',12:'Hijaz',14:'Nawa',16:'Hisar',18:'Husayni',20:'Ajam',21:'Awj',22:'Mahur'};
+const SOL  = {C:'Do',D:'Re',E:'Mi',F:'Fa',G:'Sol',A:'La',B:'Si'};
+let GRID = 1, SPELL = {};      // GRID: 1 = semitones (Level 1), 0.5 = quarter tones (maqam routes)
+const pc = m => ((Math.round(m) % 12) + 12) % 12;
+const qOf = m => ((Math.round(Math.round(m / GRID) * GRID * 2) % 24) + 24) % 24;
+const oct = m => Math.floor(Math.round(m) / 12) - 1;
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const ftom = f => 69 + 12 * Math.log2(f / 440);
+const fold = d => ((d + 6) % 12 + 12) % 12 - 6;     // interval folded into one octave, -6..+6
+const west = m => { const q = qOf(m); return SPELL[q] || WEST[q] || `${WEST[q - 1]}+¼`; };
+const solf = w => SOL[w[0]] + w.slice(1);
+const name = m => S.settings.names === 'solfege' ? solf(west(m)) : west(m);
+const sub = m => { const w = west(m), ar = ARN[qOf(m)]; return `${S.settings.names === 'solfege' ? w : solf(w)}${ar ? ` · ${ar}` : ''}`; };
+const semis = n => `${n} half step${n === 1 ? '' : 's'}`;
+const gapText = g => g === 0.5 ? 'a quarter tone' : Number.isInteger(g) ? semis(g) : `${g * 2} quarter tones`;
+
+/* oud tunings, lowest course to highest */
+const TUNINGS = {
+  FF:{ label:'F to F', notes:[41,45,50,55,60,65] },   // F2 A2 D3 G3 C4 F4
+  CC:{ label:'C to C', notes:[36,41,45,50,55,60] },   // C2 F2 A2 D3 G3 C4
+};
+const COURSE = ['6th', '5th', '4th', '3rd', '2nd', '1st (highest)'];
+const oudStrings = () => (TUNINGS[S.settings.tuning] || TUNINGS.FF).notes.map((m, i) => ({ m, label:COURSE[i] }));
+const SCALE = [48,50,52,53,55,57,59,60];   // C Ajam (major) in first position: C3–C4
+
+/* ---------- state ---------- */
+const KEY = 'samaa.v1';
+const DEFAULT = { xp:0, streak:0, bestStreak:0, lastDay:null, done:{}, daily:{}, lessons:0,
+  pearls:50, freezes:0, frozen:[], boostUntil:0, perfects:0, badges:[], chests:[], joined:null, player:'Oud player', goal:20,
+  q:{ date:null }, gear:{ owned:[], worn:null }, notice:null, ear:{}, onboarded:false, guest:false, owner:null,
+  maqam:'rast', settings:{ names:'western', sens:6, tap:false, tuning:'FF', mic2:true, volume:0.8, tonic:true, theme:'system' } };
+function load(){
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return {...JSON.parse(JSON.stringify(DEFAULT)), ...s, settings:{...DEFAULT.settings, ...(s.settings||{})}}; } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+const S = load();
+function save(){ S.savedAt = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} Cloud.queue(); }
+/* replace the whole state in place (S is shared by reference everywhere) */
+function replaceState(next){
+  for (const k of Object.keys(S)) delete S[k];
+  const d = JSON.parse(JSON.stringify(DEFAULT));
+  Object.assign(S, d, next, { settings:{ ...d.settings, ...((next && next.settings) || {}) } });
+}
+/* ISO week, e.g. 2026-W45: the league resets every Monday */
+function weekKey(d = new Date()){
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return `${t.getUTCFullYear()}-W${String(Math.ceil(((t - y0) / 864e5 + 1) / 7)).padStart(2, '0')}`;
+}
+function weekXp(){
+  const now = new Date(), back = (now.getDay() + 6) % 7; let sum = 0;   // Monday .. today
+  for (let i = 0; i <= back; i++){ const d = new Date(); d.setDate(d.getDate() - i); sum += S.daily[dayKey(d)] || 0; }
+  return sum;
+}
+const hasProgress = st => !!st && ((st.xp || 0) > 0 || Object.keys(st.done || {}).length > 0);
+/* guest progress + an existing account: keep the best of both */
+function mergeStates(a, b){
+  const [hi, lo] = (a.xp || 0) >= (b.xp || 0) ? [a, b] : [b, a];
+  const m = JSON.parse(JSON.stringify(hi));
+  const maxMap = k => { m[k] = m[k] || {}; for (const [x, v] of Object.entries(lo[k] || {})) m[k][x] = Math.max(m[k][x] || 0, v); };
+  maxMap('done'); maxMap('daily');
+  const union = (o, k) => [...new Set([...(o[k] || []), ...((k === 'owned' ? lo.gear?.owned : lo[k]) || [])])];
+  m.badges = union(m, 'badges'); m.chests = union(m, 'chests'); m.frozen = union(m, 'frozen');
+  m.gear = m.gear || { owned:[], worn:null }; m.gear.owned = union(m.gear, 'owned');
+  m.pearls = Math.max(m.pearls || 0, lo.pearls || 0); m.bestStreak = Math.max(m.bestStreak || 0, lo.bestStreak || 0);
+  m.ear = m.ear || {}; for (const [x, [h, ms]] of Object.entries(lo.ear || {})){ const c = m.ear[x] || [0, 0]; m.ear[x] = [c[0] + h, c[1] + ms]; }
+  return m;
+}
+
+/* ---------- accounts & cloud save (Supabase) ----------
+   Fill in config.js to switch accounts on. Without it the app runs in guest mode on this device. */
+const CFG = window.SAMAA_CONFIG || {};
+const Cloud = {
+  sb:null, user:null, timer:null, status:'off',
+  enabled(){ return !!this.sb; },
+  init(){
+    if (CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase){
+      try { this.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey); } catch(e){ this.sb = null; }
+    }
+  },
+  queue(){ if (!this.user) return; clearTimeout(this.timer); this.timer = setTimeout(() => this.push(), 1200); },
+  async push(){
+    if (!this.user) return;
+    const { error } = await this.sb.from('profiles').upsert({
+      id:this.user.id, display_name:(S.player || 'Oud player').slice(0, 24), state:S,
+      week_xp:weekXp(), week_key:weekKey(), updated_at:new Date().toISOString(),
+    });
+    this.status = error ? 'error' : 'saved'; paintSync();
+  },
+  async pull(){
+    const { data, error } = await this.sb.from('profiles').select('state').eq('id', this.user.id).maybeSingle();
+    if (error) throw error;
+    return data && data.state && Object.keys(data.state).length ? data.state : null;
+  },
+};
+function paintSync(){
+  const el = $('#syncState'); if (!el) return;
+  el.className = `sync ${Cloud.status === 'error' ? 'err' : Cloud.user ? '' : 'off'}`;
+  el.textContent = !Cloud.user ? 'Saved on this device only' : Cloud.status === 'error' ? 'Could not save. Retrying on your next change.' : 'Saved to your account';
+}
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const dayNum = k => { const [y, m, d] = k.split('-').map(Number); return Math.round(new Date(y, m - 1, d).getTime() / 864e5); };
+/* On open: spend streak freezes on missed days, or the streak resets. */
+function settleStreak(){
+  if (!S.lastDay) return;
+  const missed = dayNum(dayKey()) - dayNum(S.lastDay) - 1;
+  if (missed < 1) return;
+  if (S.streak > 0 && S.freezes >= missed){
+    for (let i = 1; i <= missed; i++){ const d = new Date(); d.setDate(d.getDate() - i); S.frozen.push(dayKey(d)); }
+    S.freezes -= missed;
+    const y = new Date(); y.setDate(y.getDate() - 1); S.lastDay = dayKey(y);
+    S.notice = `${missed > 1 ? `${missed} streak freezes` : 'A streak freeze'} saved your ${S.streak}-day streak.`;
+  } else S.streak = 0;
+  save();
+}
+/* today's counters for daily quests */
+function today(){ if (S.q.date !== dayKey()) S.q = { date:dayKey(), xp:0, combo:0, lessons:0, claimed:[] }; return S.q; }
+function liveStreak(){
+  const y = new Date(); y.setDate(y.getDate()-1);
+  return (S.lastDay === dayKey() || S.lastDay === dayKey(y)) ? S.streak : 0;
+}
+
+/* ---------- audio: plucked-string synth (Karplus–Strong) ---------- */
+let ctx = null, bodyIn = null, master = null;
+async function ensureCtx(){
+  if (!ctx){
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // a little "wooden body": low resonance + soft top end
+    const res = ctx.createBiquadFilter(); res.type = 'peaking'; res.frequency.value = 210; res.Q.value = 1.2; res.gain.value = 5;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3800;
+    const out = ctx.createGain(); out.gain.value = 0.9 * (S.settings.volume ?? 0.8) / 0.8; master = out;
+    res.connect(lp).connect(out).connect(ctx.destination);
+    bodyIn = res;
+  }
+  if (ctx.state === 'suspended') await ctx.resume();
+  return ctx;
+}
+const pluckCache = new Map();
+function pluckBuffer(m){
+  if (pluckCache.has(m)) return pluckCache.get(m);
+  const sr = ctx.sampleRate, f = mtof(m), dur = 2.4, len = Math.floor(sr * dur);
+  const y = new Float32Array(len);
+  const D = sr / f - 0.5;                 // averaging filter adds half a sample of delay
+  const n0 = Math.ceil(D) + 2;
+  let lp = 0;
+  for (let i = 0; i < n0; i++){ lp = lp * 0.45 + (Math.random()*2 - 1) * 0.55; y[i] = lp; }  // plectrum noise burst
+  const t60 = Math.max(1.2, 3.2 - (m - 36) * 0.06);
+  const g = Math.pow(0.001, 1 / (f * t60));
+  for (let i = n0; i < len; i++){
+    const p = i - D, i0 = Math.floor(p), fr = p - i0;
+    const a = y[i0] + (y[i0+1] - y[i0]) * fr;
+    const b = y[i0-1] + (y[i0] - y[i0-1]) * fr;
+    y[i] = g * 0.5 * (a + b);
+  }
+  let peak = 0; for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(y[i]));
+  const fade = Math.floor(sr * 0.06);
+  for (let i = 0; i < len; i++){ y[i] /= (peak || 1); if (i > len - fade) y[i] *= (len - i) / fade; }
+  const buf = ctx.createBuffer(1, len, sr); buf.copyToChannel(y, 0);
+  pluckCache.set(m, buf); return buf;
+}
+function playNote(m, when, dur){
+  const src = ctx.createBufferSource(); src.buffer = pluckBuffer(m);
+  const g = ctx.createGain(); g.gain.setValueAtTime(0.55, when); g.gain.setTargetAtTime(0, when + dur, 0.07);
+  src.connect(g).connect(bodyIn); src.start(when); src.stop(when + dur + 0.5);
+}
+/* Plays notes in order. The mic ignores everything until the sound has died down. */
+async function playSeq(notes, noteDur = 0.9){
+  await ensureCtx();
+  const t0 = ctx.currentTime + 0.06;
+  notes.forEach((m, i) => playNote(m, t0 + i * noteDur, i === notes.length - 1 ? Math.max(noteDur, 1.1) : noteDur * 0.96));
+  const total = (notes.length - 1) * noteDur + Math.max(noteDur, 1.1) + 0.15;
+  Mic.muteFor(total * 1000 + 250);
+  await sleep(total * 1000);
+}
+async function sfx(ok){
+  await ensureCtx();
+  const t = ctx.currentTime + 0.01;
+  const tones = ok ? [[1046.5, 0], [1568, 0.09]] : [[220, 0], [196, 0.12]];
+  for (const [f, dt] of tones){
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = ok ? 'sine' : 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t + dt); g.gain.exponentialRampToValueAtTime(ok ? 0.18 : 0.22, t + dt + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.22);
+    o.connect(g).connect(ctx.destination); o.start(t + dt); o.stop(t + dt + 0.25);
+  }
+  Mic.muteFor(400);
+}
+
+/* ---------- pitch detection (YIN) ---------- */
+const yinD = new Float32Array(2048);
+function yin(buf, sr, thr = 0.12){
+  const W = 1024, tauMin = Math.floor(sr / 1000), tauMax = Math.min(Math.floor(sr / 60), buf.length - W - 1);
+  let run = 0; yinD[0] = 1;
+  for (let tau = 1; tau <= tauMax; tau++){
+    let s = 0;
+    for (let i = 0; i < W; i++){ const x = buf[i] - buf[i + tau]; s += x * x; }
+    run += s; yinD[tau] = run ? s * tau / run : 1;
+  }
+  let tau = -1;
+  for (let t = tauMin; t <= tauMax; t++){
+    if (yinD[t] < thr){ while (t + 1 <= tauMax && yinD[t+1] < yinD[t]) t++; tau = t; break; }
+  }
+  if (tau < 0) return -1;
+  const x0 = yinD[tau-1], x1 = yinD[tau], x2 = tau < tauMax ? yinD[tau+1] : x1;
+  const den = x0 + x2 - 2 * x1;
+  return sr / (den ? tau + (x0 - x2) / (2 * den) : tau);
+}
+
+const Mic = {
+  running:false, error:null, subs:new Set(), muteUntil:0, hist:[], cur:null,
+  cand:null, candSince:0, lastEmit:null, silentSince:0, stableMs:220, grid:1, floor:0.002, attackT:-1e9,
+  on(fn){ this.subs.add(fn); return () => this.subs.delete(fn); },
+  emit(e){ for (const fn of [...this.subs]) fn(e); },
+  muteFor(ms){ this.muteUntil = Math.max(this.muteUntil, performance.now() + ms); this.reset(); },
+  reset(){ this.hist = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; },
+  async start(){
+    if (this.running) return true;
+    try {
+      await ensureCtx();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+      const src = ctx.createMediaStreamSource(stream);
+      this.an = ctx.createAnalyser(); this.an.fftSize = 4096; src.connect(this.an);
+      this.buf = new Float32Array(this.an.fftSize);
+      this.running = true; this.error = null;
+      const loop = () => { this.tick(); requestAnimationFrame(loop); };
+      requestAnimationFrame(loop);
+      return true;
+    } catch (e){ this.error = e; return false; }
+  },
+  tick(){
+    if (S.settings.tap) return;
+    const t = performance.now();
+    this.an.getFloatTimeDomainData(this.buf);
+    let rms = 0; for (let i = 0; i < this.buf.length; i++) rms += this.buf[i] * this.buf[i];
+    rms = Math.sqrt(rms / this.buf.length);
+    // Noise filter. 1) a level gate above the room's own noise floor; 2) the sound must be clearly
+    // pitched (strict YIN threshold); 3) the pitch must hold steady for ~100 ms, which a plucked
+    // string does and speech (constantly gliding) does not.
+    const sens = S.settings.sens;                                   // 1 (strict) .. 10 (picks up quiet plucks)
+    const gate = Math.max(0.01 * Math.pow(10, (5 - sens) / 4), this.floor * 4);
+    const f = (rms > gate && t >= this.muteUntil) ? yin(this.buf.subarray(this.buf.length - 2048), ctx.sampleRate, 0.07 + sens * 0.01) : -1;
+    // 4) it must start with a pluck. On a smooth loudness envelope, a plucked string jumps to full
+    //    level within ~5 ms; a voice swells over tens of ms. The steady pitch must follow within 400 ms.
+    if (t >= this.muteUntil){
+      const sr = ctx.sampleRate, x = this.buf, N = x.length, k = Math.exp(-1 / (0.012 * sr));
+      const env = this.env || (this.env = new Float32Array(N));
+      let v = 0; for (let i = 0; i < N; i++){ const a = Math.abs(x[i]); v = a > v ? a : v * k; env[i] = v; }
+      const w = Math.round(0.005 * sr), look = Math.round(0.02 * sr);
+      for (let i = Math.round(0.015 * sr); i + w + look < N; i += 32){
+        const hi = env[i + w];
+        if (hi > gate * 2 && hi > (env[i] > gate * 2 ? 1.6 : 3) * env[i]){   // from quiet, or a new pluck over a ringing string
+          let peak = hi; for (let j = i + w; j < i + w + look; j += 16) peak = Math.max(peak, env[j]);
+          if (hi >= 0.7 * peak && t - this.attackT > 60){ this.attackT = t; this.hist = []; this.cand = null; this.lastEmit = null; }   // a new pluck starts a new note
+          break;
+        }
+      }
+    }
+    if (f < 0 && rms < 0.2) this.floor = rms < this.floor ? this.floor * 0.9 + rms * 0.1 : this.floor * 0.995 + rms * 0.005;
+    if (f > 60 && f < 900 && t - this.attackT < 2500){
+      this.silentSince = 0;
+      this.hist.push(ftom(f)); if (this.hist.length > 6) this.hist.shift();
+      const sorted = [...this.hist].sort((a, b) => a - b), med = sorted[sorted.length >> 1];
+      const steady = this.hist.length >= 6 && sorted[sorted.length - 2] - sorted[1] < 0.3;
+      this.cur = steady ? { midi:med, freq:mtof(med), rms } : null;
+      if (!steady){ this.cand = null; this.emit({ type:'frame', cur:null }); return; }
+      const r = Math.round(med / this.grid) * this.grid;     // snap to semitones, or quarter tones in maqam routes
+      if (r !== this.cand){ this.cand = r; this.candSince = t; }
+      else if (t - this.candSince >= this.stableMs && this.candSince - this.attackT < 400 && (this.lastEmit === null || Math.abs(r - this.lastEmit) >= this.grid)){ this.lastEmit = r; this.emit({ type:'note', midi:med }); }
+    } else {
+      // only real quiet ends a sounding note; an unpitched moment (the pluck itself) does not
+      if (rms >= gate) this.silentSince = 0; else if (!this.silentSince) this.silentSince = t;
+      if (this.silentSince && t - this.silentSince > 160){ this.hist = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; }
+    }
+    this.emit({ type:'frame', cur:this.cur });
+  }
+};
+
+/* ---------- curriculum ---------- */
+const ex = {
+  intro:(title, body) => ({ type:'intro', title, body }),
+  tune:(s) => ({ type:'tune', midi:s.m, label:s.label }),
+  compare(minGap, maxGap){
+    let a, b;
+    do { a = 45 + rnd(17); const g = minGap + rnd(maxGap - minGap + 1); b = a + (Math.random() < .5 ? g : -g); } while (b < 43 || b > 66);
+    return { type:'compare', notes:[a, b], answer: a > b ? 'first' : 'second' };
+  },
+  same(){
+    const a = pick(SCALE), diff = Math.random() < .5;
+    const b = diff ? a + pick([-2, -1, 1, 2]) : a;
+    return { type:'same', notes:[a, b], answer: diff ? 'different' : 'same' };
+  },
+  direction(minStep, maxStep, pool = SCALE){
+    const n = seq(2, minStep, maxStep, pool);
+    return { type:'direction', notes:n, answer: n[1] > n[0] ? 'up' : 'down' };
+  },
+  contour(minStep, maxStep, pool = SCALE){
+    const n = seq(3, minStep, maxStep, pool);
+    const d = (a, b) => b > a ? 'up' : 'down';
+    return { type:'contour', notes:n, answer:`${d(n[0], n[1])}-${d(n[1], n[2])}` };
+  },
+  name(pool){
+    const m = pick(pool.filter(x => x !== 48));
+    const others = shuffle(pool.filter(x => x !== m && x !== 48)).slice(0, 2);
+    return { type:'name', ref:48, midi:m, choices:shuffle([m, ...others]), answer:m };
+  },
+  echo(notes, opts = {}){ return { type:'echo', notes, dur:opts.dur || 0.9, replays:opts.replays ?? Infinity, slow:opts.slow !== false }; },
+  scale:(notes) => ({ type:'scale', notes }),
+  /* the maqam's first jins, or the foil jins it is easily confused with, played up and back down */
+  jins(mq){
+    const real = Math.random() < .5, j = real ? mq.scale.slice(0, mq.jins) : mq.foil.notes;
+    return { type:'jins', notes:[...j, ...j.slice(0, -1).reverse()], answer: real ? 'real' : 'foil' };
+  },
+  /* the signature note against its foil: same or different? */
+  sig(mq){
+    const [a, b] = mq.sig, pair = pick([[a, b], [b, a], [a, b], [a, a], [b, b]]);
+    return { type:'same', notes:pair, answer: pair[0] === pair[1] ? 'same' : 'different' };
+  },
+};
+/* a phrase that ends on the tonic (a qafla): walk away from the tonic, then reverse it */
+function qafla(len, pool){
+  let i = 0; const out = [pool[0]];
+  while (out.length < len){ let j; do { j = i + pick([1, 1, 2, -1]); } while (j < 1 || j >= pool.length || j === i); i = j; out.push(pool[i]); }
+  return out.reverse();
+}
+/* sequence on the scale; steps measured in scale degrees, never repeating a note back to back */
+function seq(len, minStep = 1, maxStep = 1, pool = SCALE){
+  let i = rnd(pool.length); const out = [pool[i]];
+  while (out.length < len){
+    let j;
+    do { const s = minStep + rnd(maxStep - minStep + 1); j = i + (Math.random() < .5 ? s : -s); } while (j < 0 || j >= pool.length);
+    i = j; out.push(pool[i]);
+  }
+  return out;
+}
+const times = (n, fn) => Array.from({ length:n }, fn);
+
+const LEVEL1 = { id:1, title:'One note', desc:'Hear one note, find it on your oud. All in Ajam (the major scale) on C.', c:'--primary', lessons:[
+    { id:'1-1', title:'Tune your oud', gen:() => [
+      ex.intro('Meet Samaa', `<p>Samaa listens through your microphone and tells you which note you are playing.</p><p>First, tune your strings, lowest to highest: ${oudStrings().map(s => west(s.m)).join(' · ')}. You can switch tunings in your profile. Pluck one string, let it ring, and turn the peg until the needle sits in the middle.</p>`),
+      ...oudStrings().map(ex.tune) ] },
+    { id:'1-2', title:'High or low', gen:() => [
+      ex.intro('Hear the direction first', `<p>Before you can play a note back, you need to hear where it sits. You will hear two notes. Which one is higher?</p><p>Big jumps first. They get closer as you go.</p>`),
+      ...times(3, () => ex.compare(6, 9)), ...times(3, () => ex.compare(3, 5)),
+      ex.echo([48]), ex.echo([55]) ] },
+    { id:'1-3', title:'Echo Do Re Mi', gen:() => [
+      ...times(2, () => ex.compare(1, 3)),
+      ...shuffle([48, 50, 52, 48, 52, 50]).map(m => ex.echo([m])) ] },
+    { id:'1-4', title:'The whole scale', gen:() => [
+      ex.intro('Hear it against Do', `<p>A note is easier to name when you hear it next to home. Samaa plays <b>Do (C)</b> first, then the mystery note.</p>`),
+      ...times(3, () => ex.name(SCALE)),
+      ...shuffle(SCALE).slice(0, 5).map(m => ex.echo([m])) ] },
+]};
+
+/* ---------- maqamat: each one is its own route through Levels 2 and 3 ----------
+   scale: midi notes, .5 = quarter tone. jins: size of the first jins (the lower building block).
+   foil: the jins a learner most easily confuses it with; sig: [the maqam's signature note, the foil's note]. */
+const MAQAMAT = [
+  { id:'rast', name:'Rast', ar:'راست', c:'--amber', tonic:'C', scale:[48,50,51.5,53,55,57,58.5,60], jins:4, quarter:true, start:true,
+    foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51.5,52],
+    about:'The “head” of the maqamat. Its third note, Sikah (E½♭), sits halfway between E♭ and E. That in-between sound is the heart of Arabic music.',
+    sigText:'Listen for the third note. In Rast it is Sikah (E½♭), a quarter tone lower than the E of Ajam.' },
+  { id:'bayati', name:'Bayati', ar:'بياتي', c:'--violet', tonic:'D', scale:[50,51.5,53,55,57,58,60,62], jins:4, quarter:true,
+    foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[51.5,51],
+    about:'Warm and everywhere: folk songs, mawwal and recitation. Its second note, E½♭, is three quarter tones above D.',
+    sigText:'Listen to the first step. Bayati climbs three quarter tones (D to E½♭). Kurd climbs only a half step (D to E♭).' },
+  { id:'hijaz', name:'Hijaz', ar:'حجاز', c:'--coral', tonic:'D', scale:[50,51,54,55,57,58,60,62], jins:4,
+    foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[54,53],
+    about:'The wide gap between E♭ and F♯ gives Hijaz its unmistakable color. No quarter tones here.',
+    sigText:'Listen for the big step in the middle, E♭ to F♯. In Kurd that step is E♭ to F, much smaller.' },
+  { id:'nahawand', name:'Nahawand', ar:'نهاوند', c:'--plum', tonic:'C', scale:[48,50,51,53,55,56,58,60], jins:4,
+    foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51,52],
+    about:'Lyrical and romantic, close to the Western minor scale. A good first maqam without quarter tones.',
+    sigText:'Listen to the third note. Nahawand has E♭, Ajam has E natural.' },
+  { id:'kurd', name:'Kurd', ar:'كرد', c:'--sky', tonic:'D', scale:[50,51,53,55,57,58,60,62], jins:4,
+    foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[51,51.5],
+    about:'Dark and plain: a half step right above the tonic, D to E♭.',
+    sigText:'Listen to the first step. Kurd moves a half step (D to E♭). Bayati moves three quarter tones (D to E½♭).' },
+  { id:'saba', name:'Saba', ar:'صبا', c:'--olive', tonic:'D', scale:[50,51.5,53,54,57,58,60,61], jins:4, quarter:true, spell:{12:'G♭', 2:'D♭'},
+    foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[54,55],
+    about:'The most sorrowful maqam. Its fourth note drops to G♭, so the scale never feels settled.',
+    sigText:'Listen to the fourth note. Saba falls to G♭. Bayati reaches a full G.' },
+  { id:'sikah', name:'Sikah', ar:'سيكاه', c:'--primary', tonic:'E½♭', scale:[51.5,53,55,57,58.5,60,62,63.5], jins:3, quarter:true,
+    foil:{ name:'Busalik', ar:'بوسليك', notes:[52,53,55] }, sig:[51.5,52],
+    about:'It starts on the quarter-tone note itself, E½♭. Bright and floating, common in religious song.',
+    sigText:'Listen to the very first note. Sikah starts on E½♭, a quarter tone lower than the E of Busalik.' },
+];
+const MAQ = Object.fromEntries(MAQAMAT.map(m => [m.id, m]));
+function setCtx(mqId){ const mq = mqId && MAQ[mqId]; GRID = mq ? 0.5 : 1; SPELL = (mq && mq.spell) || {}; Mic.grid = GRID; }
+
+function route(mq){
+  const sc = mq.scale, jn = sc.slice(0, mq.jins);
+  const two = [
+    { title:`Meet ${mq.name}`, gen:() => [
+      ex.intro(`Maqam ${mq.name} · ${mq.ar}`, `<p>${mq.about}</p><p>Listen to the scale first. Every exercise on this route stays inside ${mq.name}.</p>`),
+      ex.scale(sc), ...times(3, () => ex.jins(mq)), ...shuffle(jn).map(m => ex.echo([m])) ] },
+    { title:'The signature note', gen:() => [
+      ex.intro(`What makes it ${mq.name}`, `<p>${mq.sigText}</p>`),
+      ...times(3, () => ex.sig(mq)), ex.echo(jn, { dur:0.8 }), ...times(3, () => ex.echo(seq(2, 1, 1, jn))) ] },
+    { title:'Steps', gen:() => [ ...times(2, () => ex.direction(1, 1, sc)), ...times(5, () => ex.echo(seq(2, 1, 1, sc))) ] },
+    { title:'Skips', gen:() => [ ex.jins(mq), ...times(5, () => ex.echo(seq(2, 2, 4, sc))), ex.sig(mq) ] },
+  ];
+  const three = [
+    { title:'Inside the first jins', gen:() => [
+      ex.intro('Jins: the building block', `<p>A maqam is built from small groups of 3 to 5 notes called <b>ajnas</b> (one is a <b>jins</b>). The first jins sets the mood.</p><p>Hum each phrase once before you play it.</p>`),
+      ...times(2, () => ex.contour(1, 1, jn)), ...times(5, () => ex.echo(seq(3, 1, 1, jn), { dur:0.75 })) ] },
+    { title:'Across the scale', gen:() => [ ...times(2, () => ex.contour(1, 2, sc)), ...times(6, () => ex.echo(seq(3, 1, 3, sc), { dur:0.7 })) ] },
+    { title:'Qafla: back home', gen:() => [
+      ex.intro('Qafla', `<p>A <b>qafla</b> is the cadence that brings a phrase home. Every phrase here ends on the tonic, ${mq.tonic}.</p>`),
+      ...times(5, () => ex.echo(qafla(4, sc), { dur:0.6 })), ...times(2, () => ex.jins(mq)) ] },
+    { title:'Speed round', gen:() => [
+      ex.intro('Speed round', `<p>Fast ${mq.name} phrases and only <b>one replay</b>. Listen hard the first time.</p>`),
+      ...times(6, () => ex.echo(seq(4, 1, 3, sc), { dur:0.45, replays:1, slow:false })) ] },
+  ];
+  const lv = (n, title, desc, list) => {
+    const level = { id:n, title, desc, c:mq.c, mq:mq.id };
+    level.lessons = list.map((ls, i) => ({ ...ls, id:`${mq.id}-${n}-${i+1}`, mq:mq.id, gen:() => ls.gen().map(e => ({ ...e, mq:mq.id })) }));
+    return level;
+  };
+  return [
+    lv(2, `Two notes in ${mq.name}`, 'Intervals and the signature note of the maqam.', two),
+    lv(3, `${mq.name} phrases`, 'Three and four notes, ending in a qafla.', three),
+  ];
+}
+const ROUTES = Object.fromEntries(MAQAMAT.map(m => [m.id, route(m)]));
+const SOON = [
+  { id:4, title:'Modulation', desc:'Move from one maqam to its sisters, the way a taqsim does.' },
+  { id:5, title:'Rhythm and iqa\'', desc:'Phrases over Maqsum, Wahda and Samai.' },
+  { id:6, title:'Taqsim phrases', desc:'Longer free phrases taken from real taqasim.' },
+  { id:7, title:'Call and response', desc:'Answer long phrases, the way a takht does.' },
+];
+const withLevel = lv => lv.lessons.map((ls, i) => ({ ...ls, level:lv, idx:i }));
+const ALL = [...withLevel(LEVEL1), ...MAQAMAT.flatMap(m => ROUTES[m.id].flatMap(withLevel))];
+const byId = id => ALL.find(x => x.id === id);
+const isDone = id => (S.done[id] || 0) > 0;
+const level1Done = () => LEVEL1.lessons.every(l => isDone(l.id));
+const routeIds = mqId => ROUTES[mqId].flatMap(lv => lv.lessons.map(l => l.id));
+function unlocked(id){
+  const ls = byId(id);
+  if (!ls.mq) return ls.idx === 0 || isDone(LEVEL1.lessons[ls.idx - 1].id);
+  const ids = routeIds(ls.mq), i = ids.indexOf(id);
+  return i === 0 ? level1Done() : isDone(ids[i - 1]);
+}
+const currentId = () => { const p = [...LEVEL1.lessons.map(l => l.id), ...routeIds(S.maqam)]; return p.find(id => !isDone(id)) || p[p.length - 1]; };
+
+/* ---------- shell ---------- */
+let tab = 'learn', viewCleanup = null;
+function renderStats(){
+  const st = liveStreak();
+  $('#stats').innerHTML = `
+    <button class="stat fire ${st ? '' : 'dim'}" id="sStreak" title="Day streak">${icon('i-fire')}${st}</button>
+    <button class="stat xp" id="sXp" title="Total XP">${icon('i-bolt')}${S.xp}${xpMult() > 1 ? '<span class="x2">×2</span>' : ''}</button>
+    <button class="stat pearl" id="sPearl" title="Pearls">${icon('i-pearl')}${S.pearls}</button>
+`;
+  $('#sStreak').onclick = streakModal;
+  $('#sXp').onclick = () => go('profile');
+  $('#sPearl').onclick = () => go('shop');
+}
+function go(t){
+  tab = t;
+  document.querySelectorAll('.nav button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === t ? 'page' : 'false'));
+  if (viewCleanup){ viewCleanup(); viewCleanup = null; }
+  setCtx(null);
+  renderStats();
+  ({ learn:renderLearn, league:renderLeague, tuner:renderTuner, shop:renderShop, profile:renderProfile })[t]();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- rewards: XP, pearls, streak, quests, achievements ---------- */
+const xpMult = () => Date.now() < S.boostUntil ? 2 : 1;
+function toast(text, amount, ico = 'i-pearl'){
+  const t = document.createElement('div'); t.className = 'toast';
+  t.innerHTML = `${icon(ico)}<span>${text}</span>${amount ? `<b>${amount}</b>` : ''}`;
+  const box = $('#toasts'); while (box.children.length >= 3) box.firstChild.remove();
+  box.appendChild(t); setTimeout(() => t.remove(), 3400);
+}
+const QUESTS = [
+  { id:'xp', icon:'i-bolt', c:'--violet', label:() => `Earn ${S.goal} XP`, target:() => S.goal, val:q => q.xp, reward:15 },
+  { id:'combo', icon:'i-fire', c:'--amber', label:() => 'Get 5 right in a row', target:() => 5, val:q => q.combo, reward:10 },
+  { id:'lessons', icon:'i-star', c:'--primary', label:() => 'Finish 2 lessons', target:() => 2, val:q => q.lessons, reward:10 },
+];
+function checkQuests(){
+  const q = today();
+  for (const Q of QUESTS) if (!q.claimed.includes(Q.id) && Q.val(q) >= Q.target()){
+    q.claimed.push(Q.id); S.pearls += Q.reward; toast(`Quest done: ${Q.label()}`, `+${Q.reward}`);
+  }
+  save(); renderStats();
+}
+const BADGES = [
+  { id:'tuned', name:'Tuned up', desc:'Tune all six courses of your oud', icon:'i-tuner', c:'--primary', goal:1, val:() => +isDone('1-1') },
+  { id:'level1', name:'First steps', desc:'Finish Level 1', icon:'i-star', c:'--sky', goal:4, val:() => LEVEL1.lessons.filter(l => isDone(l.id)).length },
+  { id:'streak', name:'On fire', desc:'Reach a 7-day streak', icon:'i-fire', c:'--amber', goal:7, val:() => S.bestStreak },
+  { id:'xp', name:'Sharp ear', desc:'Earn 500 XP', icon:'i-bolt', c:'--violet', goal:500, val:() => S.xp },
+  { id:'perfect', name:'Flawless', desc:'Finish 5 lessons with no mistakes', icon:'i-check', c:'--primary', goal:5, val:() => S.perfects },
+  { id:'quarter', name:'Quarter-tone ear', desc:'Finish a lesson in Rast, Bayati, Saba or Sikah', icon:'i-ear', c:'--coral', goal:1, val:() => +ALL.some(x => x.mq && MAQ[x.mq].quarter && isDone(x.id)) },
+  { id:'explorer', name:'Maqam explorer', desc:'Start three different maqam routes', icon:'i-map', c:'--plum', goal:3, val:() => MAQAMAT.filter(m => routeIds(m.id).some(isDone)).length },
+  { id:'speed', name:'Quick fingers', desc:'Finish a speed round', icon:'i-bolt', c:'--coral', goal:1, val:() => +ALL.some(x => x.title === 'Speed round' && isDone(x.id)) },
+  { id:'dressed', name:'Dressed up', desc:'Buy an outfit for Oudi', icon:'i-shop', c:'--olive', goal:1, val:() => S.gear.owned.length },
+];
+function checkBadges(){
+  for (const b of BADGES) if (!S.badges.includes(b.id) && b.val() >= b.goal){
+    S.badges.push(b.id); S.pearls += 20; toast(`Achievement: ${b.name}`, '+20', 'i-trophy');
+  }
+  save(); renderStats();
+}
+/* ---------- ear stats: which notes you hit on the first try ---------- */
+function earRecord(m, mq, ok){ const k = `${mq || ''}|${m}`, c = S.ear[k] || [0, 0]; c[ok ? 0 : 1]++; S.ear[k] = c; save(); }
+function earLabel(k){
+  const [mq, m] = k.split('|'), g = GRID, sp = SPELL;
+  setCtx(mq || null); const l = name(+m); GRID = g; SPELL = sp; Mic.grid = g;
+  return l;
+}
+function tricky(){
+  return Object.entries(S.ear).filter(([, [h, x]]) => x > 0)
+    .sort((a, b) => b[1][1] / (b[1][0] + b[1][1]) - a[1][1] / (a[1][0] + a[1][1]) || b[1][1] - a[1][1]).slice(0, 5)
+    .map(([k]) => { const [mq, m] = k.split('|'); return { m:+m, mq:mq || null, label:earLabel(k) }; });
+}
+function weekHtml(){
+  const cells = [];
+  for (let i = 6; i >= 0; i--){
+    const d = new Date(); d.setDate(d.getDate() - i); const k = dayKey(d);
+    const on = (S.daily[k] || 0) > 0, frz = S.frozen.includes(k);
+    cells.push(`<div><span>${'SMTWTFS'[d.getDay()]}</span><div class="wd ${on ? 'on' : frz ? 'frz' : ''} ${i === 0 && !on ? 'today' : ''}" title="${k}">${on ? icon('i-fire') : frz ? icon('i-freeze') : ''}</div></div>`);
+  }
+  return `<div class="week">${cells.join('')}</div>`;
+}
+function streakModal(){
+  const st = liveStreak(), doneToday = (S.daily[dayKey()] || 0) > 0;
+  openModal(`<div class="streak-big">${icon('i-fire')}<div><b>${st}</b><p>day streak · best ${S.bestStreak}</p></div></div>
+    <p>${doneToday ? 'You practiced today. Come back tomorrow to grow your streak.' : st ? 'Finish a lesson today to keep your streak alive.' : 'Finish a lesson to start a streak.'}</p>
+    ${weekHtml()}
+    <p class="muted-line">${icon('i-freeze')}${S.freezes} of 2 streak freezes equipped</p>
+    <div class="row"><button class="btn" onclick="closeModal()">Got it</button><button class="btn ghost" id="toShop">Shop</button></div>`);
+  $('#toShop').onclick = () => { closeModal(); go('shop'); };
+}
+/* ---------- shop ---------- */
+const SHOP = {
+  power:[
+    { id:'freeze', name:'Streak freeze', desc:'Keeps your streak alive on a day you miss. Hold up to 2.', price:100, icon:'i-freeze', c:'--sky',
+      can:() => S.freezes < 2, why:'2 equipped', buy:() => { S.freezes++; }, count:() => `${S.freezes}/2 equipped` },
+    { id:'boost', name:'Double XP', desc:'Earn twice the XP for the next 15 minutes.', price:80, icon:'i-bolt', c:'--violet',
+      can:() => Date.now() > S.boostUntil, why:'Active', buy:() => { S.boostUntil = Date.now() + 15 * 60e3; } },
+  ],
+  gear:[
+    { id:'tarboush', name:'Tarboush', price:150 }, { id:'shades', name:'Sunglasses', price:120 },
+    { id:'headphones', name:'Studio headphones', price:200 }, { id:'jasmine', name:'Jasmine flower', price:60 },
+    { id:'bowtie', name:'Bow tie', price:90 }, { id:'crown', name:'Golden crown', price:400 },
+  ],
+};
+/* outfits for Oudi, drawn over the oud mascot (120×120) */
+const GEAR_SVG = {
+  tarboush:`<path d="M43 34 L77 34 L72 7 L48 7 Z" fill="#C8313A"/><rect x="41" y="30" width="38" height="7" rx="2" fill="#9E2129"/><path d="M60 7 C66 11 70 18 72 27" stroke="#1B2928" stroke-width="2.5" fill="none"/><circle cx="72" cy="28" r="3.2" fill="#1B2928"/>`,
+  shades:`<rect x="35" y="50" width="22" height="15" rx="6" fill="#141B1A"/><rect x="63" y="50" width="22" height="15" rx="6" fill="#141B1A"/><rect x="56" y="54" width="8" height="3.5" fill="#141B1A"/><path d="M39 54h7M67 54h7" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/>`,
+  headphones:`<path d="M21 66 C21 18 99 18 99 66" stroke="#2B3836" stroke-width="7" fill="none" stroke-linecap="round"/><rect x="12" y="56" width="16" height="25" rx="7" fill="#E5504A"/><rect x="92" y="56" width="16" height="25" rx="7" fill="#E5504A"/>`,
+  jasmine:[0, 72, 144, 216, 288].map(a => `<circle cx="${(86 + 6.5 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(38 + 6.5 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="5.2" fill="#fff" stroke="#E3D6C3" stroke-width="1.2"/>`).join('') + `<circle cx="86" cy="38" r="3.6" fill="#F2A22B"/>`,
+  bowtie:`<path d="M60 36 L46 28 L46 44 Z M60 36 L74 28 L74 44 Z" fill="#8A5CF0"/><circle cx="60" cy="36" r="4" fill="#6439C8"/>`,
+  crown:`<path d="M41 31 L43 9 L52 20 L60 5 L68 20 L77 9 L79 31 Z" fill="#F5C534" stroke="#C27A0C" stroke-width="2" stroke-linejoin="round"/><circle cx="60" cy="24" r="3" fill="#E5504A"/>`,
+};
+function mascot(gear = S.gear.worn, cls = '', size){
+  return `<svg class="mascot ${cls}" viewBox="0 0 120 120" ${size ? `style="width:${size}px;height:${size}px"` : ''} aria-hidden="true"><use href="#oud-mini"/>${GEAR_SVG[gear] || ''}</svg>`;
+}
+function buy(it){
+  if (S.pearls < it.price){ toast(`You need ${it.price - S.pearls} more pearls`, ''); return false; }
+  S.pearls -= it.price;
+  if (it.buy) it.buy(); else { S.gear.owned.push(it.id); S.gear.worn = it.id; }
+  save(); toast(`${it.name}: yours`, `−${it.price}`); checkBadges(); renderStats();
+  return true;
+}
+function renderShop(){
+  const left = Math.ceil((S.boostUntil - Date.now()) / 60000);
+  $('#view').innerHTML = `<div class="stack">
+    <div class="shop-head"><h2 class="section-title" style="margin:0">Shop</h2><span class="wallet" title="Your pearls">${icon('i-pearl')}${S.pearls}</span></div>
+    <p class="ex-sub" style="margin:0">Earn pearls by finishing lessons, daily quests and achievements.</p>
+    <h3>Power-ups</h3>
+    <div class="items">${SHOP.power.map(it => { const ok = it.can();
+      return `<div class="item" style="--c:var(${it.c})"><span class="ii">${icon(it.icon)}</span>
+        <div><b>${it.name}</b><p>${it.id === 'boost' && !ok ? `Active, ${left} min left.` : it.desc}${it.count ? ` ${it.count()}.` : ''}</p></div>
+        <button class="btn price" data-buy="${it.id}" ${ok && S.pearls >= it.price ? '' : 'disabled'}>${ok ? `${icon('i-pearl')}${it.price}` : it.why}</button></div>`; }).join('')}</div>
+    <h3>Oudi's wardrobe</h3>
+    <div class="gear-grid">${SHOP.gear.map(g => { const own = S.gear.owned.includes(g.id), worn = S.gear.worn === g.id;
+      return `<div class="gear ${worn ? 'worn' : ''}">${mascot(g.id)}<b>${g.name}</b>
+        <button class="btn ${own ? 'ghost' : ''}" data-gear="${g.id}" ${!own && S.pearls < g.price ? 'disabled' : ''}>${worn ? 'Take off' : own ? 'Wear' : `${icon('i-pearl')}${g.price}`}</button></div>`; }).join('')}</div>
+  </div>`;
+  document.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { buy(SHOP.power.find(x => x.id === b.dataset.buy)); renderShop(); });
+  document.querySelectorAll('[data-gear]').forEach(b => b.onclick = () => {
+    const g = SHOP.gear.find(x => x.id === b.dataset.gear);
+    if (S.gear.owned.includes(g.id)){ S.gear.worn = S.gear.worn === g.id ? null : g.id; save(); }
+    else buy(g);
+    renderShop();
+  });
+}
+document.querySelectorAll('.nav button').forEach(b => b.onclick = () => go(b.dataset.tab));
+
+function openModal(html, color){
+  const m = $('#modal');
+  m.innerHTML = `<div class="card ${color ? 'colored' : ''}" style="${color ? `--c:var(${color})` : ''}" role="dialog" aria-modal="true">${html}</div>`;
+  m.hidden = false;
+  m.onclick = e => { if (e.target === m) closeModal(); };
+  m.querySelector('button')?.focus();
+}
+function closeModal(){ $('#modal').hidden = true; }
+
+/* ---------- welcome, sign-in, password reset ---------- */
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const here = () => location.origin + location.pathname;
+function showAuth(html){ $('#authCard').innerHTML = html; $('#auth').hidden = false; document.body.style.overflow = 'hidden'; $('#auth').scrollTop = 0; }
+function hideAuth(){ $('#auth').hidden = true; document.body.style.overflow = ''; }
+const backBtn = () => `<button class="back" id="back">${icon('i-x')} Back</button>`;
+function authWelcome(){
+  showAuth(`<div class="auth-hero">${mascot(undefined, 'bounce')}<h1>Samaa <small>سماع</small></h1><p>Learn to play the oud by ear, one note at a time.</p></div>
+    <div class="perks">
+      <div class="perk"><span class="qi" style="--c:var(--sky)">${icon('i-ear')}</span>Hear a note, play it back on your oud</div>
+      <div class="perk"><span class="qi" style="--c:var(--amber)">${icon('i-tuner')}</span>Samaa listens and guides you higher or lower</div>
+      <div class="perk"><span class="qi" style="--c:var(--plum)">${icon('i-map')}</span>Routes through Rast, Bayati, Hijaz, Saba and more</div>
+    </div>
+    <button class="btn wide" id="aStart">${Cloud.enabled() ? 'Create a free account' : 'Get started'}</button>
+    ${Cloud.enabled() ? `<button class="btn ghost wide" id="aLogin">I already have an account</button><button class="link" id="aGuest" style="align-self:center">Try it without an account</button>` : ''}`);
+  $('#aStart').onclick = () => Cloud.enabled() ? authSignup() : startGuest();
+  if (Cloud.enabled()){ $('#aLogin').onclick = authLogin; $('#aGuest').onclick = startGuest; }
+}
+function startGuest(){ S.guest = true; save(); S.onboarded ? enterApp() : onboarding(0); }
+function formView(title, sub, fields, submit, extra = ''){
+  showAuth(`${backBtn()}<h2 style="font-size:30px">${title}</h2>${sub ? `<p class="form-note" style="text-align:left">${sub}</p>` : ''}
+    <form class="form" id="aForm" novalidate>${fields}<p class="form-err" id="aErr" role="alert"></p><button class="btn wide" id="aSubmit">${submit}</button></form>${extra}`);
+  $('#back').onclick = authWelcome;
+}
+async function busy(fn){
+  const b = $('#aSubmit'), label = b.textContent; b.disabled = true; b.textContent = 'One moment…'; $('#aErr').textContent = '';
+  try { await fn(); } catch(err){ $('#aErr').textContent = friendly(err); }
+  finally { if ($('#aSubmit')){ b.disabled = false; b.textContent = label; } }
+}
+function friendly(err){
+  const m = (err && (err.message || err.error_description)) || 'Something went wrong. Check your connection and try again.';
+  if (/invalid login/i.test(m)) return 'That email and password don\'t match an account.';
+  if (/already registered/i.test(m)) return 'There is already an account with this email. Log in instead.';
+  if (/email not confirmed/i.test(m)) return 'Confirm your email first: open the link we sent you.';
+  if (/password/i.test(m) && /6|8|characters|weak/i.test(m)) return 'Use a password of at least 8 characters.';
+  return m;
+}
+function authSignup(){
+  formView('Create your account', 'Your progress, streak and outfits are saved to your account, on every device.',
+    `<label>Your name<input id="fName" autocomplete="nickname" maxlength="24" value="${esc(S.player === 'Oud player' ? '' : S.player)}" placeholder="Oud player"></label>
+     <label>Email<input id="fEmail" type="email" autocomplete="email" required></label>
+     <label>Password<input id="fPass" type="password" autocomplete="new-password" minlength="8" required></label>`,
+    'Create account', `<p class="form-note">Have an account? <button class="link" id="toLogin">Log in</button></p>`);
+  $('#toLogin').onclick = authLogin;
+  $('#aForm').onsubmit = ev => { ev.preventDefault(); busy(async () => {
+    const email = $('#fEmail').value.trim(), password = $('#fPass').value, nm = $('#fName').value.trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('Enter a valid email address.');
+    if (password.length < 8) throw new Error('Use a password of at least 8 characters.');
+    if (nm) S.player = nm;
+    const { data, error } = await Cloud.sb.auth.signUp({ email, password, options:{ data:{ display_name:S.player }, emailRedirectTo:here() } });
+    if (error) throw error;
+    if (data.session){ Cloud.user = data.session.user; await afterLogin(); }
+    else showAuth(`<div class="auth-hero">${mascot()}<h2>Check your email</h2><p>We sent a link to <b>${esc(email)}</b>. Open it to confirm your account, then you're in.</p></div>
+      <button class="btn ghost wide" id="toLogin2">Back to log in</button>`), $('#toLogin2').onclick = authLogin;
+  }); };
+}
+function authLogin(){
+  formView('Welcome back', '',
+    `<label>Email<input id="fEmail" type="email" autocomplete="email" required></label>
+     <label>Password<input id="fPass" type="password" autocomplete="current-password" required></label>`,
+    'Log in', `<p class="form-note"><button class="link" id="toForgot">Forgot your password?</button> · <button class="link" id="toSignup">Create an account</button></p>`);
+  $('#toForgot').onclick = authForgot; $('#toSignup').onclick = authSignup;
+  $('#aForm').onsubmit = ev => { ev.preventDefault(); busy(async () => {
+    const { data, error } = await Cloud.sb.auth.signInWithPassword({ email:$('#fEmail').value.trim(), password:$('#fPass').value });
+    if (error) throw error;
+    Cloud.user = data.user; await afterLogin();
+  }); };
+}
+function authForgot(){
+  formView('Reset your password', 'We\'ll email you a link to choose a new password.',
+    `<label>Email<input id="fEmail" type="email" autocomplete="email" required></label>`, 'Send reset link');
+  $('#back').onclick = authLogin;
+  $('#aForm').onsubmit = ev => { ev.preventDefault(); busy(async () => {
+    const { error } = await Cloud.sb.auth.resetPasswordForEmail($('#fEmail').value.trim(), { redirectTo:here() });
+    if (error) throw error;
+    $('#aErr').style.color = 'var(--ok-ink)'; $('#aErr').textContent = 'Sent. Check your inbox for the link.';
+  }); };
+}
+function authNewPassword(){
+  formView('Choose a new password', '', `<label>New password<input id="fPass" type="password" autocomplete="new-password" minlength="8" required></label>`, 'Save password');
+  $('#back').hidden = true;
+  $('#aForm').onsubmit = ev => { ev.preventDefault(); busy(async () => {
+    if ($('#fPass').value.length < 8) throw new Error('Use a password of at least 8 characters.');
+    const { error } = await Cloud.sb.auth.updateUser({ password:$('#fPass').value });
+    if (error) throw error;
+    toast('Password updated', '', 'i-check'); await afterLogin();
+  }); };
+}
+/* after any sign-in: load the account's progress (merging guest progress made on this device) */
+async function afterLogin(){
+  const local = JSON.parse(JSON.stringify(S));
+  let remote = null;
+  try { remote = await Cloud.pull(); } catch(e){ toast('Could not load your progress. Using this device for now.', '', 'i-x'); }
+  const guestHere = local.guest && !local.owner && hasProgress(local);
+  const sameUser = local.owner === Cloud.user.id;
+  let next = remote ? (guestHere ? mergeStates(remote, local) : sameUser && (local.savedAt || 0) > (remote.savedAt || 0) ? local : remote)
+                    : (guestHere || sameUser ? local : { settings:local.settings });
+  replaceState(next);
+  S.owner = Cloud.user.id; S.guest = false;
+  if (!remote && S.player === 'Oud player') S.player = Cloud.user.user_metadata?.display_name || S.player;
+  if (!S.joined) S.joined = dayKey();
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  await Cloud.push();
+  S.onboarded ? enterApp() : onboarding(0);
+}
+async function logOut(){
+  await Cloud.push();
+  await Cloud.sb.auth.signOut();
+  Cloud.user = null;
+  const st = S.settings; replaceState({ settings:st }); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  authWelcome();
+}
+
+/* ---------- first-run setup ---------- */
+const OB = {};
+function onboarding(step){
+  const total = 4, dots = `<div class="steps">${times(total, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
+  const next = () => onboarding(step + 1);
+  if (step === 0){
+    showAuth(`${dots}<h2 style="font-size:28px">How is your oud tuned?</h2><p class="form-note" style="text-align:left">Lowest course to highest. You can change this later.</p>
+      <div class="opt-list">${Object.entries(TUNINGS).map(([k, t]) => `<button class="opt" data-v="${k}" aria-pressed="${S.settings.tuning === k}"><span class="qi" style="--c:var(--amber)">${icon('i-tuner')}</span><span>${t.label}<small>${t.notes.map(m => WEST[pc(m) * 2]).join(' · ')}</small></span></button>`).join('')}</div>
+      <button class="btn wide" id="obNext">Continue</button>`);
+    document.querySelectorAll('.opt').forEach(b => b.onclick = () => { S.settings.tuning = b.dataset.v; document.querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('#obNext').onclick = () => { save(); next(); };
+  } else if (step === 1){
+    showAuth(`${dots}<h2 style="font-size:28px">Where should you start?</h2>
+      <div class="opt-list">
+        <button class="opt" data-v="new" aria-pressed="${OB.level !== 'skip'}"><span class="qi" style="--c:var(--primary)">${icon('i-ear')}</span><span>I'm new to playing by ear<small>Start at Level 1: tune up, then single notes.</small></span></button>
+        <button class="opt" data-v="skip" aria-pressed="${OB.level === 'skip'}"><span class="qi" style="--c:var(--plum)">${icon('i-map')}</span><span>I can already find single notes<small>Skip Level 1 and pick a maqam route.</small></span></button>
+      </div><button class="btn wide" id="obNext">Continue</button>`);
+    document.querySelectorAll('.opt').forEach(b => b.onclick = () => { OB.level = b.dataset.v; document.querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('#obNext').onclick = () => { if (OB.level === 'skip') LEVEL1.lessons.forEach(l => { S.done[l.id] = S.done[l.id] || 1; }); save(); next(); };
+  } else if (step === 2){
+    showAuth(`${dots}<h2 style="font-size:28px">Pick a daily goal</h2><p class="form-note" style="text-align:left">A lesson earns 10 to 15 XP. Small and daily beats long and rare.</p>
+      <div class="opt-list">${GOALS.map(([v, l]) => `<button class="opt" data-v="${v}" aria-pressed="${S.goal === v}"><span class="qi" style="--c:var(--violet)">${icon('i-bolt')}</span><span>${l}<small>${v} XP a day · about ${Math.max(1, Math.round(v / 12))} lesson${v > 12 ? 's' : ''}</small></span></button>`).join('')}</div>
+      <button class="btn wide" id="obNext">Continue</button>`);
+    document.querySelectorAll('.opt').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; document.querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('#obNext').onclick = () => { save(); next(); };
+  } else {
+    showAuth(`${dots}<h2 style="font-size:28px">Let's check your microphone</h2>
+      <p class="form-note" style="text-align:left">Samaa learns how quiet your room is and how loud your oud is, so it ignores talking and noise. It takes about 15 seconds.</p>
+      <button class="btn wide" id="obMic">Check my microphone</button>
+      <button class="btn ghost wide" id="obKeys">No oud right now: use on-screen keys</button>`);
+    $('#obMic').onclick = () => micCheck(finishOnboarding);
+    $('#obKeys').onclick = () => { S.settings.tap = true; finishOnboarding(); };
+  }
+}
+function finishOnboarding(){ S.onboarded = true; save(); enterApp(); }
+
+/* ---------- mic check: quiet room → pluck → talk ---------- */
+async function micCheck(done){
+  showAuth(`<h2 style="font-size:28px">Mic check</h2>
+    <div class="cal-step" id="c1"><span class="qi" style="--c:var(--sky)">1</span><span>Stay quiet for 2 seconds</span></div>
+    <div class="cal-step" id="c2"><span class="qi" style="--c:var(--sky)">2</span><span>Pluck any open string and let it ring</span></div>
+    <div class="cal-step" id="c3"><span class="qi" style="--c:var(--sky)">3</span><span>Say a sentence out loud</span></div>
+    <div class="cal-meter"><i id="calLvl"></i></div>
+    <p class="hint" id="calMsg" aria-live="polite">Starting microphone…</p>
+    <button class="btn ghost wide" id="calSkip">Skip</button>`);
+  let stop = false;
+  $('#calSkip').onclick = () => { stop = true; done(); };
+  S.settings.tap = false;
+  if (!await Mic.start()){ $('#calMsg').textContent = 'The microphone is blocked. Allow it in your browser settings, or skip and use on-screen keys.'; return; }
+  const lvl = () => { const b = Mic.buf; Mic.an.getFloatTimeDomainData(b); let r = 0; for (let i = 0; i < b.length; i++) r += b[i] * b[i]; return Math.sqrt(r / b.length); };
+  const meter = r => { const el = $('#calLvl'); if (el) el.style.width = `${Math.min(100, r * 400)}%`; };
+  const mark = id => { const el = $(id); if (el){ el.classList.add('done'); el.querySelector('.qi').innerHTML = icon('i-check'); } };
+  // 1. room noise
+  $('#calMsg').textContent = 'Listening to your room…';
+  let sum = 0, n = 0; const t0 = performance.now();
+  while (performance.now() - t0 < 2000){ if (stop) return; const r = lvl(); sum += r; n++; meter(r); await sleep(30); }
+  Mic.floor = sum / n; mark('#c1');
+  // 2. pluck: start strict, loosen until the pluck is heard
+  let heard = null;
+  for (let sens = 4; sens <= 9 && !heard && !stop; sens++){
+    S.settings.sens = sens;
+    $('#calMsg').textContent = sens === 4 ? 'Now pluck any open string.' : 'Didn\'t catch that. Pluck again, a little firmer.';
+    heard = await new Promise(res => {
+      const off = Mic.on(e => { if (e.type === 'note'){ off(); clearInterval(iv); res(e.midi); } });
+      const iv = setInterval(() => meter(Mic.cur ? Mic.cur.rms : 0), 60);
+      setTimeout(() => { off(); clearInterval(iv); res(null); }, 5000);
+    });
+  }
+  if (stop) return;
+  if (!heard){ S.settings.sens = 7; $('#calMsg').textContent = 'Couldn\'t hear the oud clearly. Try moving it closer to the microphone. You can rerun this from your profile.'; save(); $('#calSkip').textContent = 'Continue'; return; }
+  mark('#c2');
+  // 3. speech must not register; tighten if it does
+  $('#calMsg').textContent = `Heard ${name(heard)}. Now say something out loud for 3 seconds.`;
+  let falses = 0;
+  const off = Mic.on(e => { if (e.type === 'note') falses++; });
+  await sleep(3500); off();
+  if (falses && S.settings.sens > 3) S.settings.sens--;
+  mark('#c3'); save();
+  $('#calMsg').textContent = falses ? `Your voice was picked up, so the filter is now stricter (sensitivity ${S.settings.sens}).` : `All set. Samaa hears your oud and ignores your voice (sensitivity ${S.settings.sens}).`;
+  $('#calSkip').className = 'btn wide'; $('#calSkip').textContent = 'Done';
+  $('#calSkip').onclick = done;
+}
+
+/* ---------- League: weekly XP ---------- */
+async function renderLeague(){
+  const days = 7 - ((new Date().getDay() + 6) % 7);
+  $('#view').innerHTML = `<div class="stack">
+    <div class="league-head"><div><h2 class="section-title" style="margin:0">Weekly league</h2><p class="ex-sub" style="margin:4px 0 0">${weekKey()} · ends in ${days} day${days > 1 ? 's' : ''}</p></div>
+      <span class="wallet" style="color:var(--violet)">${icon('i-bolt')}${weekXp()} XP</span></div>
+    <div class="panel" id="board"><p class="ex-sub" style="margin:0">Loading…</p></div></div>`;
+  const board = $('#board');
+  if (!Cloud.enabled()){ board.innerHTML = `<p style="margin:0">The league needs accounts, which aren't switched on for this site yet.</p>`; return; }
+  if (!Cloud.user){
+    board.innerHTML = `<div class="acct"><div><b>Join the league</b><p>Create a free account to compete with other oud players every week.</p></div><button class="btn" id="lgJoin">Sign up</button></div>`;
+    $('#lgJoin').onclick = authSignup; return;
+  }
+  await Cloud.push();
+  const { data, error } = await Cloud.sb.rpc('leaderboard', { wk:weekKey() });
+  if (!$('#board')) return;
+  if (error){ board.innerHTML = `<p style="margin:0">Couldn't load the league. Check your connection and try again.</p>`; return; }
+  const colors = ['--primary', '--violet', '--coral', '--sky', '--plum', '--amber', '--olive'];
+  board.innerHTML = data.length ? `<div class="rows">${data.map((r, i) => `<div class="lrow ${r.id === Cloud.user.id ? 'me' : ''}">
+      <span class="rank ${i < 3 ? 'top' : ''}">${i + 1}</span>
+      <span class="ini" style="--c:var(${colors[(r.display_name || '?').charCodeAt(0) % colors.length]})">${esc((r.display_name || '?').trim().charAt(0).toUpperCase())}</span>
+      <b>${esc(r.display_name || 'Oud player')}${r.id === Cloud.user.id ? ' (you)' : ''}</b><span class="xpv">${r.week_xp} XP</span></div>`).join('')}</div>`
+    : `<p style="margin:0">Nobody has earned XP this week yet. Finish a lesson to take first place.</p>`;
+}
+
+/* ---------- Learn ---------- */
+const OFF = [0, 52, 78, 52, 0, -52, -78, -52];
+function renderLearn(){
+  const cur = currentId();
+  const q = today(), boost = xpMult() > 1;
+  let html = `<div class="today-row">
+    ${S.notice ? `<div class="notice">${icon('i-freeze')}<span>${S.notice}</span></div>` : ''}
+    <div class="panel"><div class="panel-head"><h3>Daily quests</h3>
+      ${boost ? `<span class="tag" style="--c:var(--violet)">Double XP · ${Math.ceil((S.boostUntil - Date.now()) / 60000)} min</span>` : `<span class="muted-line" style="font-size:13px">New quests every day</span>`}</div>
+      <div class="quests">${QUESTS.map(Q => { const v = Math.min(Q.val(q), Q.target()), done = q.claimed.includes(Q.id);
+        return `<div class="quest ${done ? 'done' : ''}" style="--c:var(${Q.c})"><span class="qi">${icon(done ? 'i-check' : Q.icon)}</span>
+          <div><b>${Q.label()}</b><div class="qbar"><i style="width:${v / Q.target() * 100}%"></i><em>${v} / ${Q.target()}</em></div></div>
+          <span class="reward">${done ? 'Done' : `${icon('i-pearl')}${Q.reward}`}</span></div>`; }).join('')}</div></div>
+    ${Cloud.enabled() && !Cloud.user && hasProgress(S) ? `<div class="banner-cta"><div><b>Save your progress</b><p>Create a free account so your streak and lessons are safe on every device.</p></div><button class="btn" id="saveAcct">Create account</button></div>` : ''}
+    ${tricky().length >= 2 ? `<div class="practice-card" style="border-color:color-mix(in srgb,var(--coral) 45%,transparent)"><span class="qi" style="--c:var(--coral);width:56px;height:56px">${icon('i-ear')}</span>
+      <div><h3>Tricky notes</h3><p>Practice the notes you miss most: ${tricky().map(t => t.label).join(', ')}.</p></div>
+      <button class="btn ghost" id="trickyGo">Go</button></div>` : ''}
+    <div class="practice-card">${mascot(undefined, '', 56)}
+      <div><h3>Practice</h3><p>Mix exercises from lessons you finished to keep your ear sharp.</p></div>
+      <button class="btn ghost" id="practice">Go</button></div>
+  </div>`;
+  if (S.notice){ S.notice = null; save(); }
+  const levels = [LEVEL1, 'pick', ...ROUTES[S.maqam], ...SOON.map(l => ({ ...l, c:'--sky', soon:true }))];
+  for (const lv of levels){
+    if (lv === 'pick'){ html += maqamPicker(); continue; }
+    const c = `--c:var(${lv.c});--c-d:var(${lv.c}-d)`;
+    const mq = lv.mq && MAQ[lv.mq];
+    html += `<section class="level" style="${c}">
+      <div class="banner ${lv.soon ? 'locked' : ''}" style="background:var(--c)">
+        <div><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name} ${mq.ar}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p></div>
+        ${lv.soon ? `<span class="soon">Coming soon</span>` : ''}
+      </div><div class="path">`;
+    const items = lv.lessons || times(3, (_, i) => ({ id:`${lv.id}-${i+1}`, soon:true }));
+    items.forEach((ls, i) => {
+      const open = !ls.soon && unlocked(ls.id), done = !ls.soon && isDone(ls.id), here = ls.id === cur && !ls.soon;
+      const ico = ls.soon || !open ? 'i-lock' : done ? 'i-check' : i === 0 && lv.id === 1 ? 'i-tuner' : 'i-star';
+      html += `<div class="node-wrap" style="transform:translateX(${OFF[i % 8]}px)">
+        ${here ? `<span class="start-tag">${done ? 'AGAIN' : 'START'}</span>` : ''}
+        <button class="node ${open ? '' : 'locked'} ${here ? 'current' : ''}" data-lesson="${ls.soon ? '' : ls.id}" ${open ? '' : 'aria-disabled="true"'} aria-label="${ls.title || 'Locked lesson'}">${icon(ico)}</button>
+        ${done && S.done[ls.id] > 1 ? `<span class="done-count">×${S.done[ls.id]}</span>` : ''}
+        ${ls.title ? `<span class="node-label">${ls.title}</span>` : ''}
+      </div>`;
+    });
+    if (!lv.soon) html += `<div class="node-wrap"><button class="node ${lv.lessons.every(l => isDone(l.id)) ? '' : 'locked'}" style="--c:var(--amber);--c-d:var(--amber-d)" aria-label="Level ${lv.id} reward" data-chest="${lv.mq || ''}:${lv.id}">${icon('i-chest')}</button></div>`;
+    html += `</div></section>`;
+  }
+  $('#view').innerHTML = html;
+  $('#practice').onclick = () => startLesson(null, true);
+  if ($('#trickyGo')) $('#trickyGo').onclick = () => startLesson('tricky', true);
+  if ($('#saveAcct')) $('#saveAcct').onclick = authSignup;
+  document.querySelectorAll('[data-lesson]').forEach(b => b.onclick = () => lessonCard(b.dataset.lesson));
+  document.querySelectorAll('[data-maqam]').forEach(b => b.onclick = () => {
+    S.maqam = b.dataset.maqam; save(); renderLearn();
+    document.querySelector('.pick')?.scrollIntoView({ block:'start' });
+  });
+  document.querySelectorAll('[data-chest]').forEach(b => b.onclick = () => {
+    const [mq, n] = b.dataset.chest.split(':');
+    const lv = mq ? ROUTES[mq][n - 2] : LEVEL1;
+    const key = b.dataset.chest, full = lv.lessons.every(l => isDone(l.id)), fresh = full && !S.chests.includes(key);
+    if (fresh){ S.chests.push(key); S.pearls += 40; save(); renderStats(); sfx(true); }
+    openModal(full
+      ? `<h3>${fresh ? 'You opened the chest!' : `Level ${lv.id} complete`}</h3>${fresh ? `<p class="wallet">${icon('i-pearl')}+40 pearls</p>` : ''}<p>You finished “${lv.title}”. Replay any lesson to keep the skill sharp.</p><button class="btn wide" onclick="closeModal()">Nice</button>`
+      : `<h3>Level chest</h3><p>Finish every lesson in Level ${lv.id} to open it and get 40 pearls.</p><button class="btn wide" onclick="closeModal()">Got it</button>`);
+  });
+  const curNode = document.querySelector('.node.current');
+  if (curNode && ALL.findIndex(x => x.id === cur) > 0) curNode.scrollIntoView({ block:'center' });
+}
+function maqamPicker(){
+  const open = level1Done();
+  return `<section class="level pick">
+    <div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Levels 2–3</div>
+    <h2>Choose your maqam</h2>
+    <p>${open ? 'Each maqam has its own route of exercises. Not sure where to begin? Start with Rast.' : 'Finish Level 1 to start a route. You can look around now.'}</p>
+    <div class="mq-grid">${MAQAMAT.map(m => {
+      const ids = routeIds(m.id), n = ids.filter(isDone).length;
+      return `<button class="mq" style="--c:var(${m.c})" data-maqam="${m.id}" aria-pressed="${S.maqam === m.id}">
+        <span class="mq-top"><b>${m.name}</b><span class="ar">${m.ar}</span></span>
+        <span class="meta">on ${m.tonic}${m.quarter ? `<span class="tag">¼ tones</span>` : ''}${m.start ? `<span class="tag">Start here</span>` : ''}</span>
+        <span class="pbar"><i style="width:${n / ids.length * 100}%"></i></span></button>`;
+    }).join('')}</div></section>`;
+}
+function lessonCard(id){
+  if (!id) { openModal(`<h3>Coming soon</h3><p>We are building Levels 4 to 7: modulation, rhythm, taqsim phrases and call and response.</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
+  const ls = byId(id);
+  if (!unlocked(id)){ openModal(`<h3>${ls.title}</h3><p>${ls.mq && !level1Done() ? 'Finish Level 1 to open the maqam routes.' : 'Finish the lesson before this one to unlock it.'}</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
+  openModal(`<h3>${ls.title}</h3><p>Level ${ls.level.id}${ls.mq ? ` · Maqam ${MAQ[ls.mq].name}` : ''} · Lesson ${ls.idx + 1} of ${ls.level.lessons.length}</p>
+    <button class="btn wide" id="go">${isDone(id) ? `Practice +${5 * xpMult()} XP` : `Start +${10 * xpMult()} XP`}</button>`, ls.level.c);
+  $('#go').onclick = () => { closeModal(); startLesson(id); };
+}
+
+/* ---------- Lesson runner ---------- */
+let L = null;
+function startLesson(id, practice = false){
+  let ls, queue;
+  if (id === 'tricky'){
+    queue = shuffle(tricky().flatMap(t => [ex.echo([t.m]), ex.echo([t.m])].map(e => ({ ...e, mq:t.mq || undefined }))));
+    ls = { id:'tricky', title:'Tricky notes', level:{ c:'--coral' } };
+  } else if (practice){
+    const pool = ALL.filter(x => isDone(x.id) && x.id !== '1-1');
+    const src = pool.length ? pool : [ALL[1]];
+    queue = shuffle(src.flatMap(x => x.gen()).filter(e => e.type !== 'intro' && e.type !== 'scale')).slice(0, 8);
+    ls = { id:'practice', title:'Practice', level:{ c:'--sky' } };
+  } else {
+    ls = ALL.find(x => x.id === id);
+    queue = ls.gen();
+  }
+  L = { ls, practice, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0 };
+  $('#lesson').hidden = false; document.body.style.overflow = 'hidden';
+  renderEx();
+}
+function endLesson(){
+  if (L?.cleanup) L.cleanup();
+  L = null; $('#lesson').hidden = true; document.body.style.overflow = ''; go(tab);
+}
+$('#quit').onclick = () => {
+  openModal(`<h3>Leave this lesson?</h3><p>You will lose the progress you made in it.</p>
+    <div class="row"><button class="btn" onclick="closeModal()">Keep learning</button><button class="btn ghost" id="leave">Leave</button></div>`);
+  $('#leave').onclick = () => { closeModal(); endLesson(); };
+};
+function setProgress(){
+  $('#bar').style.width = `${(L.done / Math.max(1, L.total)) * 100}%`;
+}
+function footer(html, mode = ''){
+  $('#lfoot').className = `lfoot ${mode}`;
+  $('#lfootIn').innerHTML = html;
+}
+function renderEx(){
+  if (L.cleanup){ L.cleanup(); L.cleanup = null; }
+  if (L.idx >= L.queue.length) return complete();
+  const e = L.queue[L.idx];
+  setCtx(e.mq);
+  setProgress();
+  $('#lbody').className = 'wrap center';
+  ({ intro:exIntro, scale:exScale, jins:exChoice, tune:exTune, echo:exEcho, compare:exChoice, same:exChoice, direction:exChoice, contour:exChoice, name:exChoice })[e.type](e, $('#lbody'));
+  $('.lbody').scrollTop = 0;
+}
+const PRAISE = ['Ahsant! أحسنت', 'Nice ear!', 'Spot on!', 'Tarab! طرب', 'Exactly right', 'Beautiful'];
+function verdict(ok, detail, replay){
+  if (L.cleanup){ L.cleanup(); L.cleanup = null; }
+  const e = L.queue[L.idx];
+  sfx(ok);
+  L.answered++;
+  if (ok){
+    L.done++; L.combo = (L.combo || 0) + 1;
+    const q = today(); q.combo = Math.max(q.combo, L.combo);
+    if (L.combo === 5) checkQuests();
+  }
+  else {
+    L.wrong++; L.combo = 0;
+    if (e.type !== 'tune') L.queue.push({ ...e, retry:true });   // missed exercises come back at the end
+  }
+  setProgress();
+  footer(`<div class="verdict"><span class="badge">${icon(ok ? 'i-check' : 'i-x')}</span>
+      <div><h3>${ok ? pick(PRAISE) : 'Not quite'}${ok && L.combo >= 3 ? `<span class="combo">${L.combo} in a row</span>` : ''}</h3>${detail ? `<p>${detail}</p>` : ''}</div></div>
+      ${replay ? `<button class="link" id="replayAns">Hear it again</button>` : ''}
+      <button class="btn ${ok ? '' : 'bad'}" id="next">Continue</button>`, ok ? 'ok' : 'bad');
+  if (replay) $('#replayAns').onclick = replay;
+  $('#next').focus();
+  $('#next').onclick = () => {
+    L.idx++; renderEx();
+  };
+}
+function skipEx(){
+  if (L.cleanup){ L.cleanup(); L.cleanup = null; }
+  L.done++; L.idx++; renderEx();
+}
+function complete(){
+  const secs = Math.round((Date.now() - L.t0) / 1000);
+  const acc = L.answered ? Math.round(100 * (L.answered - L.wrong - L.slips) / L.answered) : 100;
+  const again = !L.practice && isDone(L.ls.id), perfect = L.wrong === 0 && L.slips === 0, mult = xpMult();
+  const xp = (L.practice || again ? 5 : 10 + (perfect ? 5 : 0)) * mult;
+  const pearls = L.practice ? 5 : 10 + (perfect ? 5 : 0);
+  S.xp += xp; S.pearls += pearls; S.lessons = (S.lessons || 0) + 1;
+  if (perfect && !L.practice) S.perfects++;
+  const day = dayKey(); S.daily[day] = (S.daily[day] || 0) + xp;
+  const q = today(); q.xp += xp; q.lessons++;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  let extended = false;
+  if (S.lastDay !== day){
+    S.streak = S.lastDay === dayKey(y) ? S.streak + 1 : 1; S.lastDay = day; extended = true;
+    S.bestStreak = Math.max(S.bestStreak, S.streak);
+    if (S.streak % 7 === 0){ S.pearls += 25; setTimeout(() => toast(`${S.streak}-day streak bonus`, '+25'), 900); }
+  }
+  if (!L.practice) S.done[L.ls.id] = (S.done[L.ls.id] || 0) + 1;
+  save();
+  $('#bar').style.width = '100%';
+  $('#lbody').className = 'wrap complete';
+  $('#lbody').innerHTML = `${mascot(undefined, 'bounce')}
+    <h2>${L.practice ? 'Practice complete!' : 'Lesson complete!'}</h2>
+    <p>${L.practice ? 'Your ear is staying sharp.' : perfect ? 'A perfect lesson. Your ear is waking up.' : 'Your ear gets sharper every time.'}</p>
+    <div class="result-tiles">
+      <div class="rt" style="--c:var(--violet)"><b>${icon('i-bolt')}${xp}</b><span>XP${mult > 1 ? ' ×2' : ''}</span></div>
+      <div class="rt" style="--c:var(--pearl)"><b>${icon('i-pearl')}${pearls}</b><span>Pearls</span></div>
+      <div class="rt" style="--c:var(--primary)"><b>${acc}%</b><span>Accuracy</span></div>
+      <div class="rt" style="--c:var(--sky)"><b>${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</b><span>Time</span></div>
+    </div>`;
+  footer(`<span></span><button class="btn" id="fin">Continue</button>`);
+  sfx(true);
+  setTimeout(() => { checkQuests(); checkBadges(); }, 500);
+  $('#fin').onclick = extended ? streakScreen : endLesson;
+}
+function streakScreen(){
+  $('#lbody').innerHTML = `<div class="streak-hero">${icon('i-fire')}<b>${S.streak}</b></div>
+    <h2>${S.streak === 1 ? 'Streak started!' : `${S.streak} day streak!`}</h2>
+    <p>${S.streak === 1 ? 'Practice again tomorrow to grow it.' : 'Your ear is getting daily training. See you tomorrow.'}</p>
+    <div style="width:100%;max-width:360px">${weekHtml()}</div>`;
+  footer(`<span></span><button class="btn" id="fin">Continue</button>`);
+  $('#fin').onclick = endLesson;
+}
+
+/* ----- exercise: intro card ----- */
+function exIntro(e, body){
+  body.innerHTML = `<h2 class="ex-title">${e.title}</h2>
+    <div class="tip">${mascot()}<div class="bubble">${e.body}</div></div>`;
+  footer(`<span></span><button class="btn" id="next">Continue</button>`);
+  $('#next').onclick = () => { L.idx++; renderEx(); };
+}
+
+/* ----- shared: input panel (microphone or on-screen keys) ----- */
+function inputPanel(){
+  if (S.settings.tap) return `<div class="listen"><div class="listen-head"><span class="mic-chip">On-screen keys</span>
+      <button class="link" id="useMic">Use my oud instead</button></div>${keysHtml()}</div>`;
+  return `<div class="listen">
+    <div class="listen-head"><span class="mic-chip"><span class="dot" id="dot"></span><span id="micTxt">Starting microphone…</span></span>
+      <button class="link" id="useKeys">No oud? Use keys</button></div>
+    <div class="heard" id="heard"><b>–</b><span>Pluck a string and let it ring</span></div>
+    <div id="meterBox" hidden>
+      <div class="meter"><div class="track"></div><div class="mid"></div><div class="mark" id="mark" style="left:50%"></div></div>
+      <div class="meter-labels"><span>Too low</span><span>Target</span><span>Too high</span></div>
+      <p class="hint" id="liveDir" style="text-align:center;margin-top:6px"></p>
+    </div></div>`;
+}
+function keysHtml(){
+  const e = L && L.queue[L.idx];
+  if (e && e.mq){
+    // maqam routes: the maqam's notes plus the foil notes, so quarter tones can be told apart
+    const mq = MAQ[e.mq], notes = [...new Set([...mq.scale, ...mq.foil.notes, ...mq.sig])].sort((a, b) => a - b);
+    return `<div class="pad">${notes.map(m => `<button class="pk" data-m="${m}">${name(m)}<small>${ARL[qOf(m)] || ''}</small></button>`).join('')}</div>`;
+  }
+  const whites = [48,50,52,53,55,57,59,60], blacks = [[49,0],[51,1],[54,3],[56,4],[58,5]];
+  return `<div class="keys">${whites.map(m => `<button class="wk" data-m="${m}">${name(m)}</button>`).join('')}
+    ${blacks.map(([m, k]) => `<button class="bk" data-m="${m}" aria-label="${name(m)}" style="left:${(k + 1) * 12.5 - 4}%"></button>`).join('')}</div>`;
+}
+/* wires the panel; onNote(midi) gets stable notes, onFrame(cur) every frame */
+function wireInput(rerender, onNote, onFrame){
+  const offs = [];
+  if (S.settings.tap){
+    $('#useMic').onclick = () => { S.settings.tap = false; save(); rerender(); };
+    document.querySelectorAll('.listen [data-m]').forEach(b => b.onclick = async () => {
+      const m = +b.dataset.m; b.classList.add('hit'); setTimeout(() => b.classList.remove('hit'), 180);
+      await ensureCtx(); playNote(m, ctx.currentTime + 0.01, 0.6); onNote(m, true);
+    });
+  } else {
+    $('#useKeys').onclick = () => { S.settings.tap = true; save(); rerender(); };
+    Mic.start().then(ok => {
+      if (!$('#micTxt')) return;
+      if (!ok){
+        $('#micTxt').textContent = 'Microphone blocked';
+        $('#heard').innerHTML = `<span>Allow microphone access in your browser, or switch to on-screen keys.</span>`;
+        return;
+      }
+      $('#dot').classList.add('on'); $('#micTxt').textContent = 'Listening';
+    });
+    offs.push(Mic.on(ev => {
+      if (ev.type === 'note') onNote(ev.midi, false);
+      else { onFrame && onFrame(ev.cur); const h = $('#heard'); if (h && ev.cur) h.innerHTML = `<b>${name(ev.cur.midi)}</b><span>${sub(ev.cur.midi)} · ${ev.cur.freq.toFixed(1)} Hz</span>`; }
+    }));
+  }
+  return () => offs.forEach(f => f());
+}
+
+/* ----- exercise: echo (hear, then play it back) ----- */
+function exEcho(e, body){
+  const n = e.notes.length;
+  // No failing here: wrong notes only steer you (higher / lower) until you find the right one.
+  let slot = 0, slotMiss = 0, mistakes = 0, replaysLeft = e.replays, finished = false, hinted = false, revealed = false;
+  Mic.stableMs = e.dur < 0.6 ? 160 : 220;
+  const render = () => {
+    if (L.cleanup){ L.cleanup(); L.cleanup = null; }
+    body.innerHTML = `<div class="ex-grid"><div class="ex-main">
+      <h2 class="ex-title">${n === 1 ? 'Play the note you hear' : `Play these ${n} notes back`}</h2>
+      ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : e.mq && S.settings.tonic ? `<p class="ex-sub">You'll hear the tonic, ${name(MAQ[e.mq].scale[0])}, first.</p>` : ''}
+      <div class="listen-row">
+        <button class="speak" id="play" aria-label="Play again">${icon('i-speaker')}</button>
+        ${e.slow && n > 1 ? `<button class="speak small" id="slow" aria-label="Play slowly">${icon('i-slow')}</button>` : ''}
+      </div>
+      <p class="replays" id="rep"></p>
+      <div class="slots">${e.notes.map((m, i) => `<div class="slot ${i < slot ? 'ok' : i === slot ? 'active' : ''}" data-i="${i}">${i < slot ? name(m) : '?'}</div>`).join('')}</div>
+      <p class="hint" id="hint" aria-live="polite"></p>
+      </div><div class="ex-side">${inputPanel()}</div></div>`;
+    footer(`<button class="btn ghost" id="skip">Can't play now</button><button class="link" id="reveal" ${mistakes >= 3 && !revealed ? '' : 'hidden'}>Show me the note</button>`);
+    $('#skip').onclick = skipEx;
+    $('#reveal').onclick = reveal;
+    showReplays();
+    $('#play').onclick = () => listen(e.dur, true);
+    if ($('#slow')) $('#slow').onclick = () => listen(e.dur * 1.8, true);
+    if (hinted) $('#meterBox') && ($('#meterBox').hidden = false);
+    L.cleanup = wireInput(render, onNote, onFrame);
+  };
+  const showReplays = () => {
+    const r = $('#rep'); if (!r) return;
+    if (replaysLeft === Infinity) r.textContent = n > 1 ? 'Tap to hear it again, or slower' : 'Tap to hear it again';
+    else r.textContent = replaysLeft > 0 ? `${replaysLeft} replay left` : 'No replays left';
+    const dis = replaysLeft <= 0;
+    $('#play').disabled = dis; if ($('#slow')) $('#slow').disabled = dis;
+  };
+  const listen = async (dur, isReplay) => {
+    if (isReplay){ if (replaysLeft <= 0) return; if (replaysLeft !== Infinity) replaysLeft--; }
+    $('#play')?.classList.add('playing');
+    if (e.mq && S.settings.tonic){ await playSeq([MAQ[e.mq].scale[0]], 0.8); await sleep(150); }   // home note first, so quarter tones sit in context
+    await playSeq(e.notes, dur);
+    $('#play')?.classList.remove('playing');
+    showReplays();
+  };
+  const reveal = () => {
+    revealed = true; $('#reveal').hidden = true;
+    const t = e.notes[slot];
+    $('#hint').className = 'hint'; $('#hint').textContent = `The note is ${name(t)} (${sub(t)}). Find it, then play it.`;
+    playSeq([t], 1.2);
+  };
+  // live steering once you've missed: the marker and the arrow follow whatever you're playing
+  const onFrame = cur => {
+    if (!hinted || finished) return;
+    const mk = $('#mark'), dir = $('#liveDir'); if (!mk || !cur) return;
+    const raw = fold(cur.midi - e.notes[slot]), d = Math.max(-6, Math.min(6, raw));
+    mk.style.left = `${50 + d / 6 * 50}%`;
+    if (dir) dir.textContent = Math.abs(raw) < GRID / 2 ? 'Right there, hold it…' : raw > 0 ? 'Too high: go lower ↓' : 'Too low: go higher ↑';
+  };
+  const onNote = (m) => {
+    if (finished) return;
+    const target = e.notes[slot];
+    const d = fold(m - target);
+    const slotEl = document.querySelector(`.slot[data-i="${slot}"]`);
+    if (Math.abs(d) < GRID / 2){          // within 50 cents (Level 1) or 25 cents (maqam routes)
+      slotEl.className = 'slot ok'; slotEl.textContent = name(target);
+      earRecord(target, e.mq, !slotMiss); slotMiss = 0;
+      slot++;
+      $('#hint').className = 'hint'; $('#hint').textContent = slot < n ? `Yes, ${name(target)}. Next note…` : '';
+      const nx = document.querySelector(`.slot[data-i="${slot}"]`); if (nx) nx.classList.add('active');
+      if (slot === n){
+        finished = true;
+        if (mistakes){ L.slips++; L.combo = 0; }   // found it, but not first try: no "in a row" credit
+        const what = n > 1 ? e.notes.map(name).join(' – ') : `That was ${name(target)} (${sub(target)})`;
+        verdict(true, mistakes ? `${what}. Found it after ${mistakes + 1} tries.` : what);
+      }
+      return;
+    }
+    mistakes++; slotMiss++;
+    hinted = true; $('#meterBox') && ($('#meterBox').hidden = false);
+    slotEl.classList.remove('shake'); void slotEl.offsetWidth; slotEl.classList.add('shake');
+    const dir = d > 0 ? 'lower ↓' : 'higher ↑';
+    $('#hint').className = 'hint bad';
+    const gap = Math.max(GRID, Math.round(Math.abs(d) / GRID) * GRID);
+    $('#hint').textContent = `You played ${name(m)}. That's ${gapText(gap)} too ${d > 0 ? 'high' : 'low'}. Go ${dir}`;
+    if (mistakes >= 3 && !revealed) $('#reveal').hidden = false;
+  };
+  render();
+  setTimeout(() => { if (L && L.queue[L.idx] === e) listen(e.dur, false); }, 350);
+}
+
+/* ----- exercise: tune one string ----- */
+function exTune(e, body){
+  let held = 0, last = 0, finished = false;
+  const render = () => {
+    if (L.cleanup){ L.cleanup(); L.cleanup = null; }
+    body.innerHTML = `<div class="ex-grid"><div class="ex-main">
+      <h2 class="ex-title">Tune your ${name(e.midi)} string</h2>
+      <p class="ex-sub">${e.label} course · ${name(e.midi)}${oct(e.midi)} · ${sub(e.midi)} · ${mtof(e.midi).toFixed(1)} Hz</p>
+      ${S.settings.tap ? '' : `${gaugeSvg()}<div class="hold" aria-label="Hold steady"><i id="hold"></i></div>`}
+      <p class="hint" id="hint">${S.settings.tap ? `Tap ${name(e.midi)} on the keys below.` : 'Pluck the string and hold it in the green zone.'}</p>
+      </div><div class="ex-side stack" style="gap:12px">
+      <div style="display:flex;justify-content:center"><button class="btn ghost" id="ref">${icon('i-speaker')} Hear ${name(e.midi)}</button></div>
+      ${inputPanel()}</div></div>`;
+    footer(`<button class="btn ghost" id="skip">Skip this string</button><span></span>`);
+    $('#skip').onclick = skipEx;
+    $('#ref').onclick = () => playSeq([e.midi], 1.2);
+    L.cleanup = wireInput(render, onNote, onFrame);
+  };
+  const onNote = (m, tap) => { if (tap && pc(m) === pc(e.midi) && !finished){ finished = true; verdict(true, `${name(e.midi)} string ready`); } };
+  const onFrame = cur => {
+    if (finished) return;
+    const t = performance.now(), dt = last ? t - last : 0; last = t;
+    if (!cur){ setNeedle(null); held = Math.max(0, held - dt); return paintHold(); }
+    const cents = fold(cur.midi - e.midi) * 100;
+    setNeedle(cents);
+    const h = $('#hint');
+    if (Math.abs(cents) <= 15){ held += dt; h.className = 'hint'; h.textContent = 'In tune. Hold it…'; }
+    else {
+      held = Math.max(0, held - dt);
+      if (Math.abs(cents) > 60){ h.className = 'hint bad'; h.textContent = `That's ${name(cur.midi)}. Make sure you're plucking the ${name(e.midi)} string.`; }
+      else { h.className = 'hint'; h.textContent = cents > 0 ? `${Math.round(cents)} cents sharp: loosen the peg a little ↓` : `${Math.round(-cents)} cents flat: tighten the peg a little ↑`; }
+    }
+    paintHold();
+    if (held >= 600){ finished = true; verdict(true, `${name(e.midi)} string is in tune`); }
+  };
+  const paintHold = () => { const el = $('#hold'); if (el) el.style.width = `${Math.min(100, held / 6)}%`; };
+  render();
+}
+function gaugeSvg(){
+  const ticks = [];
+  for (let c = -50; c <= 50; c += 10){
+    const a = (c / 50) * 60 * Math.PI / 180, r1 = 86, r2 = c % 50 === 0 || c === 0 ? 70 : 76;
+    ticks.push(`<line x1="${100 + r1*Math.sin(a)}" y1="${105 - r1*Math.cos(a)}" x2="${100 + r2*Math.sin(a)}" y2="${105 - r2*Math.cos(a)}" stroke="var(--muted)" stroke-width="${c === 0 ? 3 : 2}" stroke-linecap="round"/>`);
+  }
+  return `<svg class="gauge" viewBox="0 0 200 122" role="img" aria-label="Tuning needle">
+    <path d="M${100 - 86*Math.sin(Math.PI/3)} ${105 - 86*Math.cos(Math.PI/3)} A86 86 0 0 1 ${100 + 86*Math.sin(Math.PI/3)} ${105 - 86*Math.cos(Math.PI/3)}" fill="none" stroke="var(--lock)" stroke-width="14" stroke-linecap="round"/>
+    <path d="M${100 - 86*Math.sin(Math.PI/20)} ${105 - 86*Math.cos(Math.PI/20)} A86 86 0 0 1 ${100 + 86*Math.sin(Math.PI/20)} ${105 - 86*Math.cos(Math.PI/20)}" fill="none" stroke="var(--primary)" stroke-width="14"/>
+    ${ticks.join('')}
+    <text x="22" y="120" font-size="11" font-weight="800" fill="var(--muted)" font-family="Nunito,sans-serif">FLAT</text>
+    <text x="150" y="120" font-size="11" font-weight="800" fill="var(--muted)" font-family="Nunito,sans-serif">SHARP</text>
+    <g class="needle" id="needle" style="transform-origin:100px 105px;transform:rotate(0deg);opacity:.25">
+      <line x1="100" y1="105" x2="100" y2="28" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+    </g><circle cx="100" cy="105" r="8" fill="var(--ink)"/></svg>`;
+}
+function setNeedle(cents){
+  const n = $('#needle'); if (!n) return;
+  if (cents == null){ n.style.opacity = .25; return; }
+  const c = Math.max(-50, Math.min(50, cents));
+  n.style.opacity = 1; n.style.transform = `rotate(${c / 50 * 60}deg)`;
+  n.querySelector('line').setAttribute('stroke', Math.abs(cents) <= 15 ? 'var(--primary)' : 'var(--ink)');
+}
+
+/* ----- exercise: listening choices ----- */
+const CHOICE = {
+  compare:   e => ({ title:'Which note was higher?', opts:[['first','First note'],['second','Second note']], play:d => playSeq(e.notes, d || 1) }),
+  same:      e => ({ title:'Same note, or different?', opts:[['same','Same'],['different','Different']], play:d => playSeq(e.notes, d || 1) }),
+  direction: e => ({ title:'Did it go up or down?', opts:[['up','Up ↗'],['down','Down ↘']], play:d => playSeq(e.notes, d || 0.9) }),
+  contour:   e => ({ title:'Which shape did you hear?', opts:[['up-up','↗ ↗','up, up'],['up-down','↗ ↘','up, down'],['down-up','↘ ↗','down, up'],['down-down','↘ ↘','down, down']], play:d => playSeq(e.notes, d || 0.75) }),
+  name:      e => ({ title:'Here is Do. What comes next?', opts:e.choices.map(m => [m, name(m), sub(m)]), play:d => playSeq([e.ref, e.midi], d || 1) }),
+  jins:      e => { const mq = MAQ[e.mq]; return { title:`Is this ${mq.name} or ${mq.foil.name}?`,
+    opts:[['real', mq.name, mq.ar], ['foil', mq.foil.name, mq.foil.ar]], play:d => playSeq(e.notes, d || 0.5) }; },
+};
+/* ----- listening card: the maqam's scale, lit note by note ----- */
+function exScale(e, body){
+  const mq = MAQ[e.mq], up = [...e.notes, ...e.notes.slice(0, -1).reverse()], dur = 0.55;
+  body.innerHTML = `<div class="ex-grid"><div class="ex-main">
+    <h2 class="ex-title">Listen: Maqam ${mq.name}</h2>
+    <p class="ex-sub">Up and back down. Watch which notes are quarter tones.</p>
+    <div class="listen-row"><button class="speak" id="play" aria-label="Play the scale">${icon('i-speaker')}</button></div>
+    </div><div class="ex-side scale-chips">${e.notes.map((m, i) => `<div class="slot" data-i="${i}">${name(m)}<small>${ARL[qOf(m)] || ''}</small></div>`).join('')}</div></div>`;
+  footer(`<span></span><button class="btn" id="next">Continue</button>`);
+  const timers = [];
+  const play = () => {
+    timers.forEach(clearTimeout); timers.length = 0;
+    playSeq(up, dur);
+    up.forEach((m, k) => timers.push(setTimeout(() => {
+      document.querySelectorAll('.scale-chips .slot').forEach(s => s.classList.remove('lit'));
+      const i = k < e.notes.length ? k : up.length - 1 - k;
+      document.querySelector(`.scale-chips .slot[data-i="${i}"]`)?.classList.add('lit');
+    }, 60 + k * dur * 1000)));
+    timers.push(setTimeout(() => document.querySelectorAll('.scale-chips .slot').forEach(s => s.classList.remove('lit')), 60 + up.length * dur * 1000 + 400));
+  };
+  $('#play').onclick = play;
+  $('#next').onclick = () => { timers.forEach(clearTimeout); L.idx++; renderEx(); };
+  setTimeout(() => { if (L && L.queue[L.idx] === e) play(); }, 350);
+}
+function exChoice(e, body){
+  const spec = CHOICE[e.type](e);
+  let sel = null;
+  body.innerHTML = `<div class="ex-grid"><div class="ex-main">
+    <h2 class="ex-title">${spec.title}</h2>
+    ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : ''}
+    <div class="listen-row"><button class="speak" id="play" aria-label="Play again">${icon('i-speaker')}</button>
+      <button class="speak small" id="slow" aria-label="Play slowly">${icon('i-slow')}</button></div>
+    <p class="replays">Tap to hear it again</p>
+    </div><div class="ex-side">
+    <div class="choices">${spec.opts.map(([v, l, s], i) => `<button class="choice" data-v="${v}" aria-pressed="false">${l}${s ? `<small>${s}</small>` : ''}<span class="kbd-hint"><kbd>${i + 1}</kbd></span></button>`).join('')}</div>
+    </div></div>`;
+  footer(`<button class="btn ghost" id="skip">Can't listen now</button><button class="btn" id="check" disabled>Check</button>`);
+  const play = async d => { $('#play').classList.add('playing'); await spec.play(d); $('#play')?.classList.remove('playing'); };
+  $('#play').onclick = () => play();
+  $('#slow').onclick = () => play(1.6);
+  document.querySelectorAll('.choice').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.choice').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    b.setAttribute('aria-pressed', 'true'); sel = b.dataset.v; $('#check').disabled = false;
+  });
+  $('#skip').onclick = skipEx;
+  $('#check').onclick = () => {
+    document.querySelectorAll('.choice').forEach(x => x.disabled = true);
+    const ok = String(sel) === String(e.answer);
+    const label = spec.opts.find(o => String(o[0]) === String(e.answer));
+    const extra = e.type === 'name' ? ` (${sub(e.answer)})`
+      : e.type === 'compare' || e.type === 'direction' || e.type === 'same' ? `: ${e.notes.map(name).join(' then ')}`
+      : e.type === 'jins' ? ` (${e.notes.slice(0, (e.notes.length + 1) / 2).map(name).join(' ')})` : '';
+    const shown = e.type === 'contour' ? `${label[1]} (${label[2]})` : label[1];
+    verdict(ok, `${ok ? 'Answer' : 'Correct answer'}: ${shown}${extra}`, () => spec.play(1.2));
+  };
+  setTimeout(() => { if (L && L.queue[L.idx] === e) play(); }, 350);
+}
+
+/* ---------- Tuner tab ---------- */
+function renderTuner(){
+  const OUD = oudStrings();
+  $('#view').innerHTML = `<div class="stack">
+    <h2 class="section-title">Oud tuner</h2>
+    <div class="panel stack">
+      <div class="big-note" id="bn"><b>–</b><p>Pluck a string</p></div>
+      ${gaugeSvg()}
+      <p class="hint" id="th" style="text-align:center"></p>
+      <button class="btn wide" id="startMic">${S.settings.tap ? 'Use microphone' : 'Start listening'}</button>
+    </div>
+    <div class="panel stack"><div class="panel-head"><h3>Your tuning</h3><div class="seg" id="tun">${Object.entries(TUNINGS).map(([k, t]) => `<button data-v="${k}" aria-pressed="${(S.settings.tuning || 'FF') === k}">${t.label}</button>`).join('')}</div></div>
+      <p class="ex-sub" style="margin:0">Lowest to highest. Tap a string to hear its reference note.</p>
+      <div class="strings">${OUD.map((s, i) => `<button class="str" data-i="${i}">${name(s.m)}<small>${name(s.m)}${oct(s.m)}</small></button>`).join('')}</div>
+    </div></div>`;
+  document.querySelectorAll('.str').forEach(b => b.onclick = () => playSeq([OUD[b.dataset.i].m], 1.4));
+  document.querySelectorAll('#tun button').forEach(b => b.onclick = () => { S.settings.tuning = b.dataset.v; save(); go('tuner'); });
+  let off = null;
+  const begin = async () => {
+    if (S.settings.tap){ S.settings.tap = false; save(); }
+    const ok = await Mic.start();
+    if (!ok){ $('#th').textContent = 'Microphone blocked. Allow access in your browser settings and try again.'; return; }
+    $('#startMic').hidden = true;
+    off = Mic.on(ev => {
+      if (ev.type !== 'frame' || !$('#bn')) return;
+      const cur = ev.cur;
+      document.querySelectorAll('.str').forEach(b => b.classList.remove('near'));
+      if (!cur){ setNeedle(null); return; }
+      const r = Math.round(cur.midi), cents = (cur.midi - r) * 100;
+      $('#bn').innerHTML = `<b>${name(r)}<sub style="font-size:28px">${oct(r)}</sub></b><p class="ar">${ARN[pc(r) * 2]} · ${ARL[pc(r) * 2]}</p><p>${sub(r).split(' · ')[0]} · ${cur.freq.toFixed(1)} Hz · ${cents >= 0 ? '+' : ''}${Math.round(cents)} cents</p>`;
+      setNeedle(cents);
+      let best = 0; OUD.forEach((s, i) => { if (Math.abs(cur.midi - s.m) < Math.abs(cur.midi - OUD[best].m)) best = i; });
+      if (Math.abs(cur.midi - OUD[best].m) < 1.5) document.querySelector(`.str[data-i="${best}"]`).classList.add('near');
+      const q = ((Math.round(cur.midi * 2) % 24) + 24) % 24;
+      $('#th').textContent = Math.abs(cents) >= 35 && WEST[q] && q % 2
+        ? `Quarter tone: ${WEST[q]} · ${ARL[q]} ${ARN[q]}`
+        : Math.abs(cents) <= 5 ? 'In tune' : cents > 0 ? 'Sharp: loosen ↓' : 'Flat: tighten ↑';
+    });
+  };
+  $('#startMic').onclick = begin;
+  if (Mic.running && !S.settings.tap) begin();
+  viewCleanup = () => off && off();
+}
+
+/* ---------- Profile tab ---------- */
+const GOALS = [[10, 'Casual'], [20, 'Regular'], [30, 'Serious'], [50, 'Intense']];
+function xpChart(){
+  const days = times(7, (_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return { d, v:S.daily[dayKey(d)] || 0 }; });
+  const max = Math.max(S.goal, ...days.map(x => x.v)) * 1.15, H = 112;
+  return `<div class="bars"><div class="goal-line" style="bottom:${20 + S.goal / max * H}px"><span>Goal ${S.goal}</span></div>
+    ${days.map((x, i) => `<div class="bar-col ${i === 6 ? 'today' : ''}"><em>${x.v || ''}</em><i style="height:${Math.max(4, x.v / max * H)}px"></i><em>${i === 6 ? 'Today' : 'SMTWTFS'[x.d.getDay()]}</em></div>`).join('')}</div>`;
+}
+function renderProfile(){
+  const doneCount = ALL.filter(x => isDone(x.id)).length;
+  const explored = MAQAMAT.filter(m => routeIds(m.id).some(isDone)).length;
+  const since = new Date(`${S.joined}T12:00`).toLocaleDateString(undefined, { month:'long', year:'numeric' });
+  const week = times(7, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return S.daily[dayKey(d)] || 0; }).reduce((a, b) => a + b, 0);
+  const todayXp = S.daily[dayKey()] || 0;
+  const tile = (ico, c, v, label) => `<div class="tile" style="color:var(${c})">${icon(ico)}<div><b style="color:var(--ink)">${v}</b><span>${label}</span></div></div>`;
+  $('#view').innerHTML = `<div class="stack">
+    <div class="panel hero">
+      <div class="avatar">${mascot()}<button id="dress" aria-label="Change Oudi's outfit">${icon('i-shop')}</button></div>
+      <div class="hero-info">
+        <input class="name-input" id="pname" maxlength="24" aria-label="Your name">
+        <p>Learning oud by ear since ${since}</p>
+        <div class="chips"><span class="chip">${(TUNINGS[S.settings.tuning] || TUNINGS.FF).label} tuning</span><span class="chip">Route: ${MAQ[S.maqam].name}</span><span class="chip">${S.badges.length} of ${BADGES.length} achievements</span></div>
+      </div>
+    </div>
+
+    <div class="panel acct"><span class="qi" style="--c:var(--sky)">${icon('i-user')}</span>
+      <div><b>${Cloud.user ? esc(Cloud.user.email) : 'Guest'}</b><p><span id="syncState" class="sync"></span></p></div>
+      ${Cloud.user ? `<button class="btn ghost" id="logout">Log out</button>`
+        : Cloud.enabled() ? `<button class="btn" id="mkAcct">Create account</button><button class="link" id="doLogin">Log in</button>` : ''}
+    </div>
+
+    <h3>Statistics</h3>
+    <div class="tiles t3">
+      ${tile('i-fire', '--amber', liveStreak(), 'Day streak')}
+      ${tile('i-trophy', '--amber', S.bestStreak, 'Best streak')}
+      ${tile('i-bolt', '--violet', S.xp, 'Total XP')}
+      ${tile('i-pearl', '--pearl', S.pearls, 'Pearls')}
+      ${tile('i-check', '--primary', doneCount, 'Lessons finished')}
+      ${tile('i-map', '--plum', `${explored}/${MAQAMAT.length}`, 'Maqamat explored')}
+    </div>
+
+    <div class="panel stack">
+      <div class="panel-head"><div class="streak-big">${icon('i-fire')}<div><b>${liveStreak()}</b><p>day streak</p></div></div>
+        <button class="btn ghost" id="getFreeze">${icon('i-freeze')} ${S.freezes}/2 freezes</button></div>
+      ${weekHtml()}
+      <p class="muted-line">${(S.daily[dayKey()] || 0) > 0 ? 'Done for today. Your streak is safe.' : 'Finish one lesson today to keep your streak.'}</p>
+    </div>
+
+    <div class="panel stack">
+      <div class="panel-head"><h3>XP this week</h3><b style="font-variant-numeric:tabular-nums;color:var(--violet)">${week} XP</b></div>
+      ${xpChart()}
+      <div class="field" style="border-top:2px solid var(--line)"><div><label>Daily goal</label><p>Today: ${todayXp} of ${S.goal} XP</p></div>
+        <div class="seg" id="goal">${GOALS.map(([v, l]) => `<button data-v="${v}" aria-pressed="${S.goal === v}" title="${v} XP a day">${l}</button>`).join('')}</div></div>
+    </div>
+
+    <h3>Achievements</h3>
+    <div class="badges">${BADGES.map(b => { const v = Math.min(b.val(), b.goal), got = S.badges.includes(b.id) || v >= b.goal;
+      return `<div class="bdg ${got ? '' : 'locked'}" style="--c:var(${b.c});--c-d:var(${b.c}-d)"><span class="bi">${icon(b.icon)}</span>
+        <div><b>${b.name}</b><p>${b.desc}</p>${got ? '' : `<div class="qbar"><i style="width:${v / b.goal * 100}%"></i></div><p>${v} / ${b.goal}</p>`}</div></div>`; }).join('')}</div>
+
+    <h3>Your ear map</h3>
+    <div class="panel stack">${earMap()}</div>
+
+    <h3>Settings</h3>
+    <div class="panel">
+      <div class="field"><div><label>Oud tuning</label><p>Lowest course to highest</p></div>
+        <div class="seg" id="tuning">${Object.entries(TUNINGS).map(([k, t]) => `<button data-v="${k}" aria-pressed="${(S.settings.tuning || 'FF') === k}">${t.label}</button>`).join('')}</div></div>
+      <div class="field"><div><label>Note names</label><p>How notes are written in lessons</p></div>
+        <div class="seg" id="names"><button data-v="western" aria-pressed="${S.settings.names === 'western'}">C D E</button><button data-v="solfege" aria-pressed="${S.settings.names === 'solfege'}">Do Re Mi</button></div></div>
+      <div class="field"><div><label>Answer with</label><p>Your oud through the mic, or on-screen keys</p></div>
+        <div class="seg" id="input"><button data-v="mic" aria-pressed="${!S.settings.tap}">My oud</button><button data-v="tap" aria-pressed="${S.settings.tap}">Keys</button></div></div>
+      <div class="field"><div><label for="sens">Mic sensitivity</label><p>Lower it if talking or room noise gets picked up; raise it if soft plucks are missed</p></div>
+        <input type="range" id="sens" min="1" max="10" value="${S.settings.sens}"></div>
+      <div class="field"><div><label>Mic check</label><p>Measures your room and your oud, then sets the sensitivity for you</p></div>
+        <button class="btn ghost" id="micCheck">Run mic check</button></div>
+      <div class="field"><div><label for="vol">Volume</label><p>How loud Samaa plays notes</p></div>
+        <input type="range" id="vol" min="0.1" max="1" step="0.05" value="${S.settings.volume}"></div>
+      <div class="field"><div><label>Tonic first</label><p>In maqam routes, play the home note before each phrase</p></div>
+        <div class="seg" id="tonic"><button data-v="1" aria-pressed="${!!S.settings.tonic}">On</button><button data-v="0" aria-pressed="${!S.settings.tonic}">Off</button></div></div>
+      <div class="field"><div><label>Theme</label><p>Light, dark, or follow your device</p></div>
+        <div class="seg" id="theme">${[['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(S.settings.theme || 'system') === v}">${l}</button>`).join('')}</div></div>
+      <div class="field"><div><label>Reset progress</label><p>Clears XP, pearls, streak and finished lessons</p></div>
+        <button class="btn ghost" id="reset">Reset</button></div>
+    </div></div>`;
+  const nameEl = $('#pname'); nameEl.value = S.player;
+  nameEl.onchange = () => { S.player = nameEl.value.trim() || 'Oud player'; nameEl.value = S.player; save(); };
+  $('#dress').onclick = () => go('shop');
+  $('#getFreeze').onclick = () => go('shop');
+  document.querySelectorAll('#goal button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderProfile(); });
+  document.querySelectorAll('#tuning button').forEach(b => b.onclick = () => { S.settings.tuning = b.dataset.v; save(); renderProfile(); });
+  document.querySelectorAll('#names button').forEach(b => b.onclick = () => { S.settings.names = b.dataset.v; save(); renderProfile(); });
+  document.querySelectorAll('#input button').forEach(b => b.onclick = () => { S.settings.tap = b.dataset.v === 'tap'; save(); renderProfile(); });
+  $('#sens').oninput = ev => { S.settings.sens = +ev.target.value; save(); };
+  $('#vol').oninput = ev => { S.settings.volume = +ev.target.value; if (master) master.gain.value = 0.9 * S.settings.volume / 0.8; save(); };
+  $('#vol').onchange = () => playSeq([55], 0.8);
+  $('#micCheck').onclick = () => micCheck(() => { hideAuth(); go('profile'); });
+  document.querySelectorAll('#tonic button').forEach(b => b.onclick = () => { S.settings.tonic = b.dataset.v === '1'; save(); renderProfile(); });
+  document.querySelectorAll('#theme button').forEach(b => b.onclick = () => { S.settings.theme = b.dataset.v; save(); applyTheme(); renderProfile(); });
+  if ($('#logout')) $('#logout').onclick = logOut;
+  if ($('#mkAcct')) $('#mkAcct').onclick = authSignup;
+  if ($('#doLogin')) $('#doLogin').onclick = authLogin;
+  paintSync();
+  $('#reset').onclick = () => {
+    openModal(`<h3>Reset all progress?</h3><p>This clears your XP, pearls, streak, outfits and finished lessons on this device.</p>
+      <div class="row"><button class="btn" onclick="closeModal()">Keep it</button><button class="btn bad" id="yes">Reset</button></div>`);
+    $('#yes').onclick = () => { const st = S.settings, nm = S.player; Object.assign(S, JSON.parse(JSON.stringify(DEFAULT)), { settings:st, player:nm, joined:dayKey() }); save(); closeModal(); go('profile'); };
+  };
+}
+
+function earMap(){
+  const rows = Object.entries(S.ear).map(([k, [h, x]]) => ({ k, h, x, n:h + x, acc:h / (h + x), label:earLabel(k), mq:k.split('|')[0] }))
+    .sort((a, b) => a.acc - b.acc || b.n - a.n);
+  if (!rows.length) return `<p style="margin:0;color:var(--muted)">Play notes back in lessons, and this map shows which ones you hit on the first try.</p>`;
+  const tone = a => a >= 0.8 ? '--primary' : a >= 0.5 ? '--amber' : '--coral';
+  return `<div class="ear-map">${rows.map(r => `<div class="ear" style="--c:var(${tone(r.acc)})" title="${r.h} of ${r.n} on the first try">
+      <b>${esc(r.label)}</b><span>${Math.round(r.acc * 100)}%</span><small>${r.mq ? MAQ[r.mq].name : 'Level 1'} · ${r.n}×</small></div>`).join('')}</div>
+    <div class="legend"><span style="--c:var(--primary)"><i></i>80%+ first try</span><span style="--c:var(--amber)"><i></i>50–79%</span><span style="--c:var(--coral)"><i></i>under 50%: in Tricky notes</span></div>`;
+}
+
+/* ---------- keyboard shortcuts (laptop) ---------- */
+document.addEventListener('keydown', ev => {
+  if (ev.target.closest && ev.target.closest('input, textarea, select')) return;
+  if (!$('#modal').hidden){ if (ev.key === 'Escape') closeModal(); return; }
+  if ($('#lesson').hidden || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const click = sel => { const b = $(sel); if (b && !b.disabled && !b.hidden){ b.click(); return true; } return false; };
+  const k = ev.key.toLowerCase();
+  if (k === ' ' || k === 'enter'){
+    ev.preventDefault(); if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
+    if (k === ' ') click('#play'); else click('#next') || click('#check') || click('#fin');
+  } else if (k === 'escape') click('#quit');
+  else if (/^[1-4]$/.test(k)){ const c = document.querySelectorAll('.choice')[+k - 1]; if (c && !c.disabled) c.click(); }
+  else {
+    const pads = document.querySelectorAll('.listen .pk'), w = 'asdfghjkl'.indexOf(k), b = 'wetyu'.indexOf(k);
+    if (pads.length && w >= 0) pads[w]?.click();
+    else if (w >= 0) document.querySelectorAll('.listen .wk')[w]?.click();
+    else if (b >= 0) document.querySelectorAll('.listen .bk')[b]?.click();
+  }
+});
+
+/* ---------- start-up ---------- */
+function applyTheme(){ const t = S.settings.theme; if (!t || t === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t; }
+function enterApp(){ hideAuth(); if (!S.joined){ S.joined = dayKey(); save(); } settleStreak(); go('learn'); }
+async function boot(){
+  applyTheme();
+  Cloud.init();
+  if (Cloud.enabled()){
+    Cloud.sb.auth.onAuthStateChange((evt, session) => { if (evt === 'PASSWORD_RECOVERY'){ Cloud.user = session ? session.user : null; authNewPassword(); } });
+    if (/type=recovery/.test(location.hash)) return;   // the recovery event above takes over
+    try {
+      const { data } = await Cloud.sb.auth.getSession();
+      if (data.session){ Cloud.user = data.session.user; return afterLogin(); }
+    } catch(e){}
+  }
+  if (S.onboarded && (S.guest || !Cloud.enabled())) return enterApp();
+  authWelcome();
+}
+if (!S.settings.mic2){ S.settings.sens = 6; S.settings.mic2 = true; save(); }   // new noise filter: new default sensitivity
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+boot();
+setInterval(() => { if ($('#auth').hidden) renderStats(); }, 60000);
+</script>
+</body>
+</html>
