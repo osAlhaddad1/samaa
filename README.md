@@ -3,13 +3,16 @@
 Learn to play the oud by ear. Samaa plays a note, you play it back on your oud, and it listens
 through the microphone: it tells you which note you played and guides you higher or lower until
 you find it. Lessons start with single notes and continue as separate routes through the Arabic
-maqamat (Rast, Bayati, Hijaz, Nahawand, Kurd, Saba, Sikah), quarter tones included.
+maqamat (Rast, Bayati, Hijaz, Nahawand, Kurd, Saba, Sikah), quarter tones included, up to the upper jins,
+modulation to sister maqamat, and phrases over the iqa'at (Maqsum, Baladi, Saidi, Malfuf).
 
 ## Features
 
 - Pitch detection tuned for the oud: audio-thread capture, band-pass filtering, pluck and decay checks,
   octave guard and hysteresis. A pluck registers in about 140 ms; speech and room noise are ignored
-- 30 exercises per level, an 80% first-try pass mark per lesson, and a 90% mastery test to finish each level
+- Five levels, each a path of 10 mini-levels (play-back lessons, listening rounds and a review), a reward
+  chest halfway and a guidebook. 80% first-try to pass a mini-level, 90% on a 15-exercise mastery test to
+  finish a level, or jump ahead by passing the test of the level before
 - Phrases follow the sayr of each maqam, as heard in taqasim
 - Quarter-tone aware matching and note names (Rast, Dukah, Sikah, Jaharkah, Nawa…)
 - Levels, daily quests, XP, streaks with streak freezes, pearls and a shop

@@ -1,6 +1,6 @@
 /* Offline support: the app shell is cached, and the page itself is fetched fresh when online
    so updates show up right away. Account requests (Supabase) are never cached. */
-const CACHE = 'samaa-v2';
+const CACHE = 'samaa-v3';
 const SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {

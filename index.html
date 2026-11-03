@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Samaa Ear Trainer</title>
 <meta name="description" content="Learn to play the oud by ear: hear a note, play it back, and get guided higher or lower until you hit it. Lessons in the Arabic maqamat.">
-<meta name="theme-color" content="#12A182">
+<meta name="theme-color" content="#3D5BD9">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -17,25 +17,27 @@
 <style>
 /* Layout: one centered learning column, chunky tactile buttons, a winding lesson path per level. */
 :root{
-  --bg:#F3F7F6; --surface:#FFFFFF; --line:#DCE5E3; --ink:#1B2928; --muted:#667976;
-  --primary:#12A182; --primary-d:#0B7A62; --sky:#2F8AE8; --sky-d:#1E66B3;
-  --amber:#F2A22B; --amber-d:#C27A0C; --coral:#E5504A; --coral-d:#B13430;
-  --violet:#8A5CF0; --violet-d:#6439C8; --wood:#B9773F; --wood-d:#7A4A22;
-  --plum:#B8478F; --plum-d:#8C2E6B; --olive:#6E9420; --olive-d:#527013; --pearl:#1C9DC2; --pearl-d:#13748F;
-  --ok-soft:#D7F4EA; --ok-ink:#0B7A62; --bad-soft:#FCE2E0; --bad-ink:#B13430;
-  --lock:#E3E9E8; --lock-d:#C7D0CE; --lock-ink:#98A6A3; --key-black:#1B2928;
+  /* lapis, saffron and walnut: the colours of an inlaid oud */
+  --bg:#FBF6EE; --surface:#FFFFFF; --line:#EADFCE; --ink:#24213D; --muted:#776F88;
+  --primary:#3D5BD9; --primary-d:#2A41A6; --sky:#14A0B4; --sky-d:#0C7787;
+  --good:#2EA86B; --good-d:#1D7D4E;
+  --amber:#EBA233; --amber-d:#B57411; --coral:#E2475C; --coral-d:#AB2E42;
+  --violet:#8E5BE8; --violet-d:#6538BD; --wood:#C98B4E; --wood-d:#7A4824; --wood-face:#F2C88B;
+  --plum:#D35488; --plum-d:#A23863; --olive:#79A034; --olive-d:#58781F; --pearl:#3B9DD6; --pearl-d:#2775A8;
+  --ok-soft:#DDF4E6; --ok-ink:#1D7D4E; --bad-soft:#FDE3E6; --bad-ink:#AB2E42;
+  --lock:#ECE4D8; --lock-d:#D5CABA; --lock-ink:#A2988A; --key-black:#24213D;
   --f-display:"Baloo Bhaijaan 2","Nunito",system-ui,sans-serif;
   --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r:16px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#101817; --surface:#192423; --line:#2A3836; --ink:#E8F1EF; --muted:#8EA19D;
-  --ok-soft:#14372E; --ok-ink:#5FD9B5; --pearl:#4CC3E6; --pearl-d:#2A8FB0; --bad-soft:#3B1E1D; --bad-ink:#FF8F89;
-  --lock:#263230; --lock-d:#1A2422; --lock-ink:#5F716E; --key-black:#060B0A; color-scheme:dark }}
+  --bg:#14132A; --surface:#1E1C38; --line:#302D52; --ink:#EEEBF8; --muted:#A39EBE;
+  --ok-soft:#173A2B; --ok-ink:#6EDAA2; --pearl:#62BDF0; --pearl-d:#3A8FC4; --bad-soft:#3E1C25; --bad-ink:#FF8E9C;
+  --lock:#2A2847; --lock-d:#1B1934; --lock-ink:#6C6890; --key-black:#08071A; color-scheme:dark }}
 :root[data-theme="dark"]{
-  --bg:#101817; --surface:#192423; --line:#2A3836; --ink:#E8F1EF; --muted:#8EA19D;
-  --ok-soft:#14372E; --ok-ink:#5FD9B5; --pearl:#4CC3E6; --pearl-d:#2A8FB0; --bad-soft:#3B1E1D; --bad-ink:#FF8F89;
-  --lock:#263230; --lock-d:#1A2422; --lock-ink:#5F716E; --key-black:#060B0A; color-scheme:dark }
+  --bg:#14132A; --surface:#1E1C38; --line:#302D52; --ink:#EEEBF8; --muted:#A39EBE;
+  --ok-soft:#173A2B; --ok-ink:#6EDAA2; --pearl:#62BDF0; --pearl-d:#3A8FC4; --bad-soft:#3E1C25; --bad-ink:#FF8E9C;
+  --lock:#2A2847; --lock-d:#1B1934; --lock-ink:#6C6890; --key-black:#08071A; color-scheme:dark }
 
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -80,16 +82,64 @@ main{padding-block:20px 110px}
 
 /* path */
 .level{margin-bottom:36px}
-.banner{border-radius:var(--r);padding:16px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 4px 0 var(--c-d)}
+.banner{border-radius:20px;padding:18px 18px 16px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;box-shadow:0 5px 0 var(--c-d);position:relative;overflow:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.13' stroke-width='2'%3E%3Crect x='17' y='17' width='30' height='30'/%3E%3Crect x='17' y='17' width='30' height='30' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3Cpath d='M0 0L17 17M64 0L47 17M0 64L17 47M64 64L47 47'/%3E%3C/g%3E%3C/svg%3E");background-size:64px 64px}
+.banner-txt{min-width:0;flex:1}
+.banner-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+.guide-btn{display:flex;align-items:center;gap:6px;background:rgb(255 255 255 / .2);border:2px solid rgb(255 255 255 / .35);color:#fff;border-radius:14px;padding:7px 11px;font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.guide-btn svg{width:20px;height:20px}
+.guide-btn:active{transform:translateY(2px)}
+.jump-btn{background:#fff;color:var(--c-d);border-radius:12px;padding:7px 11px;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 3px 0 rgb(0 0 0 / .18);white-space:nowrap}
+.lvbar{height:10px;border-radius:9px;background:rgb(0 0 0 / .18);overflow:hidden;margin-top:10px;max-width:260px}
+.lvbar i{display:block;height:100%;background:#fff;border-radius:9px}
+.lvcount{display:block;margin-top:4px;font-size:12px;font-weight:800;opacity:.9}
+.soon.on{background:rgb(255 255 255 / .22);color:#fff}
+.banner.locked .guide-btn{color:var(--lock-ink)}
 .banner .eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
 .banner h2{font-size:24px;margin:2px 0}
 .banner p{margin:0;font-size:14px;opacity:.95;max-width:40ch}
-.banner.locked{background:var(--lock)!important;color:var(--lock-ink);box-shadow:0 4px 0 var(--lock-d)}
+.banner.locked{background-color:var(--lock)!important;color:var(--lock-ink);box-shadow:0 4px 0 var(--lock-d)}
 .soon .mini{width:12px;height:12px;vertical-align:-2px}
 .soon{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:color-mix(in srgb,var(--lock-ink) 18%,transparent);padding:4px 8px;border-radius:999px;white-space:nowrap}
 .path{display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px 0 6px;position:relative}
-.node-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
-.node{width:76px;height:70px;border-radius:50%;background:var(--c);box-shadow:0 7px 0 var(--c-d);display:grid;place-items:center;color:#fff;transition:transform .06s,box-shadow .06s}
+.node-wrap{position:relative;display:flex;flex-direction:column;align-items:center;width:124px}
+.node{width:76px;height:70px;border-radius:50%;background:var(--c);box-shadow:0 7px 0 var(--c-d);display:grid;place-items:center;color:#fff;transition:transform .06s,box-shadow .06s;position:relative}
+.node::before{content:"";position:absolute;left:14px;right:22px;top:8px;height:12px;border-radius:50%;background:rgb(255 255 255 / .28)}
+.node.locked::before{display:none}
+.node.done{background:color-mix(in srgb,var(--c) 82%,#fff)}
+.node.test{width:86px;height:78px}
+.node.test svg{width:40px;height:40px}
+.node.chest{--c:var(--amber);--c-d:var(--amber-d);border-radius:22px;width:72px;height:64px}
+.node.chest.ready{animation:wiggle 1.6s ease-in-out infinite}
+.node.chest.opened{background:color-mix(in srgb,var(--amber) 35%,var(--surface));box-shadow:0 7px 0 color-mix(in srgb,var(--amber-d) 40%,var(--line));color:var(--amber-d)}
+@keyframes wiggle{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-7deg)}86%{transform:rotate(6deg)}94%{transform:rotate(-3deg)}}
+.node-wrap.here{margin-top:30px}
+.node.chest svg{width:40px;height:40px}
+.deco{position:absolute;top:-34px;width:96px;height:115px;pointer-events:none}
+.deco.l{left:-150px} .deco.r{left:178px}
+span.deco .mascot{width:96px;height:96px}
+@media (max-width:359px){.deco{display:none}}
+.chest-pop{display:grid;place-items:center}
+.chest-pop svg{width:96px;height:96px;color:#fff;animation:hop .9s ease-in-out infinite}
+.guide-head{display:flex;gap:12px;align-items:center}
+.guide-head>svg{width:44px;height:44px;color:var(--primary);flex:none}
+.guide-head small{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+.gchips{display:flex;flex-wrap:wrap;gap:8px}
+.gchip{border:2px solid var(--line);border-radius:12px;padding:6px 10px;font-weight:800;background:var(--surface);box-shadow:0 3px 0 var(--line);display:flex;flex-direction:column;align-items:center;min-width:52px}
+.gchip small{font-size:11px;color:var(--muted);font-weight:700}
+.gchip.wide{flex:1 1 140px}
+.gchip:active{transform:translateY(3px);box-shadow:none}
+.gtips{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
+.gtips .mini,.node-label .mini{width:16px;height:16px;vertical-align:-3px}
+.beats{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;align-items:end}
+.beat{border-radius:12px;border:2px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;transition:transform .05s}
+.beat.dum{height:86px;background:color-mix(in srgb,var(--coral) 16%,var(--surface));border-color:color-mix(in srgb,var(--coral) 50%,transparent);color:var(--coral-d)}
+.beat.tak{height:62px;background:color-mix(in srgb,var(--amber) 16%,var(--surface));border-color:color-mix(in srgb,var(--amber) 50%,transparent);color:var(--amber-d)}
+.beat.rest{height:40px;border-style:dashed}
+.beat b{font-size:13px}
+.beat small{font-size:11px;color:var(--muted)}
+.beat.lit{transform:scale(1.12);box-shadow:0 0 0 3px var(--sky)}
+.lfoot.ok .btn{background:var(--good);box-shadow:0 4px 0 var(--good-d)}
 .node svg{width:34px;height:34px}
 .node:active:not(:disabled){transform:translateY(6px);box-shadow:0 1px 0 var(--c-d)}
 .node.locked{background:var(--lock);box-shadow:0 7px 0 var(--lock-d);color:var(--lock-ink);cursor:not-allowed}
@@ -108,6 +158,8 @@ main{padding-block:20px 110px}
 @media (min-width:640px){.modal{place-items:center}}
 .card{width:100%;max-width:420px;background:var(--surface);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:14px;border:2px solid var(--line);margin-bottom:env(safe-area-inset-bottom,0px)}
 .card.colored{background:var(--c);color:#fff;border:0}
+.card{max-height:calc(100dvh - 32px);overflow-y:auto}
+.card .btn svg{width:22px;height:22px;flex:none}
 .card.colored .btn{background:#fff;color:var(--c);box-shadow:0 4px 0 rgb(0 0 0 / .18)}
 .card h3{font-size:24px}
 .card p{margin:0}
@@ -124,7 +176,7 @@ main{padding-block:20px 110px}
 .x{width:36px;height:36px;display:grid;place-items:center;color:var(--lock-ink);border-radius:10px}
 .x svg{width:26px;height:26px}
 .bar{flex:1;height:16px;background:var(--lock);border-radius:999px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--primary);border-radius:999px;transition:width .35s cubic-bezier(.3,1.4,.6,1);position:relative}
+.bar i{display:block;height:100%;width:0;background:var(--good);border-radius:999px;transition:width .35s cubic-bezier(.3,1.4,.6,1);position:relative}
 .bar i::after{content:"";position:absolute;left:8px;right:8px;top:3px;height:4px;border-radius:9px;background:rgb(255 255 255 / .3)}
 .lbody{flex:1;overflow-y:auto}
 .lbody .wrap{padding-block:clamp(6px,1.6vh,14px) clamp(10px,2vh,24px);display:flex;flex-direction:column;gap:clamp(8px,1.8vh,18px);min-height:100%}
@@ -151,7 +203,7 @@ main{padding-block:20px 110px}
 .slots{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .slot{width:62px;height:62px;border-radius:16px;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--lock-ink);background:var(--surface)}
 .slot.active{border:2px solid var(--sky);color:var(--sky)}
-.slot.ok{border:2px solid var(--primary);background:var(--ok-soft);color:var(--ok-ink)}
+.slot.ok{border:2px solid var(--good);background:var(--ok-soft);color:var(--ok-ink)}
 .slot.shake{animation:shake .35s;border-color:var(--coral);color:var(--coral)}
 @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .listen{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
@@ -163,7 +215,7 @@ main{padding-block:20px 110px}
 .heard b{font-family:var(--f-display);font-size:34px;font-weight:800}
 .heard span{color:var(--muted);font-size:14px}
 .meter{position:relative;height:42px}
-.meter .track{position:absolute;left:0;right:0;top:18px;height:8px;border-radius:9px;background:linear-gradient(90deg,var(--coral),var(--amber) 35%,var(--primary) 46%,var(--primary) 54%,var(--amber) 65%,var(--coral))}
+.meter .track{position:absolute;left:0;right:0;top:18px;height:8px;border-radius:9px;background:linear-gradient(90deg,var(--coral),var(--amber) 35%,var(--good) 46%,var(--good) 54%,var(--amber) 65%,var(--coral))}
 .meter .mid{position:absolute;left:50%;top:8px;width:3px;height:28px;margin-left:-1.5px;background:var(--ink);border-radius:2px}
 .meter .mark{position:absolute;top:10px;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:var(--surface);border:4px solid var(--ink);transition:left .08s linear}
 .meter-labels{display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
@@ -257,8 +309,8 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
 .qbar em{position:absolute;inset:0;font-size:11px;font-style:normal;font-weight:800;display:grid;place-items:center;color:var(--ink);font-variant-numeric:tabular-nums}
 .reward{display:flex;align-items:center;gap:3px;font-weight:800;color:var(--pearl);font-size:15px;font-variant-numeric:tabular-nums}
 .reward svg{width:20px;height:20px}
-.quest.done .reward{color:var(--primary)}
-.quest.done .qi{background:var(--primary);color:#fff}
+.quest.done .reward{color:var(--good)}
+.quest.done .qi{background:var(--good);color:#fff}
 
 /* profile */
 .hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
@@ -348,13 +400,14 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
   .keys{height:96px}
   .pad{grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px}
   .pk{padding:5px 2px;font-size:14px;border-radius:10px} .pk small{font-size:10px}
-  .gauge{max-width:min(260px,31vh)}
+  .gauge{max-width:min(260px,29vh)}
   .ex-sub{font-size:13px}
   .hint{font-size:14px;min-height:0}
   .lfoot .btn{min-height:44px}
   .verdict .badge{width:40px;height:40px} .verdict h3{font-size:18px} .verdict p{font-size:14px}
   .ex-main .listen-row + .replays{margin-top:-4px}
 }
+@media (max-width:899px) and (max-height:660px){.lbody .wrap{padding-block:4px 8px}}
 /* five tabs fit a phone */
 .nav button{padding:6px 10px}
 @media (max-width:380px){.nav button{font-size:10px;padding:6px 6px;letter-spacing:.04em}}
@@ -390,7 +443,7 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
 .cal-meter i{display:block;height:100%;width:0;background:var(--sky);transition:width .08s}
 .cal-step{display:flex;gap:12px;align-items:center;font-weight:700}
 .cal-step .qi{flex:none}
-.cal-step.done .qi{background:var(--primary);color:#fff}
+.cal-step.done .qi{background:var(--good);color:#fff}
 
 /* banners, league, ear map, account */
 .banner-cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:var(--r);background:color-mix(in srgb,var(--primary) 12%,var(--surface));border:2px solid color-mix(in srgb,var(--primary) 40%,transparent)}
@@ -429,9 +482,9 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
 .strings{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .str{border:2px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 3px 0 var(--line);padding:8px 2px;text-align:center;font-weight:800}
 .str small{display:block;color:var(--muted);font-size:11px}
-.str.near{border-color:var(--primary);color:var(--ok-ink);background:var(--ok-soft)}
+.str.near{border-color:var(--good);color:var(--ok-ink);background:var(--ok-soft)}
 .hold{height:10px;border-radius:9px;background:var(--lock);overflow:hidden}
-.hold i{display:block;height:100%;width:0;background:var(--primary);transition:width .1s}
+.hold i{display:block;height:100%;width:0;background:var(--good);transition:width .1s}
 
 /* panels */
 .panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:18px}
@@ -473,7 +526,7 @@ input[type=range]{accent-color:var(--sky);width:160px}
 <body>
 
 <header class="top"><div class="wrap">
-  <div class="brand"><svg width="30" height="30" viewBox="0 0 120 120" aria-hidden="true"><use href="#oud-mini"/></svg><span class="word">Samaa</span> <small>سماع</small></div>
+  <div class="brand"><svg width="32" height="32" viewBox="0 0 120 120" aria-hidden="true"><use href="#oud-mini"/><path d="M51 70Q60 82 69 70Q60 74.5 51 70Z" fill="#5E1F2B"/></svg><span class="word">Samaa</span> <small>سماع</small></div>
   <div class="stats" id="stats"></div>
 </div></header>
 
@@ -517,20 +570,83 @@ input[type=range]{accent-color:var(--sky);width:160px}
     <symbol id="i-speaker" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9.5h4l5-4.5v14l-5-4.5H3z"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></symbol>
     <symbol id="i-slow" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9.5h4l5-4.5v14l-5-4.5H3z"/><text x="14" y="16" font-size="9" font-weight="900" fill="currentColor" font-family="sans-serif">½</text></symbol>
     <symbol id="i-ear" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M7 9a5 5 0 0 1 10 0c0 3-3 4-3 7a3 3 0 0 1-5 2.2M10 9.5a2 2 0 0 1 4 0"/></symbol>
-    <symbol id="i-chest" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="2" fill="currentColor"/><path fill="currentColor" opacity=".7" d="M3 9a6 6 0 0 1 6-5h6a6 6 0 0 1 6 5Z"/><rect x="10.5" y="11" width="3" height="4" rx="1" fill="#fff"/></symbol>
+    <symbol id="i-chest" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="2" fill="currentColor"/><path fill="currentColor" opacity=".8" d="M3 9a6 6 0 0 1 6-5h6a6 6 0 0 1 6 5Z"/><path d="M3 12.6h18M8 4.6V20M16 4.6V20" stroke="var(--c-d,#000)" stroke-opacity=".3" stroke-width="1.5"/><rect x="10" y="10.4" width="4" height="5.2" rx="1.2" fill="var(--c-d,#fff)"/></symbol>
     <symbol id="i-pearl" viewBox="0 0 24 24"><circle cx="12" cy="12.5" r="8.5" fill="currentColor"/><circle cx="9" cy="9.5" r="2.6" fill="#fff" opacity=".75"/><circle cx="15.5" cy="16" r="1.2" fill="#fff" opacity=".4"/></symbol>
     <symbol id="i-freeze" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.5 4l2.5 2.5L14.5 4M9.5 20l2.5-2.5 2.5 2.5"/></symbol>
     <symbol id="i-shop" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 8h15l-1.2 12a1.5 1.5 0 0 1-1.5 1.3H7.2a1.5 1.5 0 0 1-1.5-1.3Z"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></symbol>
     <symbol id="i-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 3h10v6a5 5 0 0 1-10 0Z"/><path fill="none" stroke="currentColor" stroke-width="2" d="M7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4"/><rect x="10.5" y="13" width="3" height="5" fill="currentColor"/><rect x="7.5" y="18" width="9" height="3" rx="1" fill="currentColor"/></symbol>
     <symbol id="i-map" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20Z" opacity=".35"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20ZM9 4v13.5M15 6.5V20"/></symbol>
+    <symbol id="i-headphones" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.5" y="13" width="5" height="8" rx="2" fill="currentColor"/><rect x="16.5" y="13" width="5" height="8" rx="2" fill="currentColor"/></symbol>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><rect x="2" y="8.5" width="3.5" height="7" rx="1.2" fill="currentColor"/><rect x="5" y="6" width="3.5" height="12" rx="1.4" fill="currentColor"/><rect x="15.5" y="6" width="3.5" height="12" rx="1.4" fill="currentColor"/><rect x="18.5" y="8.5" width="3.5" height="7" rx="1.2" fill="currentColor"/><rect x="8" y="10.6" width="8" height="2.8" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.5C5.5 4 9 4 11.2 5.6V20c-2.2-1.4-5.7-1.4-8.2 0Z"/><path fill="currentColor" opacity=".7" d="M21 5.5C18.5 4 15 4 12.8 5.6V20c2.2-1.4 5.7-1.4 8.2 0Z"/></symbol>
+    <symbol id="i-chest-open" viewBox="0 0 24 24"><path fill="currentColor" opacity=".55" d="M3.5 9 5 3.5h14L20.5 9Z"/><rect x="3" y="10" width="18" height="10" rx="2" fill="currentColor"/><circle cx="8.5" cy="9" r="2" fill="#fff"/><circle cx="13" cy="8.2" r="1.6" fill="#fff" opacity=".8"/><circle cx="16.5" cy="9.2" r="1.3" fill="#fff" opacity=".7"/><rect x="10.5" y="12" width="3" height="3.5" rx="1" fill="#fff" opacity=".85"/></symbol>
+    <symbol id="i-drum" viewBox="0 0 24 24"><path fill="currentColor" d="M4 5.5c0 4 3 6 5.2 6.8L8.4 20h7.2l-.8-7.7C17 11.5 20 9.5 20 5.5Z"/><ellipse cx="12" cy="5.5" rx="8" ry="2.4" fill="currentColor" opacity=".55"/></symbol>
     <symbol id="oud-mini" viewBox="0 0 120 120">
-      <rect x="53" y="2" width="14" height="28" rx="4" fill="var(--wood-d)"/>
-      <path d="M60 22c30 0 44 30 40 56-4 26-22 36-40 36S24 104 20 78C16 52 30 22 60 22Z" fill="var(--wood)"/>
-      <path d="M60 22c-14 4-22 30-22 56s8 32 22 36c-18 0-36-10-40-36C16 52 30 22 60 22Z" fill="var(--wood-d)" opacity=".28"/>
-      <circle cx="60" cy="84" r="9" fill="var(--wood-d)"/>
-      <circle cx="47" cy="58" r="7" fill="#fff"/><circle cx="73" cy="58" r="7" fill="#fff"/>
-      <circle cx="48.5" cy="59" r="3.6" fill="#1B2928"/><circle cx="74.5" cy="59" r="3.6" fill="#1B2928"/>
-      <rect x="50" y="102" width="20" height="4" rx="2" fill="var(--wood-d)"/>
+      <path d="M54.5 31 55.6 15C56.4 7 60 4 66 2.4L73 .9c3.4-.6 4.6 2.6 2.1 4.3L70.6 8C66 10.6 64.6 12.8 64.6 16.4L65.5 31Z" fill="var(--wood-d)"/>
+      <g fill="#3B2312"><circle cx="54.2" cy="18.5" r="2.3"/><circle cx="54.6" cy="25.5" r="2.3"/><circle cx="66" cy="21" r="2.3"/><circle cx="66" cy="27.6" r="2.3"/><circle cx="61.5" cy="9.6" r="2.1"/><circle cx="69" cy="5.8" r="2"/></g>
+      <path d="M60 25C89 25 104.5 53 100.6 80 96.8 105 80.5 117 60 117S23.2 105 19.4 80C15.5 53 31 25 60 25Z" fill="var(--wood-d)"/>
+      <path d="M60 28.6C86 28.6 99.4 54 96.7 79.5 93.8 101.6 78.6 113.2 60 113.2S26.2 101.6 23.3 79.5C20.6 54 34 28.6 60 28.6Z" fill="var(--wood-face)"/>
+      <path d="M60 28.6C86 28.6 99.4 54 96.7 79.5 93.8 101.6 78.6 113.2 60 113.2 75 107 83 92 83 76S77 36 60 28.6Z" fill="var(--wood)" opacity=".38"/>
+      <path d="M41 39.5C34 48.5 30 60 30.4 72" stroke="#fff" stroke-opacity=".6" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+      <circle cx="60" cy="92" r="10" fill="var(--wood-d)"/>
+      <g fill="var(--wood-face)" opacity=".92"><rect x="54.4" y="86.4" width="11.2" height="11.2" rx="1"/><rect x="54.4" y="86.4" width="11.2" height="11.2" rx="1" transform="rotate(45 60 92)"/></g>
+      <circle cx="60" cy="92" r="3" fill="var(--wood-d)"/>
+      <g stroke="#5A371B" stroke-opacity=".32" stroke-width=".9"><path d="M56.2 29V103M58.7 29V103M61.3 29V103M63.8 29V103"/></g>
+      <rect x="48.5" y="102" width="23" height="4.8" rx="2.4" fill="var(--wood-d)"/>
+      <ellipse cx="47" cy="58" rx="8.2" ry="9.2" fill="#fff"/><ellipse cx="73" cy="58" rx="8.2" ry="9.2" fill="#fff"/>
+      <circle cx="48.6" cy="59.6" r="4.8" fill="#24213D"/><circle cx="74.6" cy="59.6" r="4.8" fill="#24213D"/>
+      <circle cx="50.4" cy="57.3" r="1.8" fill="#fff"/><circle cx="76.4" cy="57.3" r="1.8" fill="#fff"/>
+      <path d="M40 46.4Q46 43.2 52 45.4M68 45.4Q74 43.2 80 46.4" stroke="var(--wood-d)" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <ellipse cx="37.2" cy="70" rx="5.2" ry="3.3" fill="#F2827F" opacity=".6"/><ellipse cx="82.8" cy="70" rx="5.2" ry="3.3" fill="#F2827F" opacity=".6"/>
+    </symbol>
+    <symbol id="deco-lantern" viewBox="0 0 100 120">
+      <path d="M50 0V13" stroke="var(--muted)" stroke-width="2"/><circle cx="50" cy="16" r="4" fill="none" stroke="var(--amber-d)" stroke-width="2.6"/>
+      <path d="M33 35Q50 12 67 35Z" fill="var(--amber-d)"/><circle cx="50" cy="21" r="2.4" fill="var(--amber-d)"/>
+      <rect x="29" y="34" width="42" height="6" rx="2.5" fill="var(--amber-d)"/>
+      <path d="M31 40H69L64.5 86H35.5Z" fill="var(--amber)"/>
+      <path d="M36.5 44.5H47.5V82H39.6Z" fill="#FFE6A6"/><path d="M52.5 44.5H63.5L60.4 82H52.5Z" fill="#FFD27C"/>
+      <path d="M42 56l2-4 2 4-2 4ZM58 56l2-4 2 4-2 4Z" fill="var(--amber-d)" opacity=".7"/>
+      <path d="M50 40V86" stroke="var(--amber-d)" stroke-width="3"/>
+      <rect x="32" y="85" width="36" height="6" rx="2.5" fill="var(--amber-d)"/><path d="M40 91H60L55 101H45Z" fill="var(--amber-d)"/>
+      <path d="M50 101v8" stroke="var(--amber-d)" stroke-width="2.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="deco-darbuka" viewBox="0 0 100 120">
+      <ellipse cx="50" cy="112" rx="28" ry="5" fill="var(--ink)" opacity=".08"/>
+      <path d="M19 26C19 56 34 66 40 70L36 104Q50 110 64 104L60 70C66 66 81 56 81 26Z" fill="var(--coral)"/>
+      <path d="M21 38Q50 49 79 38L78 45Q50 56 22 45Z" fill="var(--amber)"/>
+      <path d="M27 43l4 5 4-5 4 5 4-5 4 5 4-5 4 5 4-5 4 5 4-5 4 5" stroke="#fff" stroke-width="1.6" fill="none" opacity=".75"/>
+      <path d="M37 98Q50 103 63 98L64 104Q50 110 36 104Z" fill="var(--coral-d)"/>
+      <ellipse cx="50" cy="26" rx="32" ry="9" fill="var(--coral-d)"/><ellipse cx="50" cy="25" rx="28.5" ry="7.2" fill="#F7EBDC"/>
+      <ellipse cx="50" cy="25" rx="11" ry="2.8" fill="#E8D5BE"/>
+      <path d="M40 66Q50 72 60 66" stroke="var(--coral-d)" stroke-width="2" fill="none"/>
+    </symbol>
+    <symbol id="deco-dallah" viewBox="0 0 100 120">
+      <ellipse cx="54" cy="112" rx="34" ry="5" fill="var(--ink)" opacity=".08"/>
+      <path d="M42 50C32 72 34 96 37 104H67C70 96 72 72 62 50Z" fill="var(--amber)"/>
+      <path d="M44 50C46 40 45 33 43 28H61C59 33 58 40 60 50Z" fill="var(--amber-d)"/>
+      <path d="M41 28Q52 10 63 28Z" fill="var(--amber)"/><circle cx="52" cy="13" r="3.4" fill="var(--amber-d)"/>
+      <path d="M45 36C33 32 25 24 16 12 23 27 31 40 43 47Z" fill="var(--amber-d)"/>
+      <path d="M63 42C83 50 84 76 68 92" stroke="var(--amber-d)" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <rect x="36" y="94" width="32" height="10" rx="3" fill="var(--amber-d)"/>
+      <path d="M44 66h16M43 74h18" stroke="#fff" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+      <path d="M74 92H96Q94 106 85 106Q76 106 74 92Z" fill="var(--surface)" stroke="var(--line)" stroke-width="2.4"/>
+      <path d="M85 86q-4-6 0-11q4-6 0-11" stroke="var(--muted)" stroke-width="2.2" fill="none" opacity=".45" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="deco-palm" viewBox="0 0 100 120">
+      <ellipse cx="50" cy="113" rx="34" ry="6" fill="var(--amber)" opacity=".3"/>
+      <path d="M49 114C45 90 46 66 53 44" stroke="var(--wood)" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <path d="M44 104h9M44 92h9M45 80h9M47 68h8M49 57h7" stroke="var(--wood-d)" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+      <g fill="var(--olive)"><path d="M53 44C38 30 20 30 6 42 22 37 37 39 53 47Z"/><path d="M53 44C68 28 84 29 97 40 81 36 67 39 54 47Z"/><path d="M53 44C47 24 35 14 17 12 33 21 42 32 52 46Z"/></g>
+      <g fill="var(--olive-d)"><path d="M53 44C60 23 72 13 89 11 74 21 64 32 54 46Z"/><path d="M53 44C55 26 53 14 47 3 57 16 60 29 55 45Z"/></g>
+      <g fill="var(--amber-d)"><circle cx="49" cy="49" r="3"/><circle cx="54" cy="51" r="3"/><circle cx="58" cy="48" r="3"/></g>
+    </symbol>
+    <symbol id="deco-arch" viewBox="0 0 100 120">
+      <path d="M12 118V58C12 30 28 12 50 9 72 12 88 30 88 58V118Z" fill="var(--sky)"/>
+      <path d="M24 118V62C22 38 33 24 50 21 67 24 78 38 76 62V118Z" fill="var(--bg)"/>
+      <path d="M18 60C18 33 31 18 50 15 69 18 82 33 82 60" stroke="#fff" stroke-width="6" stroke-dasharray="8 8" fill="none" opacity=".55"/>
+      <g transform="translate(50 64)" fill="var(--amber)"><rect x="-10" y="-10" width="20" height="20" rx="2"/><rect x="-10" y="-10" width="20" height="20" rx="2" transform="rotate(45)"/></g>
+      <circle cx="50" cy="64" r="4.5" fill="var(--bg)"/>
+      <rect x="6" y="112" width="88" height="8" rx="3" fill="var(--sky-d)"/>
     </symbol>
   </defs>
 </svg>
@@ -724,6 +840,50 @@ async function playSeq(notes, noteDur = 0.9){
   const total = (notes.length - 1) * noteDur + Math.max(noteDur, 1.1) + 0.15;
   Mic.muteFor(total * 1000 + 120);   // the note has faded to ~2% by then
   await sleep(total * 1000);
+}
+/* darbuka: dum is a deep membrane thump, tak a bright rim click */
+let noiseBuf = null;
+function drum(kind, when, vol = 1){
+  const g = ctx.createGain(); g.connect(master);
+  if (kind === 'D'){
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(140, when); o.frequency.exponentialRampToValueAtTime(62, when + 0.09);
+    g.gain.setValueAtTime(0.0001, when); g.gain.exponentialRampToValueAtTime(0.9 * vol, when + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, when + 0.42);
+    o.connect(g); o.start(when); o.stop(when + 0.45);
+    return;
+  }
+  if (!noiseBuf){
+    const n = Math.floor(ctx.sampleRate * 0.12); noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+  }
+  const src = ctx.createBufferSource(); src.buffer = noiseBuf;
+  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 1.4;
+  g.gain.setValueAtTime(0.0001, when); g.gain.exponentialRampToValueAtTime(0.75 * vol, when + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, when + 0.08);
+  src.connect(bp).connect(g); src.start(when); src.stop(when + 0.1);
+  const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'triangle'; o.frequency.value = 820;
+  og.gain.setValueAtTime(0.3 * vol, when); og.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
+  o.connect(og).connect(master); o.start(when); o.stop(when + 0.06);
+}
+/* plays `bars` bars of an iqa' (or a single stroke) at `unit` seconds per eighth */
+async function playIqa(id, unit = 0.2, bars = 2, single){
+  await ensureCtx();
+  const t0 = ctx.currentTime + 0.06, p = single || IQA[id].p;
+  let end = t0;
+  for (let b = 0; b < (single ? 1 : bars); b++) [...p].forEach((c, i) => { if (c !== '.'){ const t = t0 + (b * p.length + i) * unit; drum(c, t); end = t; } });
+  const total = end - t0 + 0.55;
+  Mic.muteFor(total * 1000 + 120); await sleep(total * 1000);
+}
+/* one bar of drum alone, then the phrase on the rhythm's strokes over a second, softer bar */
+async function playOnIqa(notes, id, unit){
+  await ensureCtx();
+  const t0 = ctx.currentTime + 0.06, p = IQA[id].p, on = strokes(id), bar = p.length * unit;
+  for (let b = 0; b < 2; b++) [...p].forEach((c, i) => { if (c !== '.') drum(c, t0 + b * bar + i * unit, b ? 0.5 : 1); });
+  notes.forEach((m, j) => {
+    const t = t0 + bar + on[j] * unit, next = j + 1 < notes.length ? on[j + 1] * unit : bar;
+    playNote(m, t, j === notes.length - 1 ? 1.1 : Math.max(0.2, (next - on[j] * unit) * 0.96));
+  });
+  const total = bar + on[notes.length - 1] * unit + 1.25;
+  Mic.muteFor(total * 1000 + 120); await sleep(total * 1000);
 }
 async function sfx(ok){
   await ensureCtx();
@@ -947,8 +1107,22 @@ const ex = {
     const others = shuffle(pool.filter(x => x !== m && x !== 48)).slice(0, 2);
     return { type:'name', ref:48, midi:m, choices:shuffle([m, ...others]), answer:m };
   },
-  echo(notes, opts = {}){ return { type:'echo', notes, dur:opts.dur || 0.9, replays:opts.replays ?? Infinity, slow:opts.slow !== false }; },
-  scale:(notes) => ({ type:'scale', notes }),
+  echo(notes, opts = {}){ return { type:'echo', notes, dur:opts.dur || 0.9, replays:opts.replays ?? Infinity, slow:opts.slow !== false, ...(opts.iqa ? { iqa:opts.iqa } : {}) }; },
+  scale:(notes, label) => ({ type:'scale', notes, label }),
+  /* a phrase played twice; the second time one note moves to a neighbour */
+  odd(notes, pool){
+    const i = rnd(notes.length), alt = notes.slice();
+    const near = pool.filter(m => m !== notes[i] && Math.abs(m - notes[i]) <= 2 && m !== notes[i - 1] && m !== notes[i + 1]);
+    alt[i] = near.length ? pick(near) : notes[i] + (notes[i] > 50 ? -1 : 1);
+    return { type:'odd', notes, alt, answer:i };
+  },
+  /* does the phrase stop at home (the tonic) or on the ghammaz? */
+  rest:(notes, tonic) => ({ type:'rest', notes, answer: notes[notes.length - 1] === tonic ? 'tonic' : 'gh' }),
+  /* which maqam: a phrase from one of `choices` */
+  maqam(choices, answer, len){ return { type:'maqam', choices, answer, notes: taqsim(answer, len) || MOTIFS[answer][0] }; },
+  iqa:(choices) => ({ type:'iqa', choices, answer:pick(choices) }),
+  iqaShow:(id) => ({ type:'iqashow', iqa:id }),
+  stroke:() => ({ type:'stroke', answer:pick(['D', 'T']) }),
   /* the maqam's first jins, or the foil jins it is easily confused with, played up and back down */
   jins(mq){
     const real = Math.random() < .5, j = real ? mq.scale.slice(0, mq.jins) : mq.foil.notes;
@@ -1005,13 +1179,27 @@ const MOTIFS = {
 function taqsim(key, len, ok){
   ok = ok || (() => true);
   const pool = [];
-  for (const m of MOTIFS[key]) for (let s = 0; s + len <= m.length; s++){ const w = m.slice(s, s + len); if (ok(w)) pool.push(w); }
+  for (const m of Array.isArray(key) ? key : MOTIFS[key]) for (let s = 0; s + len <= m.length; s++){ const w = m.slice(s, s + len); if (ok(w)) pool.push(w); }
   return pool.length ? pick(pool) : null;
 }
 const phrase = (key, len, ok, fallback) => (Math.random() < 0.85 && taqsim(key, len, ok)) || fallback();
 const stepPair = w => Math.abs(w[1] - w[0]) <= 2, skipPair = w => Math.abs(w[1] - w[0]) >= 3;
 /* single notes, one per exercise, walking through a phrase in order */
 const phraseNotes = (key, n, ok) => (taqsim(key, n, ok) || shuffle(SCALE).slice(0, n)).map(m => ex.echo([m]));
+
+/* ---------- levels ----------
+   Every level is a path of 10 mini-levels (6 graded exercises each), a reward chest halfway, and a
+   mastery test at the end. Mini-levels come in three kinds, the way Duolingo mixes its path:
+   lessons (play it back on the oud), listening rounds (answer by ear, no oud needed) and a review.
+   Lesson ids never change between versions, so saved progress keeps its place. */
+const graded = e => !['intro', 'scale', 'tune', 'iqashow'].includes(e.type);
+/* exercises drawn round-robin from a set of lessons, so a review or test covers all of them */
+function mix(lessons, n){
+  const per = lessons.filter(l => l.id !== '1-1' && l.kind !== 'review').map(l => shuffle(l.gen().filter(graded)));
+  const out = [];
+  for (let r = 0; out.length < n && r < 8; r++) for (const p of shuffle(per)) if (p[r] && out.length < n) out.push(p[r]);
+  return shuffle(out);
+}
 
 const LEVEL1 = { id:1, key:'L1', title:'One note', desc:'Hear one note, find it on your oud. All in Ajam (the major scale) on C.', c:'--primary', lessons:[
     { id:'1-1', title:'Tune your oud', gen:() => [
@@ -1020,110 +1208,221 @@ const LEVEL1 = { id:1, key:'L1', title:'One note', desc:'Hear one note, find it 
     { id:'1-2', title:'High or low', gen:() => [
       ex.intro('Hear the direction first', `<p>Before you can play a note back, you need to hear where it sits. You will hear two notes. Which one is higher?</p><p>Big jumps first. They get closer as you go.</p>`),
       ...times(3, () => ex.compare(6, 9)), ...times(2, () => ex.compare(3, 5)), ex.echo([48]) ] },
+    { id:'1-6', title:'Same or different', kind:'listen', gen:() => [
+      ex.intro('Same or different?', `<p>Two notes again. This time: are they the <b>same</b> note or <b>different</b>? Some differences are only a half step, so listen closely.</p>`),
+      ...times(4, () => ex.same()), ...times(2, () => ex.compare(2, 4)) ] },
     { id:'1-3', title:'Echo Do Re Mi', gen:() => [
       ex.compare(1, 3), ...phraseNotes('ajam', 5, w => w.every(m => m <= 52)).concat(phraseNotes('ajam', 5)).slice(0, 5) ] },
+    { id:'1-7', title:'Up or down', kind:'listen', gen:() => [
+      ...times(3, () => ex.directionN(phrase('ajam', 2, stepPair, () => seq(2, 1, 1)))),
+      ...times(3, () => ex.contourN(phrase('ajam', 3, null, () => seq(3, 1, 2)))) ] },
     { id:'1-4', title:'Fa Sol La Si', gen:() => [
       ...times(2, () => ex.compare(1, 2)), ...phraseNotes('ajam', 4, w => w.every(m => m >= 53)) ] },
     { id:'1-5', title:'The whole scale', gen:() => [
       ex.intro('Hear it against Do', `<p>A note is easier to name when you hear it next to home. Samaa plays <b>Do (C)</b> first, then the mystery note.</p>`),
       ...times(2, () => ex.name(SCALE)), ...phraseNotes('ajam', 4) ] },
+    { id:'1-8', title:'Name it', kind:'listen', gen:() => [
+      ex.intro('Name the note', `<p>No oud needed for this one. Samaa plays Do, then a note from the scale. Pick its name.</p>`),
+      ...times(6, () => ex.name(SCALE)) ] },
+    { id:'1-9', title:'First pairs', gen:() => [
+      ex.intro('Two at a time', `<p>Now two notes in a row, always neighbours in the scale. Play the first, then the second.</p>`),
+      ...times(6, () => ex.echo(phrase('ajam', 2, stepPair, () => seq(2)))) ] },
+    { id:'1-10', title:'Review', kind:'review' },
 ]};
 
-/* ---------- maqamat: each one is its own route through Levels 2 and 3 ----------
+/* ---------- maqamat: each one is its own route through Levels 2 to 5 ----------
    scale: midi notes, .5 = quarter tone. jins: size of the first jins. gh: index of the ghammaz in the scale.
-   foil: the jins a learner most easily confuses it with; sig: [the maqam's signature note, the foil's note]. */
+   foil: the jins a learner most easily confuses it with; sig: [the maqam's signature note, the foil's note].
+   up: the upper jins that sits on the ghammaz. sis: sister maqamat a taqsim visits (they all have phrases). */
 const MAQAMAT = [
   { id:'rast', name:'Rast', ar:'راست', c:'--amber', tonic:'C', scale:[48,50,51.5,53,55,57,58.5,60], jins:4, gh:4, quarter:true, start:true,
-    foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51.5,52],
+    foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51.5,52], up:'Rast on G', sis:['ajam', 'nahawand'],
     about:'The “head” of the maqamat. Its third note, Sikah (E½♭), sits halfway between E♭ and E. That in-between sound is the heart of Arabic music.',
     sigText:'Listen for the third note. In Rast it is Sikah (E½♭), a quarter tone lower than the E of Ajam.' },
   { id:'bayati', name:'Bayati', ar:'بياتي', c:'--violet', tonic:'D', scale:[50,51.5,53,55,57,58,60,62], jins:4, gh:3, quarter:true,
-    foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[51.5,51],
+    foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[51.5,51], up:'Nahawand on G', sis:['kurd', 'saba'],
     about:'Warm and everywhere: folk songs, mawwal and recitation. Its second note, E½♭, is three quarter tones above D.',
     sigText:'Listen to the first step. Bayati climbs three quarter tones (D to E½♭). Kurd climbs only a half step (D to E♭).' },
   { id:'hijaz', name:'Hijaz', ar:'حجاز', c:'--coral', tonic:'D', scale:[50,51,54,55,57,58,60,62], jins:4, gh:3,
-    foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[54,53],
+    foil:{ name:'Kurd', ar:'كرد', notes:[50,51,53,55] }, sig:[54,53], up:'Nahawand on G', sis:['kurd', 'bayati'],
     about:'The wide gap between E♭ and F♯ gives Hijaz its unmistakable color. No quarter tones here.',
     sigText:'Listen for the big step in the middle, E♭ to F♯. In Kurd that step is E♭ to F, much smaller.' },
   { id:'nahawand', name:'Nahawand', ar:'نهاوند', c:'--plum', tonic:'C', scale:[48,50,51,53,55,56,58,60], jins:4, gh:4,
-    foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51,52],
+    foil:{ name:'Ajam', ar:'عجم', notes:[48,50,52,53] }, sig:[51,52], up:'Kurd on G', sis:['ajam', 'hijaz'],
     about:'Lyrical and romantic, close to the Western minor scale. A good first maqam without quarter tones.',
     sigText:'Listen to the third note. Nahawand has E♭, Ajam has E natural.' },
   { id:'kurd', name:'Kurd', ar:'كرد', c:'--sky', tonic:'D', scale:[50,51,53,55,57,58,60,62], jins:4, gh:3,
-    foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[51,51.5],
+    foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[51,51.5], up:'Nahawand on G', sis:['bayati', 'hijaz'],
     about:'Dark and plain: a half step right above the tonic, D to E♭.',
     sigText:'Listen to the first step. Kurd moves a half step (D to E♭). Bayati moves three quarter tones (D to E½♭).' },
   { id:'saba', name:'Saba', ar:'صبا', c:'--olive', tonic:'D', scale:[50,51.5,53,54,57,58,60,61], jins:4, gh:2, quarter:true, spell:{12:'G♭', 2:'D♭'},
-    foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[54,55],
+    foil:{ name:'Bayati', ar:'بياتي', notes:[50,51.5,53,55] }, sig:[54,55], up:'Hijaz on F', sis:['bayati', 'hijaz'],
     about:'The most sorrowful maqam. Its fourth note drops to G♭, so the scale never feels settled.',
     sigText:'Listen to the fourth note. Saba falls to G♭. Bayati reaches a full G.' },
   { id:'sikah', name:'Sikah', ar:'سيكاه', c:'--primary', tonic:'E½♭', scale:[51.5,53,55,57,58.5,60,62,63.5], jins:3, gh:2, quarter:true,
-    foil:{ name:'Busalik', ar:'بوسليك', notes:[52,53,55] }, sig:[51.5,52],
+    foil:{ name:'Busalik', ar:'بوسليك', notes:[52,53,55] }, sig:[51.5,52], up:'Rast on G', sis:['rast', 'bayati'],
     about:'It starts on the quarter-tone note itself, E½♭. Bright and floating, common in religious song.',
     sigText:'Listen to the very first note. Sikah starts on E½♭, a quarter tone lower than the E of Busalik.' },
 ];
 const MAQ = Object.fromEntries(MAQAMAT.map(m => [m.id, m]));
+const MQN = id => MAQ[id] || { name:'Ajam', ar:'عجم' };
 function setCtx(mqId){ const mq = mqId && MAQ[mqId]; GRID = mq ? 0.5 : 1; SPELL = (mq && mq.spell) || {}; Mic.grid = GRID; }
-/* every note a maqam's exercises can ask for (scale, foil, and the notes its phrases borrow) */
-const maqamNotes = mq => [...new Set([...mq.scale, ...mq.foil.notes, ...mq.sig, ...MOTIFS[mq.id].flat()])].sort((a, b) => a - b);
 
-/* 5 lessons per level, 6 graded exercises each = 30 per level, then a mastery test */
+/* modulation: taqsim moves that step into a sister maqam and come back (Rast to Suznak and Nahawand,
+   Bayati to Saba, Hijaz and Rast below the tonic, Nahawand's B natural on the way up, Sikah to Huzam...) */
+const MOD = {
+  rast:     [[48,50,51.5,53,55,53,51,50,48], [55,56,59,60,59,56,55,53,51.5,50,48], [55,57,58.5,60,58,57,55]],
+  bayati:   [[50,51.5,53,54,53,51.5,50], [53,51.5,50,48,50,51.5,53,51.5,50], [55,53,51.5,50,51,54,55,54,51,50]],
+  hijaz:    [[55,57,58.5,60,58.5,57,55,54,51,50], [50,51,54,55,53,51,50], [55,54,51,50,51.5,53,51.5,50]],
+  nahawand: [[55,56,59,60,59,56,55], [48,50,52,53,55,53,51,50,48], [53,55,56,59,60,58,56,55]],
+  kurd:     [[50,51,53,51,50,51.5,53,51.5,50], [55,53,51,50,51,54,55,54,51,50], [50,51,53,54,53,51,50]],
+  saba:     [[50,51.5,53,55,53,54,53,51.5,50], [51.5,50,48,50,51.5,53,54]],
+  sikah:    [[55,53,51.5,50,48,50,51.5], [53,51.5,50,51.5,53,51.5,50], [55,56,59,60,59,56,55,53,51.5]],
+};
+/* every note a maqam's exercises can ask for (scale, foil, and the notes its phrases borrow) */
+const maqamNotes = mq => [...new Set([...mq.scale, ...mq.foil.notes, ...mq.sig, ...MOTIFS[mq.id].flat(), ...MOD[mq.id].flat()])].sort((a, b) => a - b);
+
+/* iqa'at: one bar of eighths. D = dum (deep, centre of the darbuka), T = tak (bright, on the rim) */
+const IQA = {
+  maqsum:{ name:'Maqsum', ar:'مقسوم', p:'DT.TD.T.' },
+  baladi:{ name:'Baladi', ar:'بلدي', p:'DD.TD.T.' },
+  saidi: { name:'Saidi', ar:'صعيدي', p:'DT.DD.T.' },
+  malfuf:{ name:'Malfuf', ar:'ملفوف', p:'D..T..T.' },
+};
+const strokes = id => [...IQA[id].p].flatMap((c, i) => c === '.' ? [] : [i]);
+const iqaWords = id => [...IQA[id].p].map(c => c === 'D' ? 'Dum' : c === 'T' ? 'Tak' : '–').join(' ');
+
 function route(mq){
-  const sc = mq.scale, jn = sc.slice(0, mq.jins), tonic = sc[0], gh = sc[mq.gh], k = mq.id;
-  const inJins = w => w.every(m => jn.includes(m));
+  const sc = mq.scale, jn = sc.slice(0, mq.jins), up = sc.slice(mq.gh), tonic = sc[0], gh = sc[mq.gh], k = mq.id;
+  const inJins = w => w.every(m => jn.includes(m)), inUpper = w => w.every(m => m >= gh);
   const pair = ok => ex.echo(phrase(k, 2, ok, () => seq(2, 1, ok === skipPair ? 3 : 1, sc)));
   const three = (ok, dur) => ex.echo(phrase(k, 3, ok, () => seq(3, 1, 2, ok ? jn : sc)), { dur });
-  const endsHome = w => w[w.length - 1] === tonic;
+  const endsHome = w => w[w.length - 1] === tonic, endsGh = w => w[w.length - 1] === gh;
+  const restEx = len => ex.rest(phrase(k, len, w => endsHome(w) || endsGh(w), () => qafla(len, Math.random() < .5 ? sc : up)), tonic);
+  const outside = w => w.some(m => !sc.includes(m));
+  const modPhrase = len => taqsim(MOD[k], len, outside) || MOD[k][0].slice(0, len);
+  const onIqa = (id, o = {}) => { const n = strokes(id).length; return ex.echo(phrase(k, n, null, () => seq(n, 1, 2, sc)), { ...o, iqa:id, dur:0.5 }); };
+  const sis = mq.sis.map(s => MQN(s).name).join(' and ');
+
   const two = [
-    { title:`Meet ${mq.name}`, gen:() => [
+    { k:1, title:`Meet ${mq.name}`, gen:() => [
       ex.intro(`Maqam ${mq.name} · ${mq.ar}`, `<p>${mq.about}</p><p>Listen to the scale first. Every exercise on this route stays inside ${mq.name}.</p>`),
       ex.scale(sc), ...times(2, () => ex.jins(mq)), ...(taqsim(k, 4, inJins) || shuffle(jn)).slice(0, 4).map(m => ex.echo([m])) ] },
-    { title:'The signature note', gen:() => [
+    { k:6, title:'Hear the colour', kind:'listen', gen:() => [
+      ex.intro('Every jins has a colour', `<p>${mq.name} begins with jins ${mq.name}. Its look-alike is ${mq.foil.name}: almost the same notes, a different mood. Which one do you hear?</p>`),
+      ...times(4, () => ex.jins(mq)), ...times(2, () => ex.sig(mq)) ] },
+    { k:2, title:'The signature note', gen:() => [
       ex.intro(`What makes it ${mq.name}`, `<p>${mq.sigText}</p>`),
       ...times(3, () => ex.sig(mq)), ex.echo(jn, { dur:0.8 }), ...times(2, () => pair(w => stepPair(w) && inJins(w))) ] },
-    { title:'Steps', gen:() => [ ex.directionN(phrase(k, 2, stepPair, () => seq(2, 1, 1, sc))), ...times(5, () => pair(stepPair)) ] },
-    { title:'Skips', gen:() => [ ex.jins(mq), ...times(4, () => pair(skipPair)), ex.sig(mq) ] },
-    { title:'The ghammaz', gen:() => [
+    { k:3, title:'Steps', gen:() => [ ex.directionN(phrase(k, 2, stepPair, () => seq(2, 1, 1, sc))), ...times(5, () => pair(stepPair)) ] },
+    { k:7, title:'Up or down', kind:'listen', gen:() => [
+      ...times(3, () => ex.directionN(phrase(k, 2, null, () => seq(2, 1, 2, sc)))),
+      ...times(3, () => ex.contourN(phrase(k, 3, null, () => seq(3, 1, 2, sc)))) ] },
+    { k:4, title:'Skips', gen:() => [ ex.jins(mq), ...times(4, () => pair(skipPair)), ex.sig(mq) ] },
+    { k:5, title:'The ghammaz', gen:() => [
       ex.intro('The second home', `<p>Every maqam has a second resting note, the <b>ghammaz</b>. In ${mq.name} it is <b>${name(gh)}</b>. Phrases climb to it, rest there, and come back to ${mq.tonic}.</p>`),
       ex.echo([tonic, gh]), ex.echo([gh, tonic]), ...times(4, () => pair(w => w.includes(gh) || w.includes(tonic))) ] },
+    { k:8, title:'Home or ghammaz', kind:'listen', gen:() => [
+      ex.intro('Where does it rest?', `<p>Short phrases that stop either at home (${mq.tonic}) or on the ghammaz (${name(gh)}). Which one?</p>`),
+      ...times(4, () => restEx(3)), ex.echo([gh]), ex.echo([tonic]) ] },
+    { k:9, title:'Wider pairs', gen:() => times(6, () => pair(w => w.some(m => m >= gh))) },
+    { k:10, title:'Review', kind:'review' },
   ];
   const threeL = [
-    { title:'Inside the first jins', gen:() => [
+    { k:1, title:'Inside the first jins', gen:() => [
       ex.intro('Jins: the building block', `<p>A maqam is built from small groups of 3 to 5 notes called <b>ajnas</b> (one is a <b>jins</b>). The first jins sets the mood.</p><p>Hum each phrase once before you play it.</p>`),
       ex.contourN(phrase(k, 3, inJins, () => seq(3, 1, 1, jn))), ...times(5, () => three(inJins, 0.75)) ] },
-    { title:'Across the scale', gen:() => [ ex.contourN(phrase(k, 3, null, () => seq(3, 1, 2, sc))), ...times(5, () => three(null, 0.7)) ] },
-    { title:'Four notes', gen:() => times(6, () => ex.echo(phrase(k, 4, null, () => seq(4, 1, 2, sc)), { dur:0.6 })) },
-    { title:'Qafla: back home', gen:() => [
+    { k:6, title:'Shapes', kind:'listen', gen:() => [
+      ...times(4, () => ex.contourN(phrase(k, 3, null, () => seq(3, 1, 2, sc)))),
+      ...times(2, () => ex.odd(phrase(k, 3, null, () => seq(3, 1, 2, sc)), sc)) ] },
+    { k:2, title:'Across the scale', gen:() => [ ex.contourN(phrase(k, 3, null, () => seq(3, 1, 2, sc))), ...times(5, () => three(null, 0.7)) ] },
+    { k:3, title:'Four notes', gen:() => times(6, () => ex.echo(phrase(k, 4, null, () => seq(4, 1, 2, sc)), { dur:0.6 })) },
+    { k:7, title:'Which note changed?', kind:'listen', gen:() => [
+      ex.intro('Spot the change', `<p>You'll hear a phrase twice. The second time, one note is different. Which one?</p>`),
+      ...times(6, () => ex.odd(phrase(k, 4, null, () => seq(4, 1, 2, sc)), sc)) ] },
+    { k:4, title:'Qafla: back home', gen:() => [
       ex.intro('Qafla', `<p>A <b>qafla</b> is the cadence that brings a phrase home. Every phrase here ends on the tonic, ${mq.tonic}.</p>`),
       ...times(5, () => ex.echo(phrase(k, 4, endsHome, () => qafla(4, sc)), { dur:0.6 })), ex.jins(mq) ] },
-    { title:'Speed round', gen:() => [
+    { k:8, title:'Up to the ghammaz', gen:() => [
+      ex.intro('Climbing', `<p>These phrases climb and stop on the ghammaz, ${name(gh)}, the half-way home of ${mq.name}.</p>`),
+      ...times(6, () => ex.echo(phrase(k, 4, endsGh, () => qafla(4, up)), { dur:0.6 })) ] },
+    { k:5, title:'Speed round', gen:() => [
       ex.intro('Speed round', `<p>Fast ${mq.name} phrases and only <b>one replay</b>. Listen hard the first time.</p>`),
       ...times(6, () => ex.echo(phrase(k, 4, null, () => seq(4, 1, 3, sc)), { dur:0.45, replays:1, slow:false })) ] },
+    { k:9, title:'Where does it rest?', kind:'listen', gen:() => times(6, () => restEx(4)) },
+    { k:10, title:'Review', kind:'review' },
+  ];
+  const fourL = [
+    { k:1, title:'The upper jins', gen:() => [
+      ex.intro('Above the ghammaz', `<p>From the ghammaz, ${name(gh)}, a second jins climbs higher: <b>${mq.up}</b>. A taqsim spends its middle part up here before it comes back down.</p>`),
+      ex.scale(up, `The upper jins: ${mq.up}`), ...times(6, () => ex.echo(phrase(k, 3, inUpper, () => seq(3, 1, 1, up)), { dur:0.7 })) ] },
+    { k:2, title:'The sayr', kind:'listen', gen:() => [
+      ex.intro('Sayr: the road of a maqam', `<p>Every maqam has a <b>sayr</b>, the road a taqsim usually travels: settle in the first jins, climb to the ghammaz, explore above it, then come home with a qafla.</p><p>Listen for where each phrase comes to rest.</p>`),
+      ...times(4, () => restEx(4)), ...times(2, () => ex.contourN(phrase(k, 3, null, () => seq(3, 1, 2, sc)))) ] },
+    { k:3, title:'Five notes', gen:() => times(6, () => ex.echo(phrase(k, 5, null, () => seq(5, 1, 2, sc)), { dur:0.6 })) },
+    { k:4, title:'Sister maqamat', kind:'listen', gen:() => [
+      ex.intro('Sisters', `<p>${mq.name} has close relatives: ${sis}. They share many notes but not their colour. Which one do you hear?</p>`),
+      ...times(6, () => ex.maqam([k, ...mq.sis], Math.random() < .5 ? k : pick(mq.sis), 5)) ] },
+    { k:5, title:'Stepping out', gen:() => [
+      ex.intro('Modulation', `<p>In a taqsim the player <b>steps out</b> into a sister maqam for a moment, then comes back. These phrases borrow a note from outside ${mq.name}. Listen for the colour change.</p>`),
+      ...times(6, () => ex.echo(modPhrase(4), { dur:0.6 })) ] },
+    { k:6, title:'Which note changed?', kind:'listen', gen:() => times(6, () => ex.odd(phrase(k, 4, null, () => seq(4, 1, 2, sc)), maqamNotes(mq))) },
+    { k:7, title:'Long phrases', gen:() => times(6, () => ex.echo(phrase(k, 6, null, () => seq(6, 1, 2, sc)), { dur:0.55 })) },
+    { k:8, title:'Out and back', gen:() => times(6, () => ex.echo(modPhrase(5), { dur:0.55 })) },
+    { k:9, title:'Name that maqam', kind:'listen', gen:() => times(6, () => {
+      const far = pick(MAQAMAT.map(m => m.id).filter(id => id !== k && !mq.sis.includes(id))), near = pick(mq.sis);
+      return ex.maqam(shuffle([k, near, far]), pick([k, k, near, far]), 5); }) },
+    { k:10, title:'Review', kind:'review' },
+  ];
+  const fiveL = [
+    { k:1, title:'Dum and Tak', kind:'listen', gen:() => [
+      ex.intro('The darbuka speaks two words', `<p><b>Dum</b> is the deep stroke in the middle of the drum. <b>Tak</b> is the bright stroke on the rim. Every iqa' (rhythm) is built from these two.</p>`),
+      ...times(6, () => ex.stroke()) ] },
+    { k:2, title:'Maqsum', kind:'listen', gen:() => [
+      ex.intro('Maqsum · مقسوم', `<p>The most common rhythm in Arabic music: <b>${iqaWords('maqsum')}</b>. Count 1 2 3 4 and feel it bounce.</p>`),
+      ex.iqaShow('maqsum'), ...times(6, () => ex.iqa(['maqsum', 'malfuf'])) ] },
+    { k:3, title:'Phrases on Maqsum', gen:() => [
+      ex.intro('Play on the beat', `<p>One bar of drum, then a ${mq.name} phrase that falls on the Maqsum strokes. Play the notes back. Keeping the rhythm is your bonus: Samaa checks the notes.</p>`),
+      ...times(6, () => onIqa('maqsum')) ] },
+    { k:4, title:'Baladi', kind:'listen', gen:() => [
+      ex.intro('Baladi · بلدي', `<p>Baladi is Maqsum with two Dums at the start: <b>${iqaWords('baladi')}</b>. Heavier, earthier.</p>`),
+      ex.iqaShow('baladi'), ...times(6, () => ex.iqa(['maqsum', 'baladi'])) ] },
+    { k:5, title:'Malfuf', gen:() => [
+      ex.intro('Malfuf · ملفوف', `<p>A quick, rolling rhythm: <b>${iqaWords('malfuf')}</b>. Three strokes, three notes.</p>`),
+      ex.iqaShow('malfuf'), ...times(6, () => onIqa('malfuf')) ] },
+    { k:6, title:'Saidi', kind:'listen', gen:() => [
+      ex.intro('Saidi · صعيدي', `<p>From Upper Egypt: <b>${iqaWords('saidi')}</b>. The two Dums sit in the middle of the bar.</p>`),
+      ex.iqaShow('saidi'), ...times(6, () => ex.iqa(['maqsum', 'baladi', 'saidi'])) ] },
+    { k:7, title:'Phrases on Baladi', gen:() => times(6, () => onIqa('baladi')) },
+    { k:8, title:'Phrases on Saidi', gen:() => times(6, () => onIqa('saidi', { replays:2 })) },
+    { k:9, title:'Which rhythm?', kind:'listen', gen:() => times(6, () => ex.iqa(Object.keys(IQA))) },
+    { k:10, title:'Review', kind:'review' },
   ];
   const lv = (n, title, desc, list) => {
     const level = { id:n, key:`${mq.id}-${n}`, title, desc, c:mq.c, mq:mq.id };
-    level.lessons = list.map((ls, i) => ({ ...ls, id:`${mq.id}-${n}-${i+1}`, mq:mq.id, gen:() => ls.gen().map(e => ({ ...e, mq:mq.id })) }));
+    level.lessons = list.map(ls => ({ ...ls, id:`${mq.id}-${n}-${ls.k}`, mq:mq.id, gen:ls.gen && (() => ls.gen().map(e => ({ ...e, mq:mq.id }))) }));
     return level;
   };
   return [
     lv(2, `Two notes in ${mq.name}`, 'Intervals, the signature note and the ghammaz.', two),
     lv(3, `${mq.name} phrases`, 'Three and four notes, ending in a qafla.', threeL),
+    lv(4, 'Sayr and modulation', `The upper jins, ${mq.name}'s sister maqamat and longer taqsim phrases.`, fourL),
+    lv(5, 'Rhythm and iqa\'', `${mq.name} phrases over Maqsum, Baladi, Saidi and Malfuf.`, fiveL),
   ];
 }
 const ROUTES = Object.fromEntries(MAQAMAT.map(m => [m.id, route(m)]));
-/* mastery test: 12 exercises drawn from the level's lessons, no hints; 90% on the first try to pass */
-function addTest(level){
+/* reviews mix the mini-levels before them; the mastery test (15 exercises from the whole level, no hints)
+   needs 90% on the first try */
+const TEST_N = 15;
+function finishLevel(level){
+  level.lessons.forEach((ls, i) => { if (ls.kind === 'review') ls.gen = () => mix(level.lessons.slice(0, i), 6); });
   level.test = { id:`${level.key}-test`, title:'Mastery test', test:true, mq:level.mq,
-    gen:() => {
-      const per = level.lessons.filter(l => l.id !== '1-1').map(l => shuffle(l.gen().filter(e => !['intro', 'scale', 'tune'].includes(e.type))));
-      const out = []; for (let r = 0; out.length < 12 && r < 6; r++) for (const p of per) if (p[r] && out.length < 12) out.push(p[r]);
-      return shuffle(out).map(e => ({ ...e, test:true }));
-    } };
+    gen:() => mix(level.lessons, TEST_N).map(e => ({ ...e, test:true })) };
+  level.chest = `${level.key}-chest`;
 }
-addTest(LEVEL1); MAQAMAT.forEach(m => ROUTES[m.id].forEach(addTest));
+finishLevel(LEVEL1); MAQAMAT.forEach(m => ROUTES[m.id].forEach(finishLevel));
+const CHEST_AT = 5;   // the chest sits after the fifth mini-level
 const SOON = [
-  { id:4, title:'Modulation', desc:'Move from one maqam to its sisters, the way a taqsim does.' },
-  { id:5, title:'Rhythm and iqa\'', desc:'Phrases over Maqsum, Wahda and Samai.' },
   { id:6, title:'Taqsim phrases', desc:'Longer free phrases taken from real taqasim.' },
   { id:7, title:'Call and response', desc:'Answer long phrases, the way a takht does.' },
 ];
@@ -1135,14 +1434,18 @@ const mastered = lv => isDone(lv.test.id);
 const level1Done = () => mastered(LEVEL1);
 const levelIds = lv => [...lv.lessons.map(l => l.id), lv.test.id];
 const routeIds = mqId => ROUTES[mqId].flatMap(levelIds);
+const prevLevel = lv => lv.id === 1 ? null : lv.id === 2 ? LEVEL1 : ROUTES[lv.mq][lv.id - 3];
+const levelOpen = lv => !lv.mq || (prevLevel(lv) ? mastered(prevLevel(lv)) : true);
 function unlocked(id){
   const ls = byId(id), lv = ls.level;
+  if (isDone(id)) return true;
   if (ls.test) return lv.lessons.every(l => isDone(l.id));
   if (ls.idx > 0) return isDone(lv.lessons[ls.idx - 1].id);
-  if (!lv.mq) return true;
-  return lv.id === 2 ? level1Done() : mastered(ROUTES[lv.mq][0]);
+  return levelOpen(lv);
 }
-const currentId = () => { const p = [...levelIds(LEVEL1), ...routeIds(S.maqam)]; return p.find(id => !isDone(id)) || p[p.length - 1]; };
+const currentId = () => { const p = [...levelIds(LEVEL1), ...routeIds(S.maqam)]; return p.find(id => !isDone(id) && unlocked(id)) || p.find(id => !isDone(id)) || p[p.length - 1]; };
+/* "Jump here": passing the previous level's test opens a level, and counts everything before it as done */
+function jumpDone(lv){ for (let p = lv; p; p = prevLevel(p)) levelIds(p).forEach(id => { S.done[id] = S.done[id] || 1; }); }
 
 /* ---------- shell ---------- */
 let tab = 'learn', viewCleanup = null;
@@ -1190,6 +1493,7 @@ function checkQuests(){
 const BADGES = [
   { id:'tuned', name:'Tuned up', desc:'Tune all six courses of your oud', icon:'i-tuner', c:'--primary', goal:1, val:() => +isDone('1-1') },
   { id:'level1', name:'First steps', desc:'Pass the Level 1 mastery test', icon:'i-star', c:'--sky', goal:1, val:() => +level1Done() },
+  { id:'rhythm', name:"Iqa' keeper", desc:'Master Level 5 in any maqam', icon:'i-drum', c:'--coral', goal:1, val:() => +MAQAMAT.some(m => mastered(ROUTES[m.id][3])) },
   { id:'master', name:'Maqam master', desc:'Master three levels', icon:'i-trophy', c:'--amber', goal:3, val:() => [LEVEL1, ...MAQAMAT.flatMap(m => ROUTES[m.id])].filter(mastered).length },
   { id:'streak', name:'On fire', desc:'Reach a 7-day streak', icon:'i-fire', c:'--amber', goal:7, val:() => S.bestStreak },
   { id:'xp', name:'Sharp ear', desc:'Earn 500 XP', icon:'i-bolt', c:'--violet', goal:500, val:() => S.xp },
@@ -1258,8 +1562,15 @@ const GEAR_SVG = {
   bowtie:`<path d="M60 36 L46 28 L46 44 Z M60 36 L74 28 L74 44 Z" fill="#8A5CF0"/><circle cx="60" cy="36" r="4" fill="#6439C8"/>`,
   crown:`<path d="M41 31 L43 9 L52 20 L60 5 L68 20 L77 9 L79 31 Z" fill="#F5C534" stroke="#C27A0C" stroke-width="2" stroke-linejoin="round"/><circle cx="60" cy="24" r="3" fill="#E5504A"/>`,
 };
-function mascot(gear = S.gear.worn, cls = '', size){
-  return `<svg class="mascot ${cls}" viewBox="0 0 120 120" ${size ? `style="width:${size}px;height:${size}px"` : ''} aria-hidden="true"><use href="#oud-mini"/>${GEAR_SVG[gear] || ''}</svg>`;
+const MOUTH = {
+  calm:`<path d="M53 71Q60 77.5 67 71" stroke="#5E1F2B" stroke-width="2.8" stroke-linecap="round" fill="none"/>`,
+  happy:`<path d="M51 70Q60 82 69 70Q60 74.5 51 70Z" fill="#5E1F2B"/><path d="M55.5 76Q60 79.5 64.5 76Q60 74.6 55.5 76Z" fill="#F28B82"/>`,
+  wow:`<ellipse cx="60" cy="74" rx="4.4" ry="5.4" fill="#5E1F2B"/><ellipse cx="60" cy="76.5" rx="2.6" ry="1.8" fill="#F28B82"/>`,
+  sad:`<path d="M53.5 76Q60 70.5 66.5 76" stroke="#5E1F2B" stroke-width="2.8" stroke-linecap="round" fill="none"/><path d="M82 63q2.6 4 0 6.2q-2.6-2.2 0-6.2Z" fill="#7CC3F0"/>`,
+};
+function mascot(gear = S.gear.worn, cls = '', size, mood){
+  mood = mood || (/bounce/.test(cls) ? 'happy' : 'calm');
+  return `<svg class="mascot ${cls}" viewBox="0 0 120 120" ${size ? `style="width:${size}px;height:${size}px"` : ''} aria-hidden="true"><use href="#oud-mini"/>${MOUTH[mood] || ''}${GEAR_SVG[gear] || ''}</svg>`;
 }
 function buy(it){
   if (S.pearls < it.price){ toast(`You need ${it.price - S.pearls} more pearls`, ''); return false; }
@@ -1551,31 +1862,16 @@ function renderLearn(){
   const levels = [LEVEL1, 'pick', ...ROUTES[S.maqam], ...SOON.map(l => ({ ...l, c:'--sky', soon:true }))];
   for (const lv of levels){
     if (lv === 'pick'){ html += maqamPicker(); continue; }
-    const c = `--c:var(${lv.c});--c-d:var(${lv.c}-d)`;
-    const mq = lv.mq && MAQ[lv.mq];
-    html += `<section class="level" style="${c}">
-      <div class="banner ${lv.soon ? 'locked' : ''}" style="background:var(--c)">
-        <div><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name} ${mq.ar}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p></div>
-        ${lv.soon ? `<span class="soon">Coming soon</span>` : lv.test && mastered(lv) ? `<span class="soon" style="background:rgb(255 255 255 / .22)">${icon('i-trophy', 'mini')} Mastered</span>` : ''}
-      </div><div class="path">`;
-    const items = lv.lessons ? [...lv.lessons, lv.test] : times(3, (_, i) => ({ id:`${lv.id}-${i+1}`, soon:true }));
-    items.forEach((ls, i) => {
-      const open = !ls.soon && unlocked(ls.id), done = !ls.soon && isDone(ls.id), here = ls.id === cur && !ls.soon;
-      const ico = ls.soon || !open ? (ls.test ? 'i-trophy' : 'i-lock') : ls.test ? 'i-trophy' : done ? 'i-check' : i === 0 && lv.id === 1 ? 'i-tuner' : 'i-star';
-      html += `<div class="node-wrap" style="transform:translateX(${OFF[i % 8]}px)">
-        ${here ? `<span class="start-tag">${done ? 'AGAIN' : 'START'}</span>` : ''}
-        <button class="node ${open ? '' : 'locked'} ${here ? 'current' : ''}" ${ls.test && open ? 'style="--c:var(--amber);--c-d:var(--amber-d)"' : ''} data-lesson="${ls.soon ? '' : ls.id}" ${open ? '' : 'aria-disabled="true"'} aria-label="${ls.title || 'Locked lesson'}">${icon(ico)}</button>
-        ${done && S.done[ls.id] > 1 ? `<span class="done-count">×${S.done[ls.id]}</span>` : ''}
-        ${ls.title ? `<span class="node-label">${ls.title}</span>` : ''}
-      </div>`;
-    });
-    html += `</div></section>`;
+    html += levelHtml(lv, cur);
   }
   $('#view').innerHTML = html;
   $('#practice').onclick = () => startLesson(null, true);
   if ($('#trickyGo')) $('#trickyGo').onclick = () => startLesson('tricky', true);
   if ($('#saveAcct')) $('#saveAcct').onclick = authSignup;
   document.querySelectorAll('[data-lesson]').forEach(b => b.onclick = () => lessonCard(b.dataset.lesson));
+  document.querySelectorAll('[data-chest]').forEach(b => b.onclick = () => openChest(b.dataset.chest));
+  document.querySelectorAll('[data-guide]').forEach(b => b.onclick = () => guidebook(b.dataset.guide));
+  document.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => jumpCard(b.dataset.jump));
   document.querySelectorAll('[data-maqam]').forEach(b => b.onclick = () => {
     S.maqam = b.dataset.maqam; save(); renderLearn();
     document.querySelector('.pick')?.scrollIntoView({ block:'start' });
@@ -1583,10 +1879,100 @@ function renderLearn(){
   const curNode = document.querySelector('.node.current');
   if (curNode && ALL.findIndex(x => x.id === cur) > 0) curNode.scrollIntoView({ block:'center' });
 }
+const levelByKey = key => [LEVEL1, ...MAQAMAT.flatMap(m => ROUTES[m.id])].find(l => l.key === key);
+const DECO = { 1:['lantern', 'palm', 'oudi'], 2:['dallah', 'arch', 'oudi'], 3:['lantern', 'palm', 'oudi'], 4:['arch', 'dallah', 'oudi'], 5:['darbuka', 'lantern', 'oudi'] };
+function decoHtml(lvId, n, side){
+  const d = DECO[lvId][n % 3];
+  return d === 'oudi' ? `<span class="deco ${side}">${mascot(undefined, 'bounce', 96)}</span>`
+    : `<svg class="deco ${side}" viewBox="0 0 100 120" aria-hidden="true"><use href="#deco-${d}"/></svg>`;
+}
+function levelHtml(lv, cur){
+  const mq = lv.mq && MAQ[lv.mq];
+  const open = !lv.soon && levelOpen(lv), doneN = lv.lessons ? lv.lessons.filter(l => isDone(l.id)).length : 0, total = lv.lessons ? lv.lessons.length : 10;
+  let html = `<section class="level" style="--c:var(${lv.c});--c-d:var(${lv.c}-d)">
+    <div class="banner ${lv.soon ? 'locked' : ''}" style="background-color:var(--c)">
+      <div class="banner-txt"><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name} ${mq.ar}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p>
+        ${lv.soon ? '' : `<div class="lvbar"><i style="width:${doneN / total * 100}%"></i></div><small class="lvcount">${doneN} of ${total} mini-levels${mastered(lv) ? ' · mastered' : ''}</small>`}</div>
+      <div class="banner-act">
+        ${lv.soon ? `<span class="soon">Coming soon</span>` : `<button class="guide-btn" data-guide="${lv.key}" aria-label="Guidebook">${icon('i-book')}<span>Guide</span></button>`}
+        ${!lv.soon && mastered(lv) ? `<span class="soon on">${icon('i-trophy', 'mini')} Mastered</span>` : ''}
+        ${!lv.soon && !open && prevLevel(lv) ? `<button class="jump-btn" data-jump="${lv.key}">Jump here?</button>` : ''}
+      </div>
+    </div><div class="path">`;
+  const items = lv.lessons ? [...lv.lessons.slice(0, CHEST_AT), { chest:true }, ...lv.lessons.slice(CHEST_AT), lv.test] : times(4, (_, i) => ({ id:`${lv.id}-${i+1}`, soon:true }));
+  let decoN = 0;
+  items.forEach((ls, i) => {
+    const side = OFF[i % 8] > 0 ? 'l' : 'r';
+    const deco = lv.lessons && (i % 8 === 2 || i % 8 === 6) ? decoHtml(lv.id, decoN++, side) : '';
+    if (ls.chest){
+      const ready = lv.lessons.slice(0, CHEST_AT).every(l => isDone(l.id)), got = S.chests.includes(lv.chest);
+      html += `<div class="node-wrap" style="transform:translateX(${OFF[i % 8]}px)">${deco}
+        <button class="node chest ${ready && !got ? 'ready' : ''} ${got ? 'opened' : ''} ${ready ? '' : 'locked'}" data-chest="${lv.key}" aria-label="Reward chest">${icon(got ? 'i-chest-open' : 'i-chest')}</button>
+        <span class="node-label">${got ? 'Opened' : 'Reward'}</span></div>`;
+      return;
+    }
+    const isOpen = !ls.soon && unlocked(ls.id), done = !ls.soon && isDone(ls.id), here = ls.id === cur && !ls.soon;
+    const kindIco = ls.test ? 'i-trophy' : ls.kind === 'listen' ? 'i-headphones' : ls.kind === 'review' ? 'i-dumbbell' : ls.id === '1-1' ? 'i-tuner' : 'i-star';
+    const ico = ls.soon ? 'i-lock' : !isOpen ? (ls.test ? 'i-trophy' : 'i-lock') : done && !ls.test ? 'i-check' : kindIco;
+    const style = ls.test && isOpen ? '--c:var(--amber);--c-d:var(--amber-d)' : '';
+    html += `<div class="node-wrap ${here ? 'here' : ''}" style="transform:translateX(${OFF[i % 8]}px)">${deco}
+      ${here ? `<span class="start-tag">${done ? 'AGAIN' : 'START'}</span>` : ''}
+      <button class="node ${ls.test ? 'test' : ''} ${done ? 'done' : ''} ${isOpen ? '' : 'locked'} ${here ? 'current' : ''}" style="${style}" data-lesson="${ls.soon ? '' : ls.id}" ${isOpen ? '' : 'aria-disabled="true"'} aria-label="${ls.title || 'Locked lesson'}">${icon(ico)}</button>
+      ${done && S.done[ls.id] > 1 ? `<span class="done-count">×${S.done[ls.id]}</span>` : ''}
+      ${ls.title ? `<span class="node-label">${ls.test ? ls.title : `${lv.lessons.indexOf(ls) + 1}. ${ls.title}`}</span>` : ''}
+    </div>`;
+  });
+  return html + `</div></section>`;
+}
+function openChest(key){
+  const lv = levelByKey(key);
+  if (S.chests.includes(lv.chest)){ openModal(`<h3>Already opened</h3><p>You found the pearls in this chest. The next one is halfway through the next level.</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
+  if (!lv.lessons.slice(0, CHEST_AT).every(l => isDone(l.id))){ openModal(`<h3>Reward chest</h3><p>Pass the first ${CHEST_AT} mini-levels of this level to open it.</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
+  const gift = 15 + 5 * lv.id;
+  S.chests.push(lv.chest); S.pearls += gift; save(); renderStats();
+  openModal(`<div class="chest-pop">${icon('i-chest-open')}</div><h3>${gift} pearls!</h3><p>Halfway through Level ${lv.id}. Spend them in the shop.</p><button class="btn wide" id="ok">Collect</button>`, '--amber');
+  sfx(true);
+  $('#ok').onclick = () => { closeModal(); renderLearn(); };
+}
+function jumpCard(key){
+  const lv = levelByKey(key), prev = prevLevel(lv);
+  openModal(`<h3>Jump to Level ${lv.id}?</h3><p>Already know ${prev.id === 1 ? 'single notes' : `Level ${prev.id}`}? Pass its mastery test (${TEST_N} exercises, 90% on the first try) and everything before Level ${lv.id} counts as done.</p>
+    <div class="row"><button class="btn" id="go">Take the test</button><button class="btn ghost" onclick="closeModal()">Not now</button></div>`, '--amber');
+  $('#go').onclick = () => { closeModal(); startLesson(prev.test.id, false, true); };
+}
+/* guidebook: what the level teaches, with sounds to tap */
+function guidebook(key){
+  const lv = levelByKey(key), mq = lv.mq && MAQ[lv.mq];
+  setCtx(lv.mq);
+  const chip = (m, sub) => `<button class="gchip" data-m="${m}">${name(m)}${sub ? `<small>${sub}</small>` : ''}</button>`;
+  let body;
+  if (!mq) body = `<p>Ajam on C: the major scale, and the first notes most oud players learn.</p>
+    <div class="gchips">${SCALE.map(m => chip(m, SOL[west(m)[0]])).join('')}</div>
+    <ul class="gtips"><li>Hear it first, hum it, then play it.</li><li>Missed a note? Samaa tells you to go higher or lower until you find it.</li><li>Listening rounds (${icon('i-headphones', 'mini')}) need no oud.</li></ul>`;
+  else {
+    const gh = mq.scale[mq.gh], up = mq.scale.slice(mq.gh);
+    const extra = {
+      2:`<li>The signature note: ${mq.sigText}</li><li>The ghammaz, the second home, is <b>${name(gh)}</b>.</li>`,
+      3:`<li>Phrases come home with a <b>qafla</b> on ${mq.tonic}.</li><li>Hum each phrase once before you play it.</li>`,
+      4:`<li>The upper jins is <b>${mq.up}</b>: ${up.map(name).join(' ')}.</li><li>Sister maqamat: ${mq.sis.map(s => MQN(s).name).join(', ')}.</li>`,
+      5:`<li>Phrases fall on the strokes of the rhythm. Samaa checks the notes, the rhythm is yours to keep.</li>`,
+    }[lv.id];
+    body = `<p>${mq.about}</p>
+      <div class="gchips">${mq.scale.map((m, i) => chip(m, i === 0 ? 'tonic' : i === mq.gh ? 'ghammaz' : ARL[qOf(m)] || '')).join('')}</div>
+      ${lv.id === 5 ? `<div class="gchips">${Object.keys(IQA).map(id => `<button class="gchip wide" data-iqa="${id}">${IQA[id].name}<small>${iqaWords(id)}</small></button>`).join('')}</div>` : ''}
+      <ul class="gtips">${extra}<li>Listening rounds (${icon('i-headphones', 'mini')}) need no oud. Reviews (${icon('i-dumbbell', 'mini')}) mix what came before.</li></ul>
+      <button class="btn ghost wide" id="gphrase">${icon('i-speaker')} Hear a ${mq.name} phrase</button>`;
+  }
+  openModal(`<div class="guide-head">${icon('i-book')}<div><small>Level ${lv.id} guidebook</small><h3>${lv.title}</h3></div></div>${body}
+    <button class="btn wide" onclick="closeModal()">Got it</button>`);
+  document.querySelectorAll('.gchip[data-m]').forEach(b => b.onclick = () => playSeq([+b.dataset.m], 1));
+  document.querySelectorAll('.gchip[data-iqa]').forEach(b => b.onclick = () => playIqa(b.dataset.iqa, 0.22, 2));
+  if ($('#gphrase')) $('#gphrase').onclick = () => playSeq(taqsim(mq.id, 5) || mq.scale, 0.5);
+}
 function maqamPicker(){
   const open = level1Done();
   return `<section class="level pick">
-    <div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Levels 2–3</div>
+    <div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Levels 2–5</div>
     <h2>Choose your maqam</h2>
     <p>${open ? 'Each maqam has its own route of exercises. Not sure where to begin? Start with Rast.' : 'Finish Level 1 to start a route. You can look around now.'}</p>
     <div class="mq-grid">${MAQAMAT.map(m => {
@@ -1598,26 +1984,26 @@ function maqamPicker(){
     }).join('')}</div></section>`;
 }
 function lessonCard(id){
-  if (!id) { openModal(`<h3>Coming soon</h3><p>We are building Levels 4 to 7: modulation, rhythm, taqsim phrases and call and response.</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
+  if (!id) { openModal(`<h3>Coming soon</h3><p>We are building Levels 6 and 7: free taqsim phrases and call and response.</p><button class="btn wide" onclick="closeModal()">OK</button>`); return; }
   const ls = byId(id);
   if (!unlocked(id)){
     const why = ls.test ? `Pass all ${ls.level.lessons.length} lessons of this level first.`
-      : ls.idx === 0 && ls.mq ? `Pass the mastery test of ${ls.level.id === 2 ? 'Level 1' : `Level 2 in ${MAQ[ls.mq].name}`} to open this level.`
-      : 'Pass the lesson before this one to unlock it.';
+      : ls.idx === 0 && ls.mq ? `Pass the mastery test of ${ls.level.id === 2 ? 'Level 1' : `Level ${ls.level.id - 1} in ${MAQ[ls.mq].name}`} to open this level.`
+      : 'Pass the mini-level before this one to unlock it.';
     openModal(`<h3>${ls.title}</h3><p>${why}</p><button class="btn wide" onclick="closeModal()">OK</button>`); return;
   }
   const where = `Level ${ls.level.id}${ls.mq ? ` · Maqam ${MAQ[ls.mq].name}` : ''}`;
   openModal(ls.test
-    ? `<h3>Mastery test</h3><p>${where} · 12 exercises from the whole level, no hints. Get <b>90%</b> right on the first try to master the level${mastered(ls.level) ? '' : ' and unlock the next one'}.</p>
+    ? `<h3>Mastery test</h3><p>${where} · ${TEST_N} exercises from all ${ls.level.lessons.length} mini-levels, no hints. Get <b>90%</b> right on the first try to master the level${mastered(ls.level) ? '' : ' and unlock the next one'}.</p>
        <button class="btn wide" id="go">${mastered(ls.level) ? 'Take it again' : 'Start the test'}</button>`
-    : `<h3>${ls.title}</h3><p>${where} · Lesson ${ls.idx + 1} of ${ls.level.lessons.length} · 6 exercises. ${id === '1-1' ? '' : 'Pass with 80% right on the first try.'}</p>
+    : `<h3>${ls.title}</h3><p>${where} · Mini-level ${ls.idx + 1} of ${ls.level.lessons.length} · ${ls.kind === 'listen' ? 'Listening round, no oud needed' : ls.kind === 'review' ? 'Review of the mini-levels before it' : 'Play it back on your oud'} · 6 exercises. ${id === '1-1' ? '' : 'Pass with 80% right on the first try.'}</p>
        <button class="btn wide" id="go">${isDone(id) ? `Practice +${5 * xpMult()} XP` : `Start +${10 * xpMult()} XP`}</button>`, ls.test ? '--amber' : ls.level.c);
   $('#go').onclick = () => { closeModal(); startLesson(id); };
 }
 
 /* ---------- Lesson runner ---------- */
 let L = null;
-function startLesson(id, practice = false){
+function startLesson(id, practice = false, jump = false){
   let ls, queue;
   if (id === 'tricky'){
     queue = shuffle(tricky().flatMap(t => [ex.echo([t.m]), ex.echo([t.m])].map(e => ({ ...e, mq:t.mq || undefined }))));
@@ -1625,13 +2011,13 @@ function startLesson(id, practice = false){
   } else if (practice){
     const pool = ALL.filter(x => isDone(x.id) && x.id !== '1-1' && !x.test);
     const src = pool.length ? pool : [ALL[1]];
-    queue = shuffle(src.flatMap(x => x.gen()).filter(e => e.type !== 'intro' && e.type !== 'scale')).slice(0, 8);
+    queue = shuffle(src.flatMap(x => x.gen()).filter(e => e.type !== 'intro' && e.type !== 'scale' && e.type !== 'iqashow')).slice(0, 8);
     ls = { id:'practice', title:'Practice', level:{ c:'--sky' } };
   } else {
     ls = ALL.find(x => x.id === id);
     queue = ls.gen();
   }
-  L = { ls, practice, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0, firstOk:0 };
+  L = { ls, practice, jump, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale' && e.type !== 'iqashow').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0, firstOk:0 };
   $('#lesson').hidden = false; document.body.style.overflow = 'hidden';
   renderEx();
 }
@@ -1659,7 +2045,7 @@ function renderEx(){
   L.curSlip = false;
   setProgress();
   $('#lbody').className = 'wrap center';
-  ({ intro:exIntro, scale:exScale, jins:exChoice, tune:exTune, echo:exEcho, compare:exChoice, same:exChoice, direction:exChoice, contour:exChoice, name:exChoice })[e.type](e, $('#lbody'));
+  (CHOICE[e.type] ? exChoice : { intro:exIntro, scale:exScale, tune:exTune, echo:exEcho, iqashow:exIqaShow }[e.type])(e, $('#lbody'));
   $('.lbody').scrollTop = 0;
 }
 const PRAISE = ['Ahsant! أحسنت', 'Nice ear!', 'Spot on!', 'Tarab! طرب', 'Exactly right', 'Beautiful'];
@@ -1714,19 +2100,20 @@ function complete(){
     if (S.streak % 7 === 0){ S.pearls += 25; setTimeout(() => toast(`${S.streak}-day streak bonus`, '+25'), 900); }
   }
   if (!L.practice && passed) S.done[L.ls.id] = (S.done[L.ls.id] || 0) + 1;
+  if (L.jump && passed) jumpDone(L.ls.level);
   if (newlyMastered){ S.pearls += 40; setTimeout(() => toast(`Level ${L.ls.level.id} mastered`, '+40', 'i-trophy'), 700); }
   save();
   $('#bar').style.width = '100%';
   $('#lbody').className = 'wrap complete';
   const pct = Math.round(rate * 100), firstTry = `${L.firstOk} of ${L.total} right on the first try (${pct}%)`;
-  $('#lbody').innerHTML = `${mascot(undefined, passed ? 'bounce' : '')}
+  $('#lbody').innerHTML = `${mascot(undefined, passed ? 'bounce' : '', undefined, passed ? 'happy' : 'sad')}
     <h2 style="${passed ? '' : 'color:var(--coral)'}">${!passed ? 'Almost there' : L.practice ? 'Practice complete!' : L.ls.test ? `Level ${L.ls.level.id} mastered!` : 'Lesson passed!'}</h2>
     <p>${!passed ? `${firstTry}. You need ${need * 100}% to pass${L.ls.test ? ' the mastery test' : ''}. Each try trains your ear.`
       : L.practice ? 'Your ear is staying sharp.' : L.ls.test ? `${firstTry}. You've truly got this level.` : perfect ? 'A perfect lesson. Your ear is waking up.' : `${firstTry}. Your ear gets sharper every time.`}</p>
     <div class="result-tiles">
       <div class="rt" style="--c:var(--violet)"><b>${icon('i-bolt')}${xp}</b><span>XP${mult > 1 ? ' ×2' : ''}</span></div>
       <div class="rt" style="--c:var(--pearl)"><b>${icon('i-pearl')}${pearls}</b><span>Pearls</span></div>
-      <div class="rt" style="--c:var(${passed ? '--primary' : '--coral'})"><b>${L.practice ? acc : pct}%</b><span>${L.practice ? 'Accuracy' : 'First try'}</span></div>
+      <div class="rt" style="--c:var(${passed ? '--good' : '--coral'})"><b>${L.practice ? acc : pct}%</b><span>${L.practice ? 'Accuracy' : 'First try'}</span></div>
       <div class="rt" style="--c:var(--sky)"><b>${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</b><span>Time</span></div>
     </div>`;
   const retryId = L.ls.id;
@@ -1735,7 +2122,8 @@ function complete(){
   sfx(passed);
   setTimeout(() => { checkQuests(); checkBadges(); }, 500);
   $('#fin').onclick = extended ? streakScreen : endLesson;
-  if ($('#again')) $('#again').onclick = () => { if (L.cleanup) L.cleanup(); startLesson(retryId); };
+  const retryJump = L.jump;
+  if ($('#again')) $('#again').onclick = () => { if (L.cleanup) L.cleanup(); startLesson(retryId, false, retryJump); };
 }
 function streakScreen(){
   $('#lbody').innerHTML = `<div class="streak-hero">${icon('i-fire')}<b>${S.streak}</b></div>
@@ -1817,7 +2205,7 @@ function exEcho(e, body){
     if (L.cleanup){ L.cleanup(); L.cleanup = null; }
     body.innerHTML = `<div class="ex-grid"><div class="ex-main">
       <h2 class="ex-title">${n === 1 ? 'Play the note you hear' : `Play these ${n} notes back`}</h2>
-      ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : e.mq && S.settings.tonic ? `<p class="ex-sub">You'll hear the tonic, ${name(MAQ[e.mq].scale[0])}, first.</p>` : ''}
+      ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : e.iqa ? `<p class="ex-sub">On ${IQA[e.iqa].name}: one bar of drum, then the phrase.</p>` : e.mq && S.settings.tonic ? `<p class="ex-sub">You'll hear the tonic, ${name(MAQ[e.mq].scale[0])}, first.</p>` : ''}
       <div class="listen-row">
         <button class="speak" id="play" aria-label="Play again">${icon('i-speaker')}</button>
         ${e.slow && n > 1 ? `<button class="speak small" id="slow" aria-label="Play slowly">${icon('i-slow')}</button>` : ''}
@@ -1846,7 +2234,7 @@ function exEcho(e, body){
     if (isReplay){ if (replaysLeft <= 0) return; if (replaysLeft !== Infinity) replaysLeft--; }
     $('#play')?.classList.add('playing');
     if (e.mq && S.settings.tonic){ await playSeq([MAQ[e.mq].scale[0]], 0.8); await sleep(150); }   // home note first, so quarter tones sit in context
-    await playSeq(e.notes, dur);
+    if (e.iqa) await playOnIqa(e.notes, e.iqa, dur * 0.44); else await playSeq(e.notes, dur);
     $('#play')?.classList.remove('playing');
     showReplays();
   };
@@ -1942,7 +2330,7 @@ function gaugeSvg(){
   }
   return `<svg class="gauge" viewBox="0 0 200 122" role="img" aria-label="Tuning needle">
     <path d="M${100 - 86*Math.sin(Math.PI/3)} ${105 - 86*Math.cos(Math.PI/3)} A86 86 0 0 1 ${100 + 86*Math.sin(Math.PI/3)} ${105 - 86*Math.cos(Math.PI/3)}" fill="none" stroke="var(--lock)" stroke-width="14" stroke-linecap="round"/>
-    <path d="M${100 - 86*Math.sin(Math.PI/20)} ${105 - 86*Math.cos(Math.PI/20)} A86 86 0 0 1 ${100 + 86*Math.sin(Math.PI/20)} ${105 - 86*Math.cos(Math.PI/20)}" fill="none" stroke="var(--primary)" stroke-width="14"/>
+    <path d="M${100 - 86*Math.sin(Math.PI/20)} ${105 - 86*Math.cos(Math.PI/20)} A86 86 0 0 1 ${100 + 86*Math.sin(Math.PI/20)} ${105 - 86*Math.cos(Math.PI/20)}" fill="none" stroke="var(--good)" stroke-width="14"/>
     ${ticks.join('')}
     <text x="22" y="120" font-size="11" font-weight="800" fill="var(--muted)" font-family="Nunito,sans-serif">FLAT</text>
     <text x="150" y="120" font-size="11" font-weight="800" fill="var(--muted)" font-family="Nunito,sans-serif">SHARP</text>
@@ -1957,7 +2345,7 @@ function setNeedle(cents){
   needleS = needleS == null ? cents : needleS * 0.6 + cents * 0.4;   // smoothed, so the needle doesn't jitter
   const c = Math.max(-50, Math.min(50, needleS));
   n.style.opacity = 1; n.style.transform = `rotate(${c / 50 * 60}deg)`;
-  n.querySelector('line').setAttribute('stroke', Math.abs(needleS) <= 15 ? 'var(--primary)' : 'var(--ink)');
+  n.querySelector('line').setAttribute('stroke', Math.abs(needleS) <= 15 ? 'var(--good)' : 'var(--ink)');
 }
 
 /* ----- exercise: listening choices ----- */
@@ -1969,12 +2357,41 @@ const CHOICE = {
   name:      e => ({ title:'Here is Do. What comes next?', opts:e.choices.map(m => [m, name(m), sub(m)]), play:d => playSeq([e.ref, e.midi], d || 1) }),
   jins:      e => { const mq = MAQ[e.mq]; return { title:`Is this ${mq.name} or ${mq.foil.name}?`,
     opts:[['real', mq.name, mq.ar], ['foil', mq.foil.name, mq.foil.ar]], play:d => playSeq(e.notes, d || 0.5) }; },
+  odd:       e => ({ title:'Which note changed the second time?', opts:e.notes.map((_, i) => [i, `Note ${i + 1}`]),
+    play:async d => { await playSeq(e.notes, d ? 0.8 : 0.55); await sleep(300); await playSeq(e.alt, d ? 0.8 : 0.55); } }),
+  rest:      e => { const mq = MAQ[e.mq]; return { title:'Where does the phrase come to rest?',
+    opts:[['tonic', 'Home', `the tonic, ${name(mq.scale[0])}`], ['gh', 'Ghammaz', `the second home, ${name(mq.scale[mq.gh])}`]], play:d => playSeq(e.notes, d ? 0.85 : 0.6) }; },
+  maqam:     e => ({ title:'Which maqam is this?', opts:e.choices.map(id => [id, MQN(id).name, MQN(id).ar]), play:d => playSeq(e.notes, d ? 0.75 : 0.5) }),
+  iqa:       e => ({ title:'Which rhythm is this?', opts:e.choices.map(id => [id, IQA[id].name, IQA[id].ar]), play:d => playIqa(e.answer, d ? 0.27 : 0.2, 2) }),
+  stroke:    e => ({ title:'Dum or Tak?', opts:[['D', 'Dum', 'deep, in the centre'], ['T', 'Tak', 'bright, on the rim']], play:() => playIqa(null, 0.3, 1, e.answer) }),
 };
+/* ----- listening card: an iqa', its strokes lit in time ----- */
+function exIqaShow(e, body){
+  const r = IQA[e.iqa], unit = 0.24;
+  body.innerHTML = `<div class="ex-grid"><div class="ex-main">
+    <h2 class="ex-title">Listen: ${r.name} · ${r.ar}</h2>
+    <p class="ex-sub">Two bars. Big boxes are Dum, small ones Tak.</p>
+    <div class="listen-row"><button class="speak" id="play" aria-label="Play the rhythm">${icon('i-speaker')}</button></div>
+    </div><div class="ex-side"><div class="beats">${[...r.p].map((c, i) => `<div class="beat ${c === 'D' ? 'dum' : c === 'T' ? 'tak' : 'rest'}" data-i="${i}"><b>${c === 'D' ? 'Dum' : c === 'T' ? 'Tak' : ''}</b><small>${i % 2 ? '&' : i / 2 + 1}</small></div>`).join('')}</div></div></div>`;
+  footer(`<span></span><button class="btn" id="next">Continue</button>`);
+  const timers = [];
+  const play = () => {
+    timers.forEach(clearTimeout); timers.length = 0;
+    playIqa(e.iqa, unit, 2);
+    for (let k = 0; k < r.p.length * 2; k++) timers.push(setTimeout(() => {
+      document.querySelectorAll('.beat').forEach(b => b.classList.toggle('lit', +b.dataset.i === k % r.p.length));
+    }, 60 + k * unit * 1000));
+    timers.push(setTimeout(() => document.querySelectorAll('.beat').forEach(b => b.classList.remove('lit')), 60 + r.p.length * 2 * unit * 1000 + 200));
+  };
+  $('#play').onclick = play;
+  $('#next').onclick = () => { timers.forEach(clearTimeout); L.idx++; renderEx(); };
+  setTimeout(() => { if (L && L.queue[L.idx] === e) play(); }, 350);
+}
 /* ----- listening card: the maqam's scale, lit note by note ----- */
 function exScale(e, body){
   const mq = MAQ[e.mq], up = [...e.notes, ...e.notes.slice(0, -1).reverse()], dur = 0.55;
   body.innerHTML = `<div class="ex-grid"><div class="ex-main">
-    <h2 class="ex-title">Listen: Maqam ${mq.name}</h2>
+    <h2 class="ex-title">${e.label || `Listen: Maqam ${mq.name}`}</h2>
     <p class="ex-sub">Up and back down. Watch which notes are quarter tones.</p>
     <div class="listen-row"><button class="speak" id="play" aria-label="Play the scale">${icon('i-speaker')}</button></div>
     </div><div class="ex-side scale-chips">${e.notes.map((m, i) => `<div class="slot" data-i="${i}">${name(m)}<small>${ARL[qOf(m)] || ''}</small></div>`).join('')}</div></div>`;
@@ -2021,7 +2438,10 @@ function exChoice(e, body){
     const label = spec.opts.find(o => String(o[0]) === String(e.answer));
     const extra = e.type === 'name' ? ` (${sub(e.answer)})`
       : e.type === 'compare' || e.type === 'direction' || e.type === 'same' ? `: ${e.notes.map(name).join(' then ')}`
-      : e.type === 'jins' ? ` (${e.notes.slice(0, (e.notes.length + 1) / 2).map(name).join(' ')})` : '';
+      : e.type === 'jins' ? ` (${e.notes.slice(0, (e.notes.length + 1) / 2).map(name).join(' ')})`
+      : e.type === 'odd' ? `: ${name(e.notes[e.answer])} became ${name(e.alt[e.answer])}`
+      : e.type === 'rest' || e.type === 'maqam' ? ` (${e.notes.map(name).join(' ')})`
+      : e.type === 'iqa' ? `: ${iqaWords(e.answer)}` : '';
     const shown = e.type === 'contour' ? `${label[1]} (${label[2]})` : label[1];
     verdict(ok, `${ok ? 'Answer' : 'Correct answer'}: ${shown}${extra}`, () => spec.play(1.2));
   };
@@ -2185,10 +2605,10 @@ function earMap(){
   const rows = Object.entries(S.ear).map(([k, [h, x]]) => ({ k, h, x, n:h + x, acc:h / (h + x), label:earLabel(k), mq:k.split('|')[0] }))
     .sort((a, b) => a.acc - b.acc || b.n - a.n);
   if (!rows.length) return `<p style="margin:0;color:var(--muted)">Play notes back in lessons, and this map shows which ones you hit on the first try.</p>`;
-  const tone = a => a >= 0.8 ? '--primary' : a >= 0.5 ? '--amber' : '--coral';
+  const tone = a => a >= 0.8 ? '--good' : a >= 0.5 ? '--amber' : '--coral';
   return `<div class="ear-map">${rows.map(r => `<div class="ear" style="--c:var(${tone(r.acc)})" title="${r.h} of ${r.n} on the first try">
       <b>${esc(r.label)}</b><span>${Math.round(r.acc * 100)}%</span><small>${r.mq ? MAQ[r.mq].name : 'Level 1'} · ${r.n}×</small></div>`).join('')}</div>
-    <div class="legend"><span style="--c:var(--primary)"><i></i>80%+ first try</span><span style="--c:var(--amber)"><i></i>50–79%</span><span style="--c:var(--coral)"><i></i>under 50%: in Tricky notes</span></div>`;
+    <div class="legend"><span style="--c:var(--good)"><i></i>80%+ first try</span><span style="--c:var(--amber)"><i></i>50–79%</span><span style="--c:var(--coral)"><i></i>under 50%: in Tricky notes</span></div>`;
 }
 
 /* ---------- keyboard shortcuts (laptop) ---------- */
