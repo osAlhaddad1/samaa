@@ -1,0 +1,44 @@
+name: Android app
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'config.js', 'icons/**', 'native/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - name: Prepare the Android project
+        working-directory: native
+        run: npm ci && npm run sync
+      - name: Build the signed APK
+        working-directory: native/android
+        env:
+          SAMAA_KEY_PASSWORD: ${{ secrets.SAMAA_KEY_PASSWORD }}
+          SAMAA_KEYSTORE_B64: ${{ secrets.SAMAA_KEYSTORE_B64 }}
+        run: |
+          # without a signing key in the repository secrets, Gradle signs with its debug key
+          if [ -n "$SAMAA_KEYSTORE_B64" ]; then
+            echo "$SAMAA_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/samaa.keystore"
+            export SAMAA_KEYSTORE="$RUNNER_TEMP/samaa.keystore"
+          fi
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/Samaa.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Samaa-apk
+          path: ${{ runner.temp }}/Samaa.apk
+      - name: Publish the latest APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="app-${{ github.run_number }}"
+          gh release create "$tag" "$RUNNER_TEMP/Samaa.apk" --title "Samaa for Android (build ${{ github.run_number }})" --notes "Download Samaa.apk on your phone and open it to install." --latest

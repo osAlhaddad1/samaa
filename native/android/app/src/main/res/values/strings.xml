@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Samaa</string>
+    <string name="title_activity_main">Samaa</string>
+    <string name="package_name">com.osalhaddad.samaa</string>
+    <string name="custom_url_scheme">com.osalhaddad.samaa</string>
+</resources>

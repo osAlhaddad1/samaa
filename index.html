@@ -76,20 +76,20 @@ main{padding-block:20px 110px}
 /* bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .nav .wrap{display:flex;justify-content:space-around;height:64px;align-items:center}
-.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 16px;border-radius:12px;border:2px solid transparent}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 16px}
 .nav button svg{width:26px;height:26px}
-.nav button[aria-current="page"]{color:var(--sky);background:color-mix(in srgb,var(--sky) 12%,transparent);border-color:color-mix(in srgb,var(--sky) 40%,transparent)}
+.nav button[aria-current="page"]{color:var(--primary)}
+.nav button[aria-current="page"] svg{background:color-mix(in srgb,var(--primary) 14%,transparent);border-radius:999px;box-sizing:content-box;padding:2px 14px;margin-block:-2px}
 
 /* path */
 .level{margin-bottom:36px}
-.banner{border-radius:20px;padding:18px 18px 16px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;box-shadow:0 5px 0 var(--c-d);position:relative;overflow:hidden;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.13' stroke-width='2'%3E%3Crect x='17' y='17' width='30' height='30'/%3E%3Crect x='17' y='17' width='30' height='30' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3Cpath d='M0 0L17 17M64 0L47 17M0 64L17 47M64 64L47 47'/%3E%3C/g%3E%3C/svg%3E");background-size:64px 64px}
+.banner{border-radius:20px;padding:18px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;box-shadow:0 5px 0 var(--c-d);position:relative;overflow:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.08' stroke-width='2'%3E%3Crect x='17' y='17' width='30' height='30'/%3E%3Crect x='17' y='17' width='30' height='30' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3Cpath d='M0 0L17 17M64 0L47 17M0 64L17 47M64 64L47 47'/%3E%3C/g%3E%3C/svg%3E");background-size:64px 64px}
 .banner-txt{min-width:0;flex:1}
 .banner-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
-.guide-btn{display:flex;align-items:center;gap:6px;background:rgb(255 255 255 / .2);border:2px solid rgb(255 255 255 / .35);color:#fff;border-radius:14px;padding:7px 11px;font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
-.guide-btn svg{width:20px;height:20px}
-.guide-btn:active{transform:translateY(2px)}
-.jump-btn{background:#fff;color:var(--c-d);border-radius:12px;padding:7px 11px;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 3px 0 rgb(0 0 0 / .18);white-space:nowrap}
+.guide-btn,.jump-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 14px;border-radius:999px;background:#fff;color:var(--c-d);font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 3px 0 rgb(0 0 0 / .2);white-space:nowrap;transition:transform .06s,box-shadow .06s}
+.guide-btn svg{width:18px;height:18px}
+.guide-btn:active,.jump-btn:active{transform:translateY(3px);box-shadow:none}
 .lvbar{height:10px;border-radius:9px;background:rgb(0 0 0 / .18);overflow:hidden;margin-top:10px;max-width:260px}
 .lvbar i{display:block;height:100%;background:#fff;border-radius:9px}
 .lvcount{display:block;margin-top:4px;font-size:12px;font-weight:800;opacity:.9}
@@ -103,13 +103,11 @@ main{padding-block:20px 110px}
 .soon{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:color-mix(in srgb,var(--lock-ink) 18%,transparent);padding:4px 8px;border-radius:999px;white-space:nowrap}
 .path{display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px 0 6px;position:relative}
 .node-wrap{position:relative;display:flex;flex-direction:column;align-items:center;width:124px}
-.node{width:76px;height:70px;border-radius:50%;background:var(--c);box-shadow:0 7px 0 var(--c-d);display:grid;place-items:center;color:#fff;transition:transform .06s,box-shadow .06s;position:relative}
-.node::before{content:"";position:absolute;left:14px;right:22px;top:8px;height:12px;border-radius:50%;background:rgb(255 255 255 / .28)}
-.node.locked::before{display:none}
+.node{width:72px;height:72px;margin-bottom:7px;border-radius:50%;background:var(--c);box-shadow:0 7px 0 var(--c-d),inset 0 0 0 4px rgb(255 255 255 / .16);display:grid;place-items:center;color:#fff;transition:transform .06s,box-shadow .06s;position:relative}
 .node.done{background:color-mix(in srgb,var(--c) 82%,#fff)}
-.node.test{width:86px;height:78px}
-.node.test svg{width:40px;height:40px}
-.node.chest{--c:var(--amber);--c-d:var(--amber-d);border-radius:22px;width:72px;height:64px}
+.node.test{width:84px;height:84px}
+.node.test svg{width:42px;height:42px}
+.node.chest{--c:var(--amber);--c-d:var(--amber-d);border-radius:22px}
 .node.chest.ready{animation:wiggle 1.6s ease-in-out infinite}
 .node.chest.opened{background:color-mix(in srgb,var(--amber) 35%,var(--surface));box-shadow:0 7px 0 color-mix(in srgb,var(--amber-d) 40%,var(--line));color:var(--amber-d)}
 @keyframes wiggle{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-7deg)}86%{transform:rotate(6deg)}94%{transform:rotate(-3deg)}}
@@ -141,9 +139,9 @@ span.deco .mascot{width:96px;height:96px}
 .beat.lit{transform:scale(1.12);box-shadow:0 0 0 3px var(--sky)}
 .lfoot.ok .btn{background:var(--good);box-shadow:0 4px 0 var(--good-d)}
 .node svg{width:34px;height:34px}
-.node:active:not(:disabled){transform:translateY(6px);box-shadow:0 1px 0 var(--c-d)}
+.node:active:not(:disabled){transform:translateY(6px);box-shadow:0 1px 0 var(--c-d),inset 0 0 0 4px rgb(255 255 255 / .16)}
 .node.locked{background:var(--lock);box-shadow:0 7px 0 var(--lock-d);color:var(--lock-ink);cursor:not-allowed}
-.node.current{outline:6px solid color-mix(in srgb,var(--c) 28%,transparent);outline-offset:6px}
+.node.current::after{content:"";position:absolute;inset:-11px -11px -18px;border-radius:50%;border:5px solid color-mix(in srgb,var(--c) 32%,transparent);pointer-events:none}
 .node-label{margin-top:12px;font-size:13px;font-weight:800;color:var(--muted);text-align:center}
 .start-tag{position:absolute;top:-38px;background:var(--surface);color:var(--c);border:2px solid var(--line);font-weight:800;font-size:13px;letter-spacing:.1em;padding:5px 12px;border-radius:12px;animation:bob 1.4s ease-in-out infinite;white-space:nowrap}
 .start-tag::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:var(--surface);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:translateX(-50%) rotate(45deg)}
@@ -152,6 +150,7 @@ span.deco .mascot{width:96px;height:96px}
 .practice-card{display:flex;gap:14px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:28px}
 .practice-card p{margin:2px 0 0;color:var(--muted);font-size:14px}
 .practice-card>div{flex:1;min-width:0}
+.practice-card .btn{min-height:42px;height:42px;padding:0 20px;border-radius:999px;font-size:14px;flex:none}
 
 /* modal */
 .modal{position:fixed;inset:0;z-index:20;background:rgb(0 0 0 / .45);display:grid;place-items:end center;padding:16px}
@@ -388,7 +387,7 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
 .streak-hero svg{width:100%;height:100%}
 .tip .mascot{width:clamp(64px,12vh,96px);height:clamp(64px,12vh,96px)}
 /* short phone screens (iPhone SE and similar): compact exercise layout */
-@media (max-width:899px) and (max-height:760px){
+@media (max-width:899px) and (max-height:860px){
   .speak{width:64px;height:64px;border-radius:18px;box-shadow:0 4px 0 var(--sky-d)}
   .speak.small{width:48px;height:48px;border-radius:14px}
   .listen-row{padding:0}
@@ -407,7 +406,7 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
   .verdict .badge{width:40px;height:40px} .verdict h3{font-size:18px} .verdict p{font-size:14px}
   .ex-main .listen-row + .replays{margin-top:-4px}
 }
-@media (max-width:899px) and (max-height:660px){.lbody .wrap{padding-block:4px 8px}}
+@media (max-width:899px) and (max-height:680px){.lbody .wrap{padding-block:4px 8px}}
 /* five tabs fit a phone */
 .nav button{padding:6px 10px}
 @media (max-width:380px){.nav button{font-size:10px;padding:6px 6px;letter-spacing:.04em}}
@@ -439,6 +438,10 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
 .opt small{display:block;color:var(--muted);font-weight:700;font-size:13px}
 .opt[aria-pressed="true"]{border-color:var(--sky);box-shadow:0 4px 0 var(--sky);background:color-mix(in srgb,var(--sky) 10%,var(--surface))}
 .opt .qi{flex:none}
+.lvl{height:6px;border-radius:9px;background:var(--lock);overflow:hidden}
+.lvl i{display:block;height:100%;width:0;background:var(--lock-ink);border-radius:9px;transition:width .08s}
+.lvl i.over{background:var(--good)}
+.sel{font:700 14px var(--f-body);color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:8px 10px;max-width:220px}
 .cal-meter{height:14px;border-radius:9px;background:var(--lock);overflow:hidden}
 .cal-meter i{display:block;height:100%;width:0;background:var(--sky);transition:width .08s}
 .cal-step{display:flex;gap:12px;align-items:center;font-weight:700}
@@ -654,6 +657,7 @@ input[type=range]{accent-color:var(--sky);width:160px}
 <script>
 "use strict";
 /* ---------- helpers ---------- */
+const NATIVE = /SamaaApp/.test(navigator.userAgent);
 const $ = s => document.querySelector(s);
 const rnd = n => Math.floor(Math.random()*n);
 const pick = a => a[rnd(a.length)];
@@ -836,9 +840,9 @@ function playNote(m, when, dur){
 async function playSeq(notes, noteDur = 0.9){
   await ensureCtx();
   const t0 = ctx.currentTime + 0.06;
-  notes.forEach((m, i) => playNote(m, t0 + i * noteDur, i === notes.length - 1 ? Math.max(noteDur, 1.1) : noteDur * 0.96));
-  const total = (notes.length - 1) * noteDur + Math.max(noteDur, 1.1) + 0.15;
-  Mic.muteFor(total * 1000 + 120);   // the note has faded to ~2% by then
+  notes.forEach((m, i) => playNote(m, t0 + i * noteDur, i === notes.length - 1 ? Math.max(noteDur, 0.85) : noteDur * 0.96));
+  const total = (notes.length - 1) * noteDur + Math.max(noteDur, 0.85) + 0.12;
+  Mic.muteFor(total * 1000 + 60);   // the note has faded to ~2% by then
   await sleep(total * 1000);
 }
 /* darbuka: dum is a deep membrane thump, tak a bright rim click */
@@ -900,39 +904,41 @@ async function sfx(ok){
 }
 
 /* ---------- pitch detection ----------
-   How a pluck becomes a note, in order:
-   1. audio-thread capture: an AudioWorklet hands over 512 samples (~11 ms) at a time, so analysis runs
-      ~90×/s and is not tied to screen refresh (falls back to an AnalyserNode + animation frames)
-   2. band-pass 60 Hz–1.5 kHz before anything else: drops hum, rumble, hiss and most consonant noise
-   3. a room-noise gate on the newest 21 ms, and a pluck detector (full level within ~5 ms)
-   4. YIN on a 2× downsampled window: 4× less work per frame
-   5. octave guard: if the dip at twice the period is far deeper, the fundamental was weak (low courses)
-   6. clarity-weighted median over the last ~60 ms, steady within a third of a semitone
-   7. hysteresis between neighbouring notes / quarter tones, so the reading doesn't flicker
-   8. adaptive confirmation: a strong, clear pluck is confirmed in ~70 ms, a borderline one in ~150 ms
-   9. pluck-decay check: a string fades after the pluck, a voice swells, so voices are refused
-   10. Samaa's own notes are muted precisely, and the tuner needle is smoothed */
-const yinD = new Float32Array(1024);
-function yin(x, sr, thr = 0.12){
-  const W = 512, tauMin = Math.max(2, Math.floor(sr / 1000)), tauMax = Math.min(Math.floor(sr / 60), x.length - W - 1);
+   Built for a real oud through a cheap microphone, with no auto-gain: quiet, rounded plucks, doubled
+   courses that beat, partials that aren't quite harmonic, and low fundamentals the mic barely hears.
+   1. audio-thread capture: an AudioWorklet hands over 512 samples (~11 ms) at a time
+   2. band-pass 60 Hz–1.5 kHz, then 4× decimation to ~12 kHz
+   3. the gate follows the room's noise floor, not a fixed level, so a quiet mic works as well as a loud one
+   4. YIN over a 42 ms window, long enough for the low courses. If no dip is clean, the best dip still counts
+   5. a pitch held steady for ~30 ms is shown right away; nothing depends on recognising a "pluck shape"
+   6. the exercise tells the engine which note it wants, within a fretless tolerance, in any octave.
+      A steady match is accepted at once
+   7. a wrong note needs proof: held 170 ms and fading like a string. Voices don't fade, so they aren't scolded
+   8. the engine learns how far your oud sits from concert pitch and listens around that */
+const yinD = new Float32Array(256);
+const YIN_W = 512, DEC_LEN = 720;
+function yin(x, sr){
+  const W = YIN_W, tauMin = Math.max(2, Math.floor(sr / 1000)), tauMax = Math.min(Math.floor(sr / 60), x.length - W - 1, 255);
   let run = 0; yinD[0] = 1;
   for (let tau = 1; tau <= tauMax; tau++){
     let s = 0;
     for (let i = 0; i < W; i++){ const d = x[i] - x[i + tau]; s += d * d; }
     run += s; yinD[tau] = run ? s * tau / run : 1;
   }
-  let tau = -1;
+  let tau = -1, low = tauMin;
   for (let t = tauMin; t <= tauMax; t++){
-    if (yinD[t] < thr){ while (t + 1 <= tauMax && yinD[t + 1] < yinD[t]) t++; tau = t; break; }
+    if (yinD[t] < yinD[low]) low = t;
+    if (yinD[t] < 0.15){ while (t + 1 <= tauMax && yinD[t + 1] < yinD[t]) t++; tau = t; break; }
   }
-  if (tau < 0) return null;
+  if (tau < 0){ if (yinD[low] > 0.45) return null; tau = low; }   // no clean dip: beating courses, or a noisy room
   // octave guard
   const t2 = tau * 2;
   if (t2 + 2 <= tauMax){
     let best = t2; for (let j = t2 - 2; j <= t2 + 2; j++) if (yinD[j] < yinD[best]) best = j;
     if (yinD[tau] > 0.04 && yinD[best] < yinD[tau] * 0.4) tau = best;   // only when the first match was a weak one
   }
-  const x0 = yinD[tau - 1], x1 = yinD[tau], x2 = tau < tauMax ? yinD[tau + 1] : x1;
+  if (tau <= 1 || tau >= tauMax) return null;
+  const x0 = yinD[tau - 1], x1 = yinD[tau], x2 = yinD[tau + 1];
   const den = x0 + x2 - 2 * x1;
   return { f:sr / (den ? tau + (x0 - x2) / (2 * den) : tau), clarity:1 - x1 };
 }
@@ -954,30 +960,40 @@ const TAP_WORKLET = `class SamaaTap extends AudioWorkletProcessor{
 registerProcessor('samaa-tap', SamaaTap);`;
 
 const Mic = {
-  running:false, error:null, subs:new Set(), muteUntil:0, hist:[], cur:null,
-  cand:null, candSince:0, lastEmit:null, silentSince:0, stableMs:150, grid:1, floor:0.002, attackT:-1e9, attackPeak:0,
-  N:4096, ring:null, dec:new Float32Array(1024),
+  running:false, error:null, warn:'', subs:new Set(), muteUntil:0, hist:[], cur:null,
+  cand:null, candSince:0, lastEmit:null, silentSince:0, grid:1, floor:0.001, attackT:-1e9,
+  N:8192, ring:null, dec:new Float32Array(DEC_LEN), peaks:[], env:[], onset:0, lastMed:null, level:0, gate:0.001,
+  target:null, tol:0.45, matchT:0, hitOnset:-1, hitPitch:null, offset:0, lastSound:0, noPitch:0, onsetPitched:false,
   on(fn){ this.subs.add(fn); return () => this.subs.delete(fn); },
   emit(e){ for (const fn of [...this.subs]) fn(e); },
   muteFor(ms){ this.muteUntil = Math.max(this.muteUntil, performance.now() + ms); this.reset(); },
-  reset(){ this.hist = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; this.attackPeak = 0; },
+  reset(){ this.hist = []; this.env = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; this.lastMed = null; this.matchT = 0; this.hitPitch = null; },
+  /* the note the exercise is waiting for; null when it isn't waiting */
+  expect(m, tol = 0.45){ this.target = m ?? null; this.tol = tol; this.matchT = 0; },
+  settle(){ this.offset = 0; this.peaks = []; this.hitOnset = -1; this.noPitch = 0; },
   async start(){
     if (this.running) return true;
     try {
       await ensureCtx();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio:{ channelCount:1, echoCancellation:false, noiseSuppression:false, autoGainControl:false, latency:0 } });
-      const src = ctx.createMediaStreamSource(stream);
+      const want = { channelCount:1, echoCancellation:false, noiseSuppression:false, autoGainControl:false, voiceIsolation:false, latency:0 };
+      if (S.settings.micId) want.deviceId = { ideal:S.settings.micId };
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:want });
+      const track = stream.getAudioTracks()[0], got = track.getSettings ? track.getSettings() : {};
+      this.warn = /bluetooth|airpods|hands-?free|buds/i.test(track.label) ? 'Bluetooth mics blur the sound. Use the phone or laptop mic for the best results.'
+        : got.noiseSuppression || got.echoCancellation ? 'This device filters the mic for calls, which can hide the oud. Try another mic in your profile.' : '';
+      track.addEventListener('ended', () => this.stop());
+      this.stream = stream; this.offset = S.settings.offset || 0;
+      this.D = Math.max(1, Math.round(ctx.sampleRate / 12000));
+      const src = this.src = ctx.createMediaStreamSource(stream);
       this.ring = new Float32Array(this.N);
       if (ctx.audioWorklet && window.AudioWorkletNode){
-        const lp = src;   // the band-pass runs in feed()
         try {
-          const url = URL.createObjectURL(new Blob([TAP_WORKLET], { type:'application/javascript' }));
-          await ctx.audioWorklet.addModule(url);
+          if (!this.tapReady){ await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([TAP_WORKLET], { type:'application/javascript' }))); this.tapReady = true; }
           const node = new AudioWorkletNode(ctx, 'samaa-tap');
           const sink = ctx.createGain(); sink.gain.value = 0;          // keeps the node running, silently
-          lp.connect(node); node.connect(sink).connect(ctx.destination);
+          src.connect(node); node.connect(sink).connect(ctx.destination);   // the band-pass runs in feed()
           node.port.onmessage = ev => this.feed(ev.data, performance.now());
-          this.running = true; this.error = null; this.mode = 'worklet';
+          this.node = node; this.running = true; this.error = null; this.mode = 'worklet';
           return true;
         } catch(e){ /* fall back to the analyser below */ }
       }
@@ -986,12 +1002,20 @@ const Mic = {
       this.an = ctx.createAnalyser(); this.an.fftSize = this.N; src.connect(hp).connect(lp).connect(this.an);
       this.buf = new Float32Array(this.N);
       this.running = true; this.error = null; this.mode = 'frames';
-      const loop = () => { this.tick(); requestAnimationFrame(loop); };
+      const loop = () => { if (!this.running || this.mode !== 'frames') return; this.tick(); requestAnimationFrame(loop); };
       requestAnimationFrame(loop);
       return true;
     } catch (e){ this.error = e; return false; }
   },
+  stop(){
+    this.running = false;
+    if (this.stream) this.stream.getTracks().forEach(t => t.stop());
+    if (this.node){ this.node.port.onmessage = null; this.node.disconnect(); this.node = null; }
+    if (this.src){ this.src.disconnect(); this.src = null; }
+    this.stream = null; this.mode = null;
+  },
   feed(chunk, t){
+    if (this.tape) this.tape(chunk);
     if (!this.bp){ const h = biquad('hp', 60, ctx.sampleRate), l = biquad('lp', 1500, ctx.sampleRate); this.bp = b => { h(b); l(b); }; }
     this.bp(chunk);
     const r = this.ring || (this.ring = new Float32Array(this.N));
@@ -1004,76 +1028,89 @@ const Mic = {
   },
   analyse(x, t, hop){
     if (S.settings.tap) return;
-    const N = x.length, sr = ctx.sampleRate;
+    const N = x.length, sr = ctx.sampleRate, D = this.D || (this.D = Math.max(1, Math.round(sr / 12000)));
     let rms = 0; for (let i = N - 1024; i < N; i++) rms += x[i] * x[i];
     rms = Math.sqrt(rms / 1024);                                    // newest ~21 ms
     const sens = S.settings.sens;                                   // 1 (strict) .. 10 (picks up quiet plucks)
-    const gate = Math.max(0.01 * Math.pow(10, (5 - sens) / 4), this.floor * 4);
-    const muted = t < this.muteUntil;
-    // pluck detector, scanning only audio that arrived since the last frame
-    if (!muted){
-      const k = Math.exp(-1 / (0.012 * sr)), env = this.env || (this.env = new Float32Array(N));
-      let v = 0; for (let i = 0; i < N; i++){ const a = Math.abs(x[i]); v = a > v ? a : v * k; env[i] = v; }
-      const w = Math.round(0.005 * sr), look = Math.round(0.02 * sr);
-      const from = Math.max(Math.round(0.015 * sr), N - hop - 2 * w - look - 32);
-      for (let i = from; i + 2 * w + look < N; i += 32){
-        // compare with the loudest point of the previous 20 ms, so a low string's per-cycle pulses aren't read as plucks
-        let before = env[i]; for (let j = Math.max(0, i - look); j < i; j += 16) before = Math.max(before, env[j]);
-        if (env[i + w] > gate * 2 && env[i + w] > (before > gate * 2 ? 1.6 : 3) * before){   // from quiet, or a new pluck over a ringing string
-          // rise time: from where the level starts climbing, how close to its peak is it 5 ms later?
-          let o = i; while (o < i + w && env[o + 1] <= env[i] * 1.2) o++;
-          let hi = 0; for (let j = o; j <= o + w; j += 8) hi = Math.max(hi, env[j]);      // loudest point in the first 5 ms
-          let peak = hi; for (let j = o; j < o + w + look; j += 16) peak = Math.max(peak, env[j]);
-          // plucks reach 0.6–1.0 of their peak in 5 ms; voices stay under 0.3
-          if (hi >= 0.45 * peak && t - this.attackT > 60){ this.attackT = t; this.attackPeak = rms; this.hist = []; this.cand = null; this.lastEmit = null; }
-          break;
-        }
-      }
+    const gate = Math.max(this.floor * (1.6 + (10 - sens) * 0.35), 0.0003);
+    this.level = rms; this.gate = gate;
+    let peak = 0; for (let i = N - hop; i < N; i++){ const a = Math.abs(x[i]); if (a > peak) peak = a; }
+    const P = this.peaks; P.push(peak); if (P.length > 8) P.shift();
+    if (t < this.muteUntil){ this.emit({ type:'frame', cur:null }); return; }
+    if (rms > gate) this.lastSound = t;
+    // a jump in level: a new pluck. Peaks over two hops, so a low string's cycles aren't read as plucks
+    if (P.length === 8){
+      const now = Math.max(P[7], P[6]), before = Math.max(P[2], P[3], P[4], P[5]);
+      if (now > gate * 1.5 && now > 1.5 * before && t - this.attackT > 50) this.markOnset(t, true);
     }
     let r = null;
-    if (!muted && rms > gate){
-      const d = this.dec;
-      for (let i = 0, o = N - 2048; i < 1024; i++) d[i] = (x[o + 2 * i] + x[o + 2 * i + 1]) * 0.5;
-      r = yin(d, sr / 2, 0.07 + sens * 0.01);
+    if (rms > gate){
+      const d = this.dec, o = N - DEC_LEN * D;
+      for (let i = 0; i < DEC_LEN; i++){ let s = 0; for (let j = 0; j < D; j++) s += x[o + i * D + j]; d[i] = s / D; }
+      r = yin(d, sr / D);
+      if (r && (r.f < 55 || r.f > 1100 || r.clarity < 0.6)) r = null;
     }
-    if (!r && rms < 0.2) this.floor = rms < this.floor ? this.floor * 0.9 + rms * 0.1 : this.floor * 0.995 + rms * 0.005;
-    if (r && r.f > 60 && r.f < 900 && t - this.attackT < 2500){
+    let steady = false;
+    if (r && t - this.attackT >= 12){
       this.silentSince = 0;
-      if (t - this.attackT < 60) this.attackPeak = Math.max(this.attackPeak, rms);
+      this.env.push({ t, rms }); if (this.env.length > 90) this.env.shift();
       // octave fold: a low course flipping between its fundamental and 2nd harmonic is still one note
       let m = ftom(r.f);
       const ref = this.hist.length ? this.hist[this.hist.length - 1].m : null;
       if (ref !== null){ const k = Math.round((m - ref) / 12); if (k && Math.abs(m - 12 * k - ref) < 0.4) m -= 12 * k; }
       this.hist.push({ m, c:r.clarity, t });
-      while (this.hist.length && t - this.hist[0].t > 65) this.hist.shift();
-      const h = this.hist, sorted = h.map(e => e.m).sort((a, b) => a - b);
-      const span = h.length ? t - h[0].t : 0;
-      const clear = h.length && h.reduce((s, e) => s + e.c, 0) / h.length > 0.92;
-      const spread = sorted.length >= 5 ? sorted[sorted.length - 2] - sorted[1] : sorted[sorted.length - 1] - sorted[0];   // ignore one outlier each side once there are enough
-      const steady = (clear ? h.length >= 3 && span >= 20 : h.length >= 4 && span >= 30) && spread < 0.3;
-      if (!steady){ this.cur = null; this.cand = null; this.emit({ type:'frame', cur:null }); return; }
-      // clarity-weighted median
-      const byM = [...h].sort((a, b) => a.m - b.m), total = h.reduce((s, e) => s + e.c, 0);
-      let acc = 0, med = byM[0].m; for (const e of byM){ acc += e.c; if (acc >= total / 2){ med = e.m; break; } }
-      const clarity = total / h.length;
-      this.cur = { midi:med, freq:mtof(med), rms };
-      let q = Math.round(med / this.grid) * this.grid;
-      if (this.cand !== null && Math.abs(med - this.cand) < 0.65 * this.grid) q = this.cand;   // hysteresis
-      if (q !== this.cand){ this.cand = q; this.candSince = t; }
-      const need = clarity > 0.92 && rms > gate * 3 ? this.stableMs * 0.3 : this.stableMs;
-      const fading = t - this.attackT < 60 || rms <= this.attackPeak * 1.25;
-      // a new pluck, or a new pitch on a still-sounding string (another course, or a slide on the fretless neck)
-      const fresh = this.candSince - this.attackT < 400 || (this.lastEmit !== null && Math.abs(q - this.lastEmit) >= this.grid);
-      if (t - this.candSince >= need && fresh && fading
-          && (this.lastEmit === null || Math.abs(q - this.lastEmit) >= this.grid)){
-        this.lastEmit = q; this.emit({ type:'note', midi:med });
-      }
-    } else {
+      while (this.hist.length && t - this.hist[0].t > 70) this.hist.shift();
+      const h = this.hist, sorted = h.map(e => e.m).sort((a, b) => a - b), n = sorted.length;
+      const spread = n >= 6 ? sorted[n - 2] - sorted[1] : sorted[n - 1] - sorted[0];   // ignore one outlier each side
+      steady = n >= 4 && t - h[0].t >= 28 && spread < 0.25;
+      if (steady) this.track(t, rms, gate, spread);
+    } else if (rms >= gate) this.silentSince = 0;
+    if (!steady){
+      this.cur = null; this.cand = null; this.matchT = 0;
       // only real quiet ends a sounding note; an unpitched moment (the pluck itself) does not
-      if (rms >= gate) this.silentSince = 0; else if (!this.silentSince) this.silentSince = t;
-      if (this.silentSince && t - this.silentSince > 160){ this.hist = []; this.cand = null; this.lastEmit = null; this.cur = null; this.attackT = -1e9; }
+      if (rms < gate && !this.silentSince) this.silentSince = t;
+      if (this.silentSince && t - this.silentSince > 160){ this.hist = []; this.env = []; this.lastEmit = null; this.lastMed = null; this.attackT = -1e9; }
+      if (!r || rms < gate * 2) this.floor = rms < this.floor ? this.floor + (rms - this.floor) * 0.1 : Math.min(0.05, this.floor * 1.002);
     }
     this.emit({ type:'frame', cur:this.cur });
+  },
+  markOnset(t, loud){
+    if (loud && this.attackT > 0 && !this.onsetPitched) this.noPitch++;
+    this.onset++; this.attackT = t; this.env = []; this.cand = null; this.lastEmit = null; this.matchT = 0; this.onsetPitched = false;
+    if (loud) this.hist = [];
+  },
+  /* a steady pitch: show it, and decide whether it answers the exercise */
+  track(t, rms, gate, spread){
+    const h = this.hist, byM = [...h].sort((a, b) => a.m - b.m), total = h.reduce((s, e) => s + e.c, 0);
+    let acc = 0, med = byM[0].m; for (const e of byM){ acc += e.c; if (acc >= total / 2){ med = e.m; break; } }   // clarity-weighted median
+    // no level jump, but sound after quiet or a new pitch on a sounding string (a soft pluck, a slide): still a new note
+    if (this.lastMed === null || Math.abs(med - this.lastMed) >= 0.6) this.markOnset(t, false);
+    this.lastMed = med; this.onsetPitched = true; this.noPitch = 0;
+    this.env.push({ t, rms });
+    const clarity = total / h.length;
+    this.cur = { midi:med, freq:mtof(med), rms };
+    const sameAsHit = this.hitOnset === this.onset && this.hitPitch !== null && Math.abs(fold(med - this.hitPitch)) < 0.4;
+    if (this.target !== null){
+      const d = fold(med - this.offset - this.target);
+      if (Math.abs(d) <= this.tol && !sameAsHit && t - this.attackT < 1400 && t - h[0].t >= 50 && spread < 0.2 && clarity > 0.65){
+        if (!this.matchT) this.matchT = t;
+        if (t - this.matchT >= 55){
+          this.hitOnset = this.onset; this.hitPitch = med; this.target = null; this.matchT = 0;
+          this.offset = Math.max(-0.4, Math.min(0.4, this.offset + d * 0.25)); S.settings.offset = +this.offset.toFixed(3);
+          this.emit({ type:'hit', midi:med });
+          return;
+        }
+      } else this.matchT = 0;
+    }
+    // the strict path: reported as a played note only when it rings and fades like a string
+    let q = Math.round(med / this.grid) * this.grid;
+    if (this.cand !== null && Math.abs(med - this.cand) < 0.65 * this.grid) q = this.cand;   // hysteresis
+    if (q !== this.cand){ this.cand = q; this.candSince = t; }
+    const age = t - this.attackT;
+    if (t - this.candSince < 170 || age < 260 || age > 1600 || sameAsHit || q === this.lastEmit) return;
+    const avg = list => list.reduce((s, e) => s + e.rms, 0) / Math.max(1, list.length);
+    const first = avg(this.env.filter(e => e.t - this.attackT < 130)), last = avg(this.env.filter(e => t - e.t < 110));
+    if (last < 0.85 * first){ this.lastEmit = q; this.emit({ type:'note', midi:med }); }
   }
 };
 
@@ -1615,7 +1652,7 @@ function closeModal(){ $('#modal').hidden = true; }
 
 /* ---------- welcome, sign-in, password reset ---------- */
 const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-const here = () => location.origin + location.pathname;
+const here = () => NATIVE ? 'https://osalhaddad1.github.io/samaa/' : location.origin + location.pathname;
 function showAuth(html){ $('#authCard').innerHTML = html; $('#auth').hidden = false; document.body.style.overflow = 'hidden'; $('#auth').scrollTop = 0; }
 function hideAuth(){ $('#auth').hidden = true; document.body.style.overflow = ''; }
 const backBtn = () => `<button class="back" id="back">${icon('i-x')} Back</button>`;
@@ -1774,7 +1811,7 @@ async function micCheck(done){
   let stop = false;
   $('#calSkip').onclick = () => { stop = true; done(); };
   S.settings.tap = false;
-  if (!await Mic.start()){ $('#calMsg').textContent = 'The microphone is blocked. Allow it in your browser settings, or skip and use on-screen keys.'; return; }
+  if (!await Mic.start()){ $('#calMsg').textContent = 'The microphone is blocked. Allow it in your settings, or skip and use on-screen keys.'; return; }
   const lvl = () => {   // level of the newest ~21 ms, from whichever capture mode is running
     let b = Mic.ring; if (Mic.mode === 'frames'){ Mic.an.getFloatTimeDomainData(Mic.buf); b = Mic.buf; }
     let r = 0; for (let i = b.length - 1024; i < b.length; i++) r += b[i] * b[i]; return Math.sqrt(r / 1024);
@@ -1786,19 +1823,20 @@ async function micCheck(done){
   let sum = 0, n = 0; const t0 = performance.now();
   while (performance.now() - t0 < 2000){ if (stop) return; const r = lvl(); sum += r; n++; meter(r); await sleep(30); }
   Mic.floor = sum / n; mark('#c1');
-  // 2. pluck: start strict, loosen until the pluck is heard
+  // 2. pluck: the default sensitivity first, then more open until the oud is heard
   let heard = null;
-  for (let sens = 4; sens <= 9 && !heard && !stop; sens++){
-    S.settings.sens = sens;
-    $('#calMsg').textContent = sens === 4 ? 'Now pluck any open string.' : 'Didn\'t catch that. Pluck again, a little firmer.';
+  for (let sens = 6; sens <= 9 && !heard && !stop; sens += 1.5){
+    S.settings.sens = Math.round(sens);
+    $('#calMsg').textContent = sens === 6 ? 'Now pluck any open string.' : 'Didn\'t catch that. Pluck again and let it ring.';
     heard = await new Promise(res => {
-      const off = Mic.on(e => { if (e.type === 'note'){ off(); clearInterval(iv); res(e.midi); } });
-      const iv = setInterval(() => meter(Mic.cur ? Mic.cur.rms : 0), 60);
-      setTimeout(() => { off(); clearInterval(iv); res(null); }, 5000);
+      let since = 0;
+      const off = Mic.on(e => { if (e.type !== 'frame') return; if (!e.cur){ since = 0; return; } since = since || performance.now(); if (performance.now() - since > 120){ off(); clearInterval(iv); res(e.cur.midi); } });
+      const iv = setInterval(() => meter(Mic.level * 8), 60);
+      setTimeout(() => { off(); clearInterval(iv); res(null); }, 6000);
     });
   }
   if (stop) return;
-  if (!heard){ S.settings.sens = 7; $('#calMsg').textContent = 'Couldn\'t hear the oud clearly. Try moving it closer to the microphone. You can rerun this from your profile.'; save(); $('#calSkip').textContent = 'Continue'; return; }
+  if (!heard){ S.settings.sens = 8; $('#calMsg').textContent = `Couldn't hear the oud clearly.${Mic.warn ? ` ${Mic.warn}` : ' Try moving it closer to the microphone.'} You can rerun this from your profile.`; save(); $('#calSkip').textContent = 'Continue'; return; }
   mark('#c2');
   // 3. speech must not register; tighten if it does
   $('#calMsg').textContent = `Heard ${name(heard)}. Now say something out loud for 3 seconds.`;
@@ -2019,11 +2057,20 @@ function startLesson(id, practice = false, jump = false){
   }
   L = { ls, practice, jump, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale' && e.type !== 'iqashow').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0, firstOk:0 };
   $('#lesson').hidden = false; document.body.style.overflow = 'hidden';
+  keepAwake(true);
   renderEx();
+}
+/* the screen stays on during a lesson: both hands are on the oud */
+let wakeLock = null;
+async function keepAwake(on){
+  try {
+    if (on && !wakeLock && navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen');
+    else if (!on && wakeLock){ await wakeLock.release(); wakeLock = null; }
+  } catch(e){ wakeLock = null; }
 }
 function endLesson(){
   if (L?.cleanup) L.cleanup();
-  L = null; $('#lesson').hidden = true; document.body.style.overflow = ''; go(tab);
+  L = null; $('#lesson').hidden = true; document.body.style.overflow = ''; keepAwake(false); go(tab);
 }
 $('#quit').onclick = () => {
   openModal(`<h3>Leave this lesson?</h3><p>You will lose the progress you made in it.</p>
@@ -2149,6 +2196,7 @@ function inputPanel(){
   return `<div class="listen">
     <div class="listen-head"><span class="mic-chip"><span class="dot" id="dot"></span><span id="micTxt">Starting microphone…</span></span>
       <button class="link" id="useKeys">No oud? Use keys</button></div>
+    <div class="lvl" aria-hidden="true"><i id="lvl"></i></div>
     <div class="heard" id="heard"><b>–</b><span>Pluck a string and let it ring</span></div>
     <div id="meterBox" hidden>
       <div class="meter"><div class="track"></div><div class="mid"></div><div class="mark" id="mark" style="left:50%"></div></div>
@@ -2185,11 +2233,25 @@ function wireInput(rerender, onNote, onFrame){
         $('#heard').innerHTML = `<span>Allow microphone access in your browser, or switch to on-screen keys.</span>`;
         return;
       }
-      $('#dot').classList.add('on'); $('#micTxt').textContent = 'Listening';
+      if (Mic.warn) toast(Mic.warn, '', 'i-ear');
     });
+    let quietFrom = performance.now();
+    const live = setInterval(() => {
+      const txt = $('#micTxt'), bar = $('#lvl'); if (!txt || !Mic.running) return;
+      const now = performance.now(), wait = now < Mic.muteUntil, loud = Mic.level > Mic.gate;
+      txt.textContent = wait ? 'Listen first…' : 'Your turn: play';
+      $('#dot')?.classList.toggle('on', !wait);
+      if (bar){ bar.style.width = `${wait ? 0 : Math.min(100, Math.max(0, Math.log10(Mic.level / Mic.floor) / 2) * 100)}%`; bar.classList.toggle('over', loud); }
+      if (wait || loud || Mic.cur) quietFrom = now;
+      const h = $('#heard'); if (!h || Mic.cur) return;
+      if (Mic.noPitch >= 3) h.innerHTML = `<span>I hear plucks but no clear note. Let one string ring and keep the others quiet.</span>`;
+      else if (now - quietFrom > 9000) h.innerHTML = `<span>I can't hear your oud yet. Bring it closer to the mic, or raise the sensitivity in your profile.</span>`;
+    }, 100);
+    offs.push(() => clearInterval(live), () => Mic.expect(null));
     offs.push(Mic.on(ev => {
-      if (ev.type === 'note') onNote(ev.midi, false);
-      else { onFrame && onFrame(ev.cur); const h = $('#heard'); if (h && ev.cur) h.innerHTML = `<b>${name(ev.cur.midi)}</b><span>${sub(ev.cur.midi)} · ${ev.cur.freq.toFixed(1)} Hz</span>`; }
+      if (ev.type === 'hit') onNote(ev.midi, false, true);
+      else if (ev.type === 'note') onNote(ev.midi, false);
+      else { onFrame && onFrame(ev.cur); const h = $('#heard'); if (h && ev.cur){ const m = ev.cur.midi - Mic.offset; h.innerHTML = `<b>${name(m)}</b><span>${sub(m)} · ${ev.cur.freq.toFixed(1)} Hz</span>`; } }
     }));
   }
   return () => offs.forEach(f => f());
@@ -2200,7 +2262,10 @@ function exEcho(e, body){
   const n = e.notes.length;
   // No failing here: wrong notes only steer you (higher / lower) until you find the right one.
   let slot = 0, slotMiss = 0, mistakes = 0, replaysLeft = e.replays, finished = false, hinted = false, revealed = false;
-  Mic.stableMs = e.dur < 0.6 ? 110 : 150;
+  // quarter tones are 50 cents apart, but a fretless neck wanders: wide enough for real fingers, tighter in tests
+  const tol = GRID === 1 ? 0.45 : e.test ? 0.28 : 0.32;
+  const waitFor = () => Mic.expect(slot < n ? e.notes[slot] : null, tol);
+  let offSince = 0;
   const render = () => {
     if (L.cleanup){ L.cleanup(); L.cleanup = null; }
     body.innerHTML = `<div class="ex-grid"><div class="ex-main">
@@ -2222,6 +2287,7 @@ function exEcho(e, body){
     if ($('#slow')) $('#slow').onclick = () => listen(e.dur * 1.8, true);
     if (hinted) $('#meterBox') && ($('#meterBox').hidden = false);
     L.cleanup = wireInput(render, onNote, onFrame);
+    waitFor();
   };
   const showReplays = () => {
     const r = $('#rep'); if (!r) return;
@@ -2246,23 +2312,29 @@ function exEcho(e, body){
   };
   // live steering once you've missed: the marker and the arrow follow whatever you're playing
   const onFrame = cur => {
-    if (!hinted || finished) return;
-    const mk = $('#mark'), dir = $('#liveDir'); if (!mk || !cur) return;
-    const raw = fold(cur.midi - e.notes[slot]), d = Math.max(-6, Math.min(6, raw));
+    if (finished) return;
+    if (!cur){ offSince = 0; return; }
+    const raw = fold(cur.midi - Mic.offset - e.notes[slot]), now = performance.now();
+    if (Math.abs(raw) <= tol) offSince = 0;
+    else if (!offSince) offSince = now;
+    else if (!hinted && now - offSince > 350){ hinted = true; $('#meterBox') && ($('#meterBox').hidden = false); }   // holding the wrong pitch: start steering
+    const mk = $('#mark'), dir = $('#liveDir'); if (!hinted || !mk) return;
+    const d = Math.max(-6, Math.min(6, raw));
     mk.style.left = `${50 + d / 6 * 50}%`;
-    if (dir) dir.textContent = Math.abs(raw) < GRID / 2 ? 'Right there, hold it…' : raw > 0 ? 'Too high: go lower ↓' : 'Too low: go higher ↑';
+    if (dir) dir.textContent = Math.abs(raw) <= tol ? 'Right there, hold it…' : raw > 0 ? 'Too high: go lower ↓' : 'Too low: go higher ↑';
   };
-  const onNote = (m) => {
+  const onNote = (m, tap, hit) => {
     if (finished) return;
     const target = e.notes[slot];
-    const d = fold(m - target);
+    const d = fold(m - (tap ? 0 : Mic.offset) - target);
     const slotEl = document.querySelector(`.slot[data-i="${slot}"]`);
-    if (Math.abs(d) < GRID / 2){          // within 50 cents (Level 1) or 25 cents (maqam routes)
+    if (hit || Math.abs(d) < (tap ? GRID / 2 : tol)){
       slotEl.className = 'slot ok'; slotEl.textContent = name(target);
       earRecord(target, e.mq, !slotMiss); slotMiss = 0;
       slot++;
       $('#hint').className = 'hint'; $('#hint').textContent = slot < n ? `Yes, ${name(target)}. Next note…` : '';
       const nx = document.querySelector(`.slot[data-i="${slot}"]`); if (nx) nx.classList.add('active');
+      waitFor();
       if (slot === n){
         finished = true;
         if (mistakes){ L.slips++; L.combo = 0; L.curSlip = true; }   // found it, but not first try: no "in a row" credit
@@ -2317,7 +2389,7 @@ function exTune(e, body){
       else { h.className = 'hint'; h.textContent = cents > 0 ? `${Math.round(cents)} cents sharp: loosen the peg a little ↓` : `${Math.round(-cents)} cents flat: tighten the peg a little ↑`; }
     }
     paintHold();
-    if (held >= 600){ finished = true; verdict(true, `${name(e.midi)} string is in tune`); }
+    if (held >= 600){ finished = true; Mic.offset = 0; S.settings.offset = 0; verdict(true, `${name(e.midi)} string is in tune`); }
   };
   const paintHold = () => { const el = $('#hold'); if (el) el.style.width = `${Math.min(100, held / 6)}%`; };
   render();
@@ -2465,17 +2537,19 @@ function renderTuner(){
     </div></div>`;
   document.querySelectorAll('.str').forEach(b => b.onclick = () => playSeq([OUD[b.dataset.i].m], 1.4));
   document.querySelectorAll('#tun button').forEach(b => b.onclick = () => { S.settings.tuning = b.dataset.v; save(); go('tuner'); });
-  let off = null;
+  let off = null, seen = 0;
   const begin = async () => {
     if (S.settings.tap){ S.settings.tap = false; save(); }
     const ok = await Mic.start();
     if (!ok){ $('#th').textContent = 'Microphone blocked. Allow access in your browser settings and try again.'; return; }
     $('#startMic').hidden = true;
+    if (Mic.warn) $('#th').textContent = Mic.warn;
     off = Mic.on(ev => {
       if (ev.type !== 'frame' || !$('#bn')) return;
       const cur = ev.cur;
+      if (!cur){ if (performance.now() - seen > 500){ setNeedle(null); document.querySelectorAll('.str').forEach(b => b.classList.remove('near')); } return; }
+      seen = performance.now();
       document.querySelectorAll('.str').forEach(b => b.classList.remove('near'));
-      if (!cur){ setNeedle(null); return; }
       const r = Math.round(cur.midi), cents = (cur.midi - r) * 100;
       $('#bn').innerHTML = `<b>${name(r)}<sub style="font-size:28px">${oct(r)}</sub></b><p class="ar">${ARN[pc(r) * 2]} · ${ARL[pc(r) * 2]}</p><p>${sub(r).split(' · ')[0]} · ${cur.freq.toFixed(1)} Hz · ${cents >= 0 ? '+' : ''}${Math.round(cents)} cents</p>`;
       setNeedle(cents);
@@ -2490,6 +2564,33 @@ function renderTuner(){
   $('#startMic').onclick = begin;
   if (Mic.running && !S.settings.tap) begin();
   viewCleanup = () => off && off();
+}
+
+/* ---------- microphone choice and a test recording ---------- */
+async function fillMics(){
+  const sel = $('#micSel'); if (!sel || !navigator.mediaDevices?.enumerateDevices) return;
+  const mics = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput' && d.deviceId && d.deviceId !== 'default' && d.label);
+  if (!$('#micSel')) return;
+  sel.innerHTML = `<option value="">Default</option>${mics.map(d => `<option value="${esc(d.deviceId)}">${esc(d.label)}</option>`).join('')}`;
+  sel.value = mics.some(d => d.deviceId === S.settings.micId) ? S.settings.micId : '';
+  sel.onchange = () => { S.settings.micId = sel.value; save(); Mic.stop(); toast('Microphone changed', '', 'i-ear'); };
+}
+function wavBlob(chunks, sr){
+  const n = chunks.reduce((s, c) => s + c.length, 0), v = new DataView(new ArrayBuffer(44 + n * 2));
+  const str = (o, t) => [...t].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 2, true);
+  let o = 44; for (const c of chunks) for (const a of c){ v.setInt16(o, Math.max(-1, Math.min(1, a)) * 32767, true); o += 2; }
+  return new Blob([v], { type:'audio/wav' });
+}
+async function recordClip(){
+  const b = $('#recClip'); S.settings.tap = false;
+  if (!await Mic.start()){ toast('The microphone is blocked', ''); return; }
+  const chunks = []; Mic.tape = c => chunks.push(c.slice(0));
+  for (let left = 12; left > 0; left--){ if (b) b.textContent = `Play… ${left}`; await sleep(1000); }
+  Mic.tape = null;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(wavBlob(chunks, ctx.sampleRate)); a.download = `samaa-oud-test-${dayKey()}.wav`; a.click();
+  if ($('#recClip')) $('#recClip').textContent = 'Record';
 }
 
 /* ---------- Profile tab ---------- */
@@ -2567,6 +2668,12 @@ function renderProfile(){
         <input type="range" id="sens" min="1" max="10" value="${S.settings.sens}"></div>
       <div class="field"><div><label>Mic check</label><p>Measures your room and your oud, then sets the sensitivity for you</p></div>
         <button class="btn ghost" id="micCheck">Run mic check</button></div>
+      <div class="field"><div><label for="micSel">Microphone</label><p>A clip-on or USB mic hears the oud best</p></div>
+        <select id="micSel" class="sel"><option value="">Default</option></select></div>
+      ${NATIVE ? '' : `<div class="field"><div><label>Android app</label><p>Install Samaa on your phone</p></div>
+        <a class="btn ghost" href="https://github.com/osAlhaddad1/samaa/releases/latest/download/Samaa.apk">Get the APK</a></div>
+      <div class="field"><div><label>Test recording</label><p>Saves 12 seconds of your oud as a WAV file. Share it so the listening can be tuned to your real sound</p></div>
+        <button class="btn ghost" id="recClip">Record</button></div>`}
       <div class="field"><div><label for="vol">Volume</label><p>How loud Samaa plays notes</p></div>
         <input type="range" id="vol" min="0.1" max="1" step="0.05" value="${S.settings.volume}"></div>
       <div class="field"><div><label>Tonic first</label><p>In maqam routes, play the home note before each phrase</p></div>
@@ -2588,6 +2695,8 @@ function renderProfile(){
   $('#vol').oninput = ev => { S.settings.volume = +ev.target.value; if (master) master.gain.value = 0.9 * S.settings.volume / 0.8; save(); };
   $('#vol').onchange = () => playSeq([55], 0.8);
   $('#micCheck').onclick = () => micCheck(() => { hideAuth(); go('profile'); });
+  fillMics();
+  if ($('#recClip')) $('#recClip').onclick = recordClip;
   document.querySelectorAll('#tonic button').forEach(b => b.onclick = () => { S.settings.tonic = b.dataset.v === '1'; save(); renderProfile(); });
   document.querySelectorAll('#theme button').forEach(b => b.onclick = () => { S.settings.theme = b.dataset.v; save(); applyTheme(); renderProfile(); });
   if ($('#logout')) $('#logout').onclick = logOut;
@@ -2648,8 +2757,17 @@ async function boot(){
   if (S.onboarded && (S.guest || !Cloud.enabled())) return enterApp();
   authWelcome();
 }
-if (!S.settings.mic2){ S.settings.sens = 6; S.settings.mic2 = true; save(); }   // new noise filter: new default sensitivity
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if (!S.settings.mic3){ S.settings.sens = 6; S.settings.mic3 = true; save(); }   // new listening engine: new default sensitivity
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !NATIVE) navigator.serviceWorker.register('sw.js').catch(() => {});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
+/* Android back button: returns true if the app handled it, false to leave the app */
+window.samaaBack = () => {
+  if (!$('#modal').hidden){ closeModal(); return true; }
+  if (!$('#auth').hidden) return false;
+  if (!$('#lesson').hidden){ $('#quit').click(); return true; }
+  if (tab !== 'learn'){ go('learn'); return true; }
+  return false;
+};
 boot();
 setInterval(() => { if ($('#auth').hidden) renderStats(); }, 60000);
 </script>
