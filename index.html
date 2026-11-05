@@ -794,7 +794,7 @@ const Cloud = {
       while (S.pending.length){
         const a = S.pending[0];
         const { data, error } = await this.sb.rpc('award_xp', { p_id:a.id, p_lesson:a.lesson, p_xp:a.xp });
-        if (error && !error.code) break;          // no connection: try again later
+        if (error && error.code !== '22023') break;   // offline or an expired login: keep it and try again later
         if (data && data[0] && this.me){ this.me.xp_total = data[0].xp_total; this.me.streak = data[0].streak; }
         S.pending.shift();
       }
