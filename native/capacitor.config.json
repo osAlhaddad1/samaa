@@ -2,7 +2,7 @@
   "appId": "com.osalhaddad.samaa",
   "appName": "Samaa",
   "webDir": "www",
-  "backgroundColor": "#14132A",
+  "backgroundColor": "#0A1C1B",
   "android": {
     "appendUserAgent": "SamaaApp"
   }

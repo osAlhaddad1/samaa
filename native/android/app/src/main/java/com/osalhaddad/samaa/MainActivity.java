@@ -55,7 +55,7 @@ public class MainActivity extends BridgeActivity {
 
     /* the strips behind the status and navigation bars match the page */
     private void paintBars(boolean dark) {
-        findViewById(android.R.id.content).setBackgroundColor(dark ? 0xFF14132A : 0xFFFBF6EE);
+        findViewById(android.R.id.content).setBackgroundColor(dark ? 0xFF0A1C1B : 0xFFF8EFDD);
         WindowInsetsControllerCompat bars = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         bars.setAppearanceLightStatusBars(!dark);
         bars.setAppearanceLightNavigationBars(!dark);
