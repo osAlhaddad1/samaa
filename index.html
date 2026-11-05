@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Samaa Ear Trainer</title>
 <meta name="description" content="Learn to play the oud by ear: hear a note, play it back, and get guided higher or lower until you hit it. Lessons in the Arabic maqamat.">
-<meta name="theme-color" content="#1E4FA8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0A1C1B" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#3D5BD9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F2321" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -16,44 +16,30 @@
 <style>
 /* Layout: one centered learning column, chunky tactile buttons, a winding lesson path per level. */
 :root{
-  /* lapis, saffron and pomegranate on parchment; at night, malachite and gold */
-  --bg:#F8EFDD; --surface:#FFFBF2; --line:#E4D2AC; --ink:#2A2118; --muted:#7A6B57;
-  --primary:#1E4FA8; --primary-d:#133679; --sky:#0E8A8A; --sky-d:#096565;
-  --good:#1F8F5F; --good-d:#156B46;
-  --amber:#D5941C; --amber-d:#9C6A0C; --coral:#C5364A; --coral-d:#912436;
-  --violet:#7A3E9D; --violet-d:#552A70; --wood:#C98B4E; --wood-d:#7A4824; --wood-face:#F2C88B;
-  --plum:#B53B6C; --plum-d:#84294D; --olive:#6F8F2F; --olive-d:#4F681E; --pearl:#2A86B8; --pearl-d:#1C6287;
-  --gold:#A77B22; --brand:#1E4FA8; --cta:#1E4FA8; --cta-d:#133679; --on-cta:#fff;
-  --ok-soft:#DDF1E2; --ok-ink:#156B46; --bad-soft:#FBE1DF; --bad-ink:#912436;
-  --lock:#EADFC8; --lock-d:#D4C5A6; --lock-ink:#9C8E76; --key-black:#2A2118;
-  --frame:var(--z-frame-light); --frame-o:.6; --bg-z:.07;
-  --f-display:"El Messiri","Nunito",system-ui,sans-serif;
-  --f-callig:"Aref Ruqaa","El Messiri",serif;
+  /* lapis, saffron and walnut: the colours of an inlaid oud */
+  --bg:#FBF6EE; --surface:#FFFFFF; --line:#EADFCE; --ink:#24213D; --muted:#776F88;
+  --primary:#3D5BD9; --primary-d:#2A41A6; --sky:#14A0B4; --sky-d:#0C7787;
+  --good:#2EA86B; --good-d:#1D7D4E;
+  --amber:#EBA233; --amber-d:#B57411; --coral:#E2475C; --coral-d:#AB2E42;
+  --violet:#8E5BE8; --violet-d:#6538BD; --wood:#C98B4E; --wood-d:#7A4824; --wood-face:#F2C88B;
+  --plum:#D35488; --plum-d:#A23863; --olive:#79A034; --olive-d:#58781F; --pearl:#3B9DD6; --pearl-d:#2775A8;
+  --ok-soft:#DDF4E6; --ok-ink:#1D7D4E; --bad-soft:#FDE3E6; --bad-ink:#AB2E42;
+  --lock:#ECE4D8; --lock-d:#D5CABA; --lock-ink:#A2988A; --key-black:#24213D;
+  --f-display:"Baloo Bhaijaan 2","Nunito",system-ui,sans-serif;
   --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --brand:var(--primary);
   --r:16px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0A1C1B; --surface:#112B28; --line:#29483F; --ink:#F6ECD8; --muted:#B5AE97;
-  --primary:#2F68C9; --primary-d:#1D4690; --sky:#129084; --sky-d:#0B635B;
-  --good:#23A06A; --good-d:#157049;
-  --amber:#D99A2B; --amber-d:#9A6A14; --coral:#C93F52; --coral-d:#8F2636;
-  --violet:#9457BE; --violet-d:#673A88; --plum:#C24A7A; --plum-d:#8A2F54; --olive:#7C9A36; --olive-d:#566D21;
-  --pearl:#66BFD6; --pearl-d:#3D8DA3;
-  --gold:#D9B25F; --brand:#E2BC6B; --cta:#D9A93A; --cta-d:#8F6A17; --on-cta:#2A1B04;
-  --ok-soft:#113D2E; --ok-ink:#7FE0AE; --bad-soft:#431A22; --bad-ink:#FF9AA5;
-  --lock:#1E3A36; --lock-d:#122925; --lock-ink:#78948A; --key-black:#051210;
-  --frame:var(--z-frame-dark); --frame-o:.55; --bg-z:.055; color-scheme:dark }}
+  --bg:#0F2321; --surface:#17302D; --line:#2B4A45; --ink:#EEF1EA; --muted:#A5B5AE;
+  --primary:#17897C; --primary-d:#0E5F56; --brand:#E2BC6B;
+  --ok-soft:#143C2E; --ok-ink:#7FE0AE; --pearl:#66BFD6; --pearl-d:#3D8DA3; --bad-soft:#431C25; --bad-ink:#FF9AA5;
+  --lock:#22403B; --lock-d:#172E2A; --lock-ink:#7E9890; --key-black:#071412; color-scheme:dark }}
 :root[data-theme="dark"]{
-  --bg:#0A1C1B; --surface:#112B28; --line:#29483F; --ink:#F6ECD8; --muted:#B5AE97;
-  --primary:#2F68C9; --primary-d:#1D4690; --sky:#129084; --sky-d:#0B635B;
-  --good:#23A06A; --good-d:#157049;
-  --amber:#D99A2B; --amber-d:#9A6A14; --coral:#C93F52; --coral-d:#8F2636;
-  --violet:#9457BE; --violet-d:#673A88; --plum:#C24A7A; --plum-d:#8A2F54; --olive:#7C9A36; --olive-d:#566D21;
-  --pearl:#66BFD6; --pearl-d:#3D8DA3;
-  --gold:#D9B25F; --brand:#E2BC6B; --cta:#D9A93A; --cta-d:#8F6A17; --on-cta:#2A1B04;
-  --ok-soft:#113D2E; --ok-ink:#7FE0AE; --bad-soft:#431A22; --bad-ink:#FF9AA5;
-  --lock:#1E3A36; --lock-d:#122925; --lock-ink:#78948A; --key-black:#051210;
-  --frame:var(--z-frame-dark); --frame-o:.55; --bg-z:.055; color-scheme:dark }
+  --bg:#0F2321; --surface:#17302D; --line:#2B4A45; --ink:#EEF1EA; --muted:#A5B5AE;
+  --primary:#17897C; --primary-d:#0E5F56; --brand:#E2BC6B;
+  --ok-soft:#143C2E; --ok-ink:#7FE0AE; --pearl:#66BFD6; --pearl-d:#3D8DA3; --bad-soft:#431C25; --bad-ink:#FF9AA5;
+  --lock:#22403B; --lock-d:#172E2A; --lock-ink:#7E9890; --key-black:#071412; color-scheme:dark }
 
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -556,144 +542,13 @@ input[type=range]{accent-color:var(--sky);width:160px}
 .bubble{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative;flex:1;min-width:0}
 .bubble p{margin:0 0 8px} .bubble p:last-child{margin:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-:root{
-  --z-khatim:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.17' stroke-width='1.8' stroke-linejoin='round'%3E%3Cpath d='M36.00 0.00L46.54 10.54L61.46 10.54L61.46 25.46L72.00 36.00L61.46 46.54L61.46 61.46L46.54 61.46L36.00 72.00L25.46 61.46L10.54 61.46L10.54 46.54L0.00 36.00L10.54 25.46L10.54 10.54L25.46 10.54Z'/%3E%3Cpath d='M36.00 9.00L43.91 16.91L55.09 16.91L55.09 28.09L63.00 36.00L55.09 43.91L55.09 55.09L43.91 55.09L36.00 63.00L28.09 55.09L16.91 55.09L16.91 43.91L9.00 36.00L16.91 28.09L16.91 16.91L28.09 16.91Z'/%3E%3Cpath d='M36.00 24.00L39.51 27.51L44.49 27.51L44.49 32.49L48.00 36.00L44.49 39.51L44.49 44.49L39.51 44.49L36.00 48.00L32.49 44.49L27.51 44.49L27.51 39.51L24.00 36.00L27.51 32.49L27.51 27.51L32.49 27.51Z' stroke-width='1.4'/%3E%3C/g%3E%3Cg fill='%23fff' fill-opacity='.17'%3E%3Cpath d='M0 -7L7 0L0 7L-7 0Z'/%3E%3Cpath d='M72 -7L79 0L72 7L65 0Z'/%3E%3Cpath d='M0 65L7 72L0 79L-7 72Z'/%3E%3Cpath d='M72 65L79 72L72 79L65 72Z'/%3E%3Ccircle cx='36.0' cy='36.0' r='3.4'/%3E%3C/g%3E%3C/svg%3E");
-  --z-ogee:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='96' viewBox='0 0 64 96'%3E%3Cpath d='M32.0 0C32.0 16 64 30 64 48.0C64 66 32.0 80 32.0 96C32.0 80 0 66 0 48.0C0 30 32.0 16 32.0 0Z' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M32.00 37.00L35.22 40.22L39.78 40.22L39.78 44.78L43.00 48.00L39.78 51.22L39.78 55.78L35.22 55.78L32.00 59.00L28.78 55.78L24.22 55.78L24.22 51.22L21.00 48.00L24.22 44.78L24.22 40.22L28.78 40.22Z' fill='%23000'/%3E%3Cg fill='%23000'%3E%3Cpath d='M0 -6L6 0L0 6L-6 0Z'/%3E%3Cpath d='M64 -6L70 0L64 6L58 0Z'/%3E%3Cpath d='M0 90L6 96L0 102L-6 96Z'/%3E%3Cpath d='M64 90L70 96L64 102L58 96Z'/%3E%3C/g%3E%3C/svg%3E");
-  --z-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50.00 3.00L63.77 16.77L83.23 16.77L83.23 36.23L97.00 50.00L83.23 63.77L83.23 83.23L63.77 83.23L50.00 97.00L36.23 83.23L16.77 83.23L16.77 63.77L3.00 50.00L16.77 36.23L16.77 16.77L36.23 16.77Z' fill='%23000' stroke='%23000' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E");
-  --z-star-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50.00 9.00L62.01 21.01L78.99 21.01L78.99 37.99L91.00 50.00L78.99 62.01L78.99 78.99L62.01 78.99L50.00 91.00L37.99 78.99L21.01 78.99L21.01 62.01L9.00 50.00L21.01 37.99L21.01 21.01L37.99 21.01Z' fill='none' stroke='%23fff' stroke-opacity='.3' stroke-width='2.6' stroke-linejoin='round'/%3E%3C/svg%3E");
-  --z-star-ring:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50.00 4.00L63.47 17.47L82.53 17.47L82.53 36.53L96.00 50.00L82.53 63.47L82.53 82.53L63.47 82.53L50.00 96.00L36.53 82.53L17.47 82.53L17.47 63.47L4.00 50.00L17.47 36.53L17.47 17.47L36.53 17.47Z' fill='none' stroke='%23000' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E");
-  --z-drops:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='15' viewBox='0 0 28 15'%3E%3Cpath d='M0 0H28V2.5C22 2.5 18 5 14 11C10 5 6 2.5 0 2.5Z' fill='%23000'/%3E%3Cpath d='M14 11.5L15.6 13.2L14 15L12.4 13.2Z' fill='%23000'/%3E%3C/svg%3E");
-  --z-shurfa:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='13' viewBox='0 0 32 13'%3E%3Cpath d='M0 13V10H4V6H8V2H10V0H22V2H24V6H28V10H32V13Z' fill='%23000'/%3E%3C/svg%3E");
-  --z-divider:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='22' viewBox='0 0 220 22'%3E%3Cpath d='M110.00 1.00L112.93 3.93L117.07 3.93L117.07 8.07L120.00 11.00L117.07 13.93L117.07 18.07L112.93 18.07L110.00 21.00L107.07 18.07L102.93 18.07L102.93 13.93L100.00 11.00L102.93 8.07L102.93 3.93L107.07 3.93Z' fill='%23000'/%3E%3Cpath d='M86 11L91 6L96 11L91 16Z M124 11L129 6L134 11L129 16Z' fill='%23000'/%3E%3Cpath d='M0 10.2H80V11.8H0Z M140 10.2H220V11.8H140Z' fill='%23000'/%3E%3C/svg%3E");
-  --z-frame-light:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='108' viewBox='0 0 108 108'%3E%3Cg transform=''%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23B58A33' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23B58A33' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23B58A33'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23B58A33'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23B58A33'/%3E%3C/g%3E%3Cg transform='translate(108 0) scale(-1 1)'%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23B58A33' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23B58A33' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23B58A33'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23B58A33'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23B58A33'/%3E%3C/g%3E%3Cg transform='translate(0 108) scale(1 -1)'%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23B58A33' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23B58A33' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23B58A33'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23B58A33'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23B58A33'/%3E%3C/g%3E%3Cg transform='translate(108 108) scale(-1 -1)'%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23B58A33' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23B58A33' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23B58A33'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23B58A33'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23B58A33'/%3E%3C/g%3E%3Cg stroke='%23B58A33' fill='none'%3E%3Cpath d='M36 3H72M36 105H72M3 36V72M105 36V72' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H72M36 101.5H72M6.5 36V72M101.5 36V72' stroke-width='.7'/%3E%3C/g%3E%3C/svg%3E");
-  --z-frame-dark:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='108' viewBox='0 0 108 108'%3E%3Cg transform=''%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23C9A24E' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23C9A24E' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23C9A24E'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23C9A24E'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23C9A24E'/%3E%3C/g%3E%3Cg transform='translate(108 0) scale(-1 1)'%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23C9A24E' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23C9A24E' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23C9A24E'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23C9A24E'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23C9A24E'/%3E%3C/g%3E%3Cg transform='translate(0 108) scale(1 -1)'%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23C9A24E' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23C9A24E' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23C9A24E'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23C9A24E'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23C9A24E'/%3E%3C/g%3E%3Cg transform='translate(108 108) scale(-1 -1)'%3E%3Cpath d='M36 3H17A14 14 0 0 1 3 17V36' fill='none' stroke='%23C9A24E' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H21.5A15 15 0 0 1 6.5 21.5V36' fill='none' stroke='%23C9A24E' stroke-width='.7'/%3E%3Cpath d='M6.20 0.60L7.84 2.24L10.16 2.24L10.16 4.56L11.80 6.20L10.16 7.84L10.16 10.16L7.84 10.16L6.20 11.80L4.56 10.16L2.24 10.16L2.24 7.84L0.60 6.20L2.24 4.56L2.24 2.24L4.56 2.24Z' fill='%23C9A24E'/%3E%3Ccircle cx='21' cy='12.5' r='1.3' fill='%23C9A24E'/%3E%3Ccircle cx='12.5' cy='21' r='1.3' fill='%23C9A24E'/%3E%3C/g%3E%3Cg stroke='%23C9A24E' fill='none'%3E%3Cpath d='M36 3H72M36 105H72M3 36V72M105 36V72' stroke-width='1.5'/%3E%3Cpath d='M36 6.5H72M36 101.5H72M6.5 36V72M101.5 36V72' stroke-width='.7'/%3E%3C/g%3E%3C/svg%3E");
-  --clip-star:polygon(50.0% 0.0%,64.6% 14.6%,85.4% 14.6%,85.4% 35.4%,100.0% 50.0%,85.4% 64.6%,85.4% 85.4%,64.6% 85.4%,50.0% 100.0%,35.4% 85.4%,14.6% 85.4%,14.6% 64.6%,0.0% 50.0%,14.6% 35.4%,14.6% 14.6%,35.4% 14.6%);
-}
-
-/* ---------- Arabic theme: khatim stars, ogee trellis, ornamented frames ---------- */
-.ar,.ar-t,.brand small,.auth-hero h1 small{font-family:var(--f-callig)}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--gold);opacity:var(--bg-z);
-  -webkit-mask:var(--z-ogee) 0 0/64px 96px;mask:var(--z-ogee) 0 0/64px 96px}
-h1,h2,h3{letter-spacing:.005em}
-
-/* buttons: a cartouche shape where the browser can draw it, rounded elsewhere */
-.btn{background:var(--cta);color:var(--on-cta);box-shadow:0 4px 0 var(--cta-d)}
-.btn:active:not(:disabled){box-shadow:0 0 0 var(--cta-d)}
-.btn.bad,.lfoot.ok .btn{color:#fff}
-.btn.bad{box-shadow:0 4px 0 var(--coral-d)}
-@supports (corner-shape:scoop){
-  .btn,.choice,.opt,.mq,.pk,.slot,.gchip,.str,.speak,.bubble,.notice,.banner-cta{corner-shape:scoop}
-  .btn,.choice,.opt,.mq{border-radius:14px}
-  .speak{border-radius:22px}
-}
-.card.colored .btn{color:var(--c)}
-.practice-card .btn{border-radius:12px}
-
-/* top bar and bottom nav */
-.brand{color:var(--brand)}
-.brand small{font-size:22px;font-weight:700;color:var(--gold);line-height:1}
-.top{box-shadow:none}
-.top::after{content:"";position:absolute;left:0;right:0;top:100%;height:15px;pointer-events:none;background:var(--line);
-  -webkit-mask:var(--z-drops) 0 0/28px 15px repeat-x;mask:var(--z-drops) 0 0/28px 15px repeat-x}
-.nav::before{content:"";position:absolute;left:0;right:0;bottom:calc(100% + 2px);height:15px;pointer-events:none;background:var(--line);transform:scaleY(-1);
-  -webkit-mask:var(--z-drops) 0 0/28px 15px repeat-x;mask:var(--z-drops) 0 0/28px 15px repeat-x}
-.nav button[aria-current="page"]{color:var(--brand)}
-.nav button[aria-current="page"] svg{background:color-mix(in srgb,var(--brand) 18%,transparent);border-radius:999px 999px 7px 7px;padding:3px 13px 1px;margin-block:-3px -1px}
-@media (max-width:460px){.brand small{display:inline}}
-
-/* level banners */
-.banner{background-image:var(--z-khatim);background-size:72px 72px;background-position:center;padding-bottom:28px;box-shadow:0 5px 0 var(--c-d),inset 0 0 0 2px rgb(255 255 255 / .16)}
-.banner::after{content:"";position:absolute;left:0;right:0;bottom:0;height:13px;pointer-events:none;background:var(--c-d);opacity:.75;
-  -webkit-mask:var(--z-shurfa) center bottom/32px 13px repeat-x;mask:var(--z-shurfa) center bottom/32px 13px repeat-x}
-.banner.locked::after{background:var(--lock-d)}
-.banner.locked{background-image:none;box-shadow:0 4px 0 var(--lock-d)}
-.banner-txt,.banner-act{position:relative;z-index:1}
-.banner-ar{position:absolute;right:16px;bottom:12px;font:700 54px/1 var(--f-callig);color:#fff;opacity:.13;pointer-events:none;white-space:nowrap}
-.banner.locked .banner-ar{color:var(--lock-ink)}
-.level:not(:last-child)::after{content:"";display:block;width:min(220px,70%);height:22px;margin:30px auto 0;background:var(--gold);opacity:.7;
-  -webkit-mask:var(--z-divider) center/contain no-repeat;mask:var(--z-divider) center/contain no-repeat}
-.level{margin-bottom:30px}
-
-/* path nodes are eight-pointed stars */
-.node:not(.chest){width:86px;height:86px;margin-bottom:2px;background:none;box-shadow:none;isolation:isolate;--fill:var(--c);filter:drop-shadow(0 6px 0 var(--c-d))}
-.node:not(.chest)::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--z-star-line) center/100% 100% no-repeat,var(--fill);
-  -webkit-mask:var(--z-star) center/100% 100% no-repeat;mask:var(--z-star) center/100% 100% no-repeat}
-.node:not(.chest).done{--fill:color-mix(in srgb,var(--c) 82%,#fff);background:none}
-.node:not(.chest).test{width:102px;height:102px}
-.node:not(.chest).locked{--fill:var(--lock);background:none;box-shadow:none;filter:drop-shadow(0 6px 0 var(--lock-d))}
-.node:not(.chest):active:not(:disabled){transform:translateY(5px);box-shadow:none;filter:drop-shadow(0 1px 0 var(--c-d))}
-.node.current::after{content:none}
-.node-wrap.here::before{content:"";position:absolute;left:50%;top:-13px;width:112px;height:112px;margin-left:-56px;pointer-events:none;background:color-mix(in srgb,var(--c) 70%,transparent);
-  -webkit-mask:var(--z-star-ring) center/100% 100% no-repeat;mask:var(--z-star-ring) center/100% 100% no-repeat;animation:turn 30s linear infinite}
-.node-wrap.here:has(.test)::before{width:128px;height:128px;margin-left:-64px}
-@keyframes turn{to{transform:rotate(360deg)}}
-.node.chest{background-image:var(--z-khatim);background-size:40px 40px;border-radius:50% 50% 16px 16px/62% 62% 16px 16px}
-.node-wrap{width:128px}
-.node-label{margin-top:10px}
-.start-tag{border-color:var(--gold)}
-.start-tag::after{border-color:var(--gold)}
-.node-wrap.here{margin-top:40px}
-.done-count{right:0;top:2px}
-
-/* small icons sit in a star */
-.qi,.ii,.bi,.verdict .badge{border-radius:0;box-shadow:none;clip-path:var(--clip-star)}
-.qi{width:46px;height:46px;background:color-mix(in srgb,var(--c) 24%,transparent)}
-.qi svg{width:22px;height:22px}
-.ii{width:70px;height:70px}
-.ii svg{width:32px;height:32px}
-.bi{width:62px;height:62px}
-.bi svg{width:28px;height:28px}
-.quest{grid-template-columns:46px minmax(0,1fr) auto}
-.qbar em{text-shadow:0 0 3px var(--surface),0 0 3px var(--surface)}
-.wd.on,.wd.frz{border-radius:0;clip-path:var(--clip-star)}
-.wd{width:38px;height:38px}
-.wd svg{width:18px;height:18px}
-
-/* ornamented frames on boxes */
-.panel,.pick,.practice-card,.listen,.item,.card,.tile,.gear,.bdg,.banner-cta,.bubble,.notice{position:relative}
-.panel::before,.pick::before,.practice-card::before,.listen::before,.item::before,.card:not(.colored)::before,.gear::before,.bdg::before,.tile::before{
-  content:"";position:absolute;inset:2px;pointer-events:none;border:18px solid transparent;border-image:var(--frame) 36 fill/18px stretch;
-  opacity:var(--frame-o)}
-.tile::before,.bdg::before,.gear::before{border-width:13px;border-image-width:13px;opacity:calc(var(--frame-o) * .8)}
-.panel,.pick,.card:not(.colored){padding:20px}
+/* the Arabic touch stays small: the banner pattern, and gold on the name at night */
+.brand,.auth-hero h1,.nav button[aria-current="page"]{color:var(--brand)}
 .listen{padding:15px 17px}
-@media (max-width:899px) and (max-height:860px){.listen{padding:10px 13px}}
+.qbar em{text-shadow:0 0 3px var(--surface),0 0 3px var(--surface)}
 @media (max-width:899px) and (max-height:680px){.gauge{max-width:min(240px,26vh)}}
-.practice-card{padding:15px 18px}
-.card{border-color:var(--gold)}
-.card.colored{background-image:var(--z-khatim);background-size:72px 72px;background-position:center}
-.gear.worn{border-color:var(--gold)}
-.avatar{border-color:var(--gold);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--gold)}
-.lrow.me{background:color-mix(in srgb,var(--gold) 15%,transparent)}
-.rank-card{background-image:var(--z-khatim);background-size:72px 72px;background-position:center}
-.notice{background:color-mix(in srgb,var(--gold) 12%,var(--surface));border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
-.notice svg{color:var(--gold)}
-.banner-cta{background:color-mix(in srgb,var(--gold) 11%,var(--surface));border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
-.chip{background:color-mix(in srgb,var(--gold) 15%,var(--surface));color:var(--ink)}
-
-/* section titles carry their Arabic name */
-.section-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.ar-t{font-size:.78em;font-weight:700;color:var(--gold)}
-.mq .ar,.big-note .ar{font-family:var(--f-callig);font-weight:700}
-.mq .ar{font-size:21px}
-
-/* lesson screens */
-.lesson,.auth{background:var(--bg)}
-.lesson::before,.auth::before{content:"";position:fixed;inset:0;pointer-events:none;background:var(--gold);opacity:var(--bg-z);
-  -webkit-mask:var(--z-ogee) 0 0/64px 96px;mask:var(--z-ogee) 0 0/64px 96px}
-.lhead,.lbody,.lfoot,.auth-card{position:relative}
-.bar{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 40%,transparent)}
-.complete h2{color:var(--gold)}
-.lfoot{background:var(--bg)}
-.lfoot.ok{background:var(--ok-soft)}
-.lfoot.bad{background:var(--bad-soft)}
-
-/* welcome: Oudi stands in a mihrab arch */
-.mihrab{position:relative;width:clamp(128px,23vh,186px);aspect-ratio:200/212;display:grid;place-items:end center}
-.mihrab>svg:first-child{position:absolute;inset:0;width:100%;height:100%}
-.auth-hero .mihrab .mascot{position:relative;width:70%;height:auto;aspect-ratio:1;margin-bottom:9%}
-.auth-hero h1{color:var(--brand)}
-.auth-hero h1 small{color:var(--gold);font-size:.8em;font-weight:700}
+.choice.miss{border-color:var(--coral);box-shadow:0 4px 0 var(--coral);color:var(--bad-ink);background:var(--bad-soft);opacity:.75}
+.replays.bad{color:var(--bad-ink);font-weight:800}
 </style>
 </head>
 <body>
@@ -812,14 +667,6 @@ h1,h2,h3{letter-spacing:.005em}
       <g fill="var(--olive)"><path d="M53 44C38 30 20 30 6 42 22 37 37 39 53 47Z"/><path d="M53 44C68 28 84 29 97 40 81 36 67 39 54 47Z"/><path d="M53 44C47 24 35 14 17 12 33 21 42 32 52 46Z"/></g>
       <g fill="var(--olive-d)"><path d="M53 44C60 23 72 13 89 11 74 21 64 32 54 46Z"/><path d="M53 44C55 26 53 14 47 3 57 16 60 29 55 45Z"/></g>
       <g fill="var(--amber-d)"><circle cx="49" cy="49" r="3"/><circle cx="54" cy="51" r="3"/><circle cx="58" cy="48" r="3"/></g>
-    </symbol>
-    <symbol id="mihrab" viewBox="0 0 200 212">
-      <path d="M8 212V94C8 50 62 34 100 2C138 34 192 50 192 94V212Z" fill="var(--gold)"/>
-      <path d="M15 212V96C15 56 66 40 100 12C134 40 185 56 185 96V212Z" fill="var(--primary)"/>
-      <path d="M30 212V100C30 68 72 52 100 30C128 52 170 68 170 100V212Z" fill="var(--gold)"/>
-      <path d="M35 212V102C35 72 76 56 100 37C124 56 165 72 165 102V212Z" fill="var(--surface)"/>
-      <g fill="var(--gold)"><path d="M100 18l4 4 5.6 0 0 5.6 4 4-4 4 0 5.6-5.6 0-4 4-4-4-5.6 0 0-5.6-4-4 4-4 0-5.6 5.6 0z" transform="translate(0 -3) scale(1) "/></g>
-      <g fill="var(--amber)"><circle cx="22.5" cy="118" r="3"/><circle cx="22.5" cy="146" r="3"/><circle cx="22.5" cy="174" r="3"/><circle cx="22.5" cy="202" r="3"/><circle cx="177.5" cy="118" r="3"/><circle cx="177.5" cy="146" r="3"/><circle cx="177.5" cy="174" r="3"/><circle cx="177.5" cy="202" r="3"/></g>
     </symbol>
     <symbol id="deco-arch" viewBox="0 0 100 120">
       <path d="M12 118V58C12 30 28 12 50 9 72 12 88 30 88 58V118Z" fill="var(--sky)"/>
@@ -1836,7 +1683,7 @@ function buy(it){
 function renderShop(){
   const left = Math.ceil((S.boostUntil - Date.now()) / 60000);
   $('#view').innerHTML = `<div class="stack">
-    <div class="shop-head"><h2 class="section-title" style="margin:0">Shop <span class="ar-t">السوق</span></h2><span class="wallet" title="Your pearls">${icon('i-pearl')}${S.pearls}</span></div>
+    <div class="shop-head"><h2 class="section-title" style="margin:0">Shop</h2><span class="wallet" title="Your pearls">${icon('i-pearl')}${S.pearls}</span></div>
     <p class="ex-sub" style="margin:0">Earn pearls by finishing lessons, daily quests and achievements.</p>
     <h3>Power-ups</h3>
     <div class="items">${SHOP.power.map(it => { const ok = it.can();
@@ -1875,7 +1722,7 @@ function showAuth(html){ $('#authCard').innerHTML = html; $('#auth').hidden = fa
 function hideAuth(){ $('#auth').hidden = true; document.body.style.overflow = ''; }
 const backBtn = () => `<button class="back" id="back">${icon('i-x')} Back</button>`;
 function authWelcome(){
-  showAuth(`<div class="auth-hero"><div class="mihrab"><svg viewBox="0 0 200 212" aria-hidden="true"><use href="#mihrab"/></svg>${mascot(undefined, 'bounce')}</div><h1>Samaa <small>سماع</small></h1><p>Learn to play the oud by ear, one note at a time.</p></div>
+  showAuth(`<div class="auth-hero">${mascot(undefined, 'bounce')}<h1>Samaa <small>سماع</small></h1><p>Learn to play the oud by ear, one note at a time.</p></div>
     <div class="perks">
       <div class="perk"><span class="qi" style="--c:var(--sky)">${icon('i-ear')}</span>Hear a note, play it back on your oud</div>
       <div class="perk"><span class="qi" style="--c:var(--amber)">${icon('i-tuner')}</span>Samaa listens and guides you higher or lower</div>
@@ -2125,7 +1972,7 @@ let boardScope = 'week';
 async function renderLeague(){
   const now = new Date(), days = 7 - ((now.getUTCDay() + 6) % 7);
   $('#view').innerHTML = `<div class="stack">
-    <div class="league-head"><div><h2 class="section-title" style="margin:0">World leaderboard <span class="ar-t">الترتيب</span></h2>
+    <div class="league-head"><div><h2 class="section-title" style="margin:0">World leaderboard</h2>
       <p class="ex-sub" style="margin:4px 0 0">${boardScope === 'week' ? `New week in ${days} day${days > 1 ? 's' : ''}` : 'All players, all time'}</p></div>
       <div class="seg" id="scope"><button data-v="week" aria-pressed="${boardScope === 'week'}">This week</button><button data-v="all" aria-pressed="${boardScope === 'all'}">All time</button></div></div>
     <div id="myRank"></div>
@@ -2221,7 +2068,7 @@ function levelHtml(lv, cur){
   const mq = lv.mq && MAQ[lv.mq];
   const open = !lv.soon && levelOpen(lv), doneN = lv.lessons ? lv.lessons.filter(l => isDone(l.id)).length : 0, total = lv.lessons ? lv.lessons.length : 10;
   let html = `<section class="level" style="--c:var(${lv.c});--c-d:var(${lv.c}-d)">
-    <div class="banner ${lv.soon ? 'locked' : ''}" style="background-color:var(--c)"><span class="banner-ar" aria-hidden="true">${mq ? mq.ar : 'سماع'}</span>
+    <div class="banner ${lv.soon ? 'locked' : ''}" style="background-color:var(--c)">
       <div class="banner-txt"><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name} ${mq.ar}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p>
         ${lv.soon ? '' : `<div class="lvbar"><i style="width:${doneN / total * 100}%"></i></div><small class="lvcount">${doneN} of ${total} mini-levels${mastered(lv) ? ' · mastered' : ''}</small>`}</div>
       <div class="banner-act">
@@ -2396,7 +2243,7 @@ function verdict(ok, detail, replay){
   L.answered++;
   if (ok){
     if (!e.retry && !L.curSlip) L.firstOk++;   // mastery counts first-try answers only
-    L.done++; L.combo = (L.combo || 0) + 1;
+    L.done++; L.combo = L.curSlip ? 0 : (L.combo || 0) + 1;
     const q = today(); q.combo = Math.max(q.combo, L.combo);
     if (L.combo === 5) checkQuests();
   }
@@ -2779,7 +2626,7 @@ function exScale(e, body){
 }
 function exChoice(e, body){
   const spec = CHOICE[e.type](e);
-  let sel = null;
+  let sel = null, tries = spec.opts.length > 2 ? 2 : 1;   // with only two answers a second try would just give it away
   body.innerHTML = `<div class="ex-grid"><div class="ex-main">
     <h2 class="ex-title">${spec.title}</h2>
     ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : ''}
@@ -2799,8 +2646,18 @@ function exChoice(e, body){
   });
   $('#skip').onclick = skipEx;
   $('#check').onclick = () => {
-    document.querySelectorAll('.choice').forEach(x => x.disabled = true);
     const ok = String(sel) === String(e.answer);
+    if (!ok && --tries > 0){
+      const b = document.querySelector('.choice[aria-pressed="true"]');
+      b.classList.add('miss'); b.disabled = true; b.setAttribute('aria-pressed', 'false');
+      sel = null; $('#check').disabled = true; L.curSlip = true;
+      sfx(false);
+      const r = $('.replays'); r.className = 'replays bad'; r.textContent = 'Not quite. You have one more try.';
+      setTimeout(() => { if (L && L.queue[L.idx] === e) play(); }, 500);
+      return;
+    }
+    document.querySelectorAll('.choice').forEach(x => x.disabled = true);
+    if (ok && L.curSlip){ L.slips++; L.combo = 0; }   // right on the second try: no "in a row" credit
     const label = spec.opts.find(o => String(o[0]) === String(e.answer));
     const extra = e.type === 'name' ? ` (${sub(e.answer)})`
       : e.type === 'compare' || e.type === 'direction' || e.type === 'same' ? `: ${e.notes.map(name).join(' then ')}`
@@ -2818,7 +2675,7 @@ function exChoice(e, body){
 function renderTuner(){
   const OUD = oudStrings();
   $('#view').innerHTML = `<div class="stack">
-    <h2 class="section-title">Oud tuner <span class="ar-t">دوزان العود</span></h2>
+    <h2 class="section-title">Oud tuner</h2>
     <div class="panel stack">
       <div class="big-note" id="bn"><b>–</b><p>Pluck a string</p></div>
       ${gaugeSvg()}
