@@ -549,6 +549,81 @@ input[type=range]{accent-color:var(--sky);width:160px}
 @media (max-width:899px) and (max-height:680px){.gauge{max-width:min(240px,26vh)}}
 .choice.miss{border-color:var(--coral);box-shadow:0 4px 0 var(--coral);color:var(--bad-ink);background:var(--bad-soft);opacity:.75}
 .replays.bad{color:var(--bad-ink);font-weight:800}
+:root{
+  --z-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50.00 3.00L63.77 16.77L83.23 16.77L83.23 36.23L97.00 50.00L83.23 63.77L83.23 83.23L63.77 83.23L50.00 97.00L36.23 83.23L16.77 83.23L16.77 63.77L3.00 50.00L16.77 36.23L16.77 16.77L36.23 16.77Z' fill='%23000' stroke='%23000' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --z-divider:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='22' viewBox='0 0 220 22'%3E%3Cpath d='M110.00 1.00L112.93 3.93L117.07 3.93L117.07 8.07L120.00 11.00L117.07 13.93L117.07 18.07L112.93 18.07L110.00 21.00L107.07 18.07L102.93 18.07L102.93 13.93L100.00 11.00L102.93 8.07L102.93 3.93L107.07 3.93Z' fill='%23000'/%3E%3Cpath d='M86 11L91 6L96 11L91 16Z M124 11L129 6L134 11L129 16Z' fill='%23000'/%3E%3Cpath d='M0 10.2H80V11.8H0Z M140 10.2H220V11.8H140Z' fill='%23000'/%3E%3C/svg%3E");
+  --clip-star:polygon(50.0% 0.0%,64.6% 14.6%,85.4% 14.6%,85.4% 35.4%,100.0% 50.0%,85.4% 64.6%,85.4% 85.4%,64.6% 85.4%,50.0% 100.0%,35.4% 85.4%,14.6% 85.4%,14.6% 64.6%,0.0% 50.0%,14.6% 35.4%,14.6% 14.6%,35.4% 14.6%);
+}
+
+/* a touch of Arabic, kept sleek: calligraphy in small doses, one star, thin gold */
+:root{--gold:#B8923E;--f-callig:"Aref Ruqaa","Baloo Bhaijaan 2",serif}
+:root[data-theme="dark"]{--gold:#D9B25F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--gold:#D9B25F}}
+.ar-cal,.ar-t,.brand small,.auth-hero h1 small{font-family:var(--f-callig);font-weight:700}
+.brand small{font-size:20px;color:var(--gold);line-height:1}
+@media (max-width:460px){.brand small{display:inline}}
+.ar-t{font-size:.72em;color:var(--gold);margin-inline-start:6px}
+.auth-hero h1 small{color:var(--gold)}
+.banner-ar{font:700 24px/1 var(--f-callig);opacity:.8;margin-top:auto;text-align:end}
+.banner-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px;align-self:stretch}
+.panel-head h3::before{content:"";display:inline-block;width:11px;height:11px;margin-inline-end:8px;background:var(--gold);clip-path:var(--clip-star);vertical-align:1px}
+.level:not(:last-child)::after{content:"";display:block;width:120px;height:12px;margin:26px auto 0;background:var(--gold);opacity:.5;
+  -webkit-mask:var(--z-divider) center/contain no-repeat;mask:var(--z-divider) center/contain no-repeat}
+.nav button[aria-current="page"] svg{background:color-mix(in srgb,var(--brand) 16%,transparent);border-radius:999px 999px 7px 7px;padding:3px 13px 1px;margin-block:-3px -1px}
+.node.test,.node.test.done,.node.test.locked{width:96px;height:96px;background:none;box-shadow:none;isolation:isolate;--fill:var(--c);filter:drop-shadow(0 6px 0 var(--c-d))}
+.node.test.locked{--fill:var(--lock);filter:drop-shadow(0 6px 0 var(--lock-d))}
+.node.test::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--fill);-webkit-mask:var(--z-star) center/100% 100% no-repeat;mask:var(--z-star) center/100% 100% no-repeat}
+.arch{position:relative;display:grid;place-items:end center;width:clamp(120px,21vh,170px);aspect-ratio:200/212}
+.arch>svg:first-child{position:absolute;inset:0;width:100%;height:100%;color:var(--gold)}
+.arch .mascot{position:relative;width:74%;height:auto;aspect-ratio:1;margin-bottom:5%}
+.done-ar{font:700 34px/1 var(--f-callig);color:var(--gold)}
+@media (max-height:700px){.done-ar{display:none}}
+
+/* ranks, cards and the rest of the new game parts */
+.rank-strip{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:2px solid var(--line);border-radius:var(--r)}
+.rank-strip .ar-cal{font-size:26px;color:var(--gold);line-height:1.2;flex:none;max-width:42%}
+.rank-strip>div{flex:1;min-width:0}
+.rank-strip .qbar{margin:4px 0 2px;height:8px}
+.rank-strip small{color:var(--muted);font-weight:700}
+.weekly-open{min-height:38px;height:38px;padding:0 14px;font-size:13px}
+.tarab{display:flex;gap:4px;flex:none}
+.tarab i{width:9px;height:9px;background:var(--lock);clip-path:var(--clip-star);transition:background .2s}
+.tarab i.on{background:var(--gold)}
+.humbar{display:block;height:5px;margin:8px auto 0;max-width:200px;border-radius:9px;background:var(--lock);overflow:hidden}
+.humbar i{display:block;height:100%;background:var(--sky);transform-origin:left;animation:humfill linear forwards}
+@keyframes humfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.choice.gone{opacity:.35;text-decoration:line-through}
+.shop-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.shop-tabs::-webkit-scrollbar{display:none}
+.shop-tabs button{flex:none;padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);font-weight:800;font-size:14px;color:var(--muted)}
+.shop-tabs button[aria-selected="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+.swatch{width:72px;height:72px;border-radius:50%;box-shadow:inset 0 0 0 4px rgb(255 255 255 / .25)}
+.ring{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;border:4px solid var(--ring);box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ring)}
+.gear .ring .mascot{width:68px;height:68px}
+.title-prev{min-height:72px;display:grid;place-items:center;font:800 17px/1.2 var(--f-display);color:var(--gold);text-align:center}
+.ptitle{display:block;color:var(--gold);font-weight:800;font-size:14px}
+.gear .speak.small{margin-block:12px}
+.set-name{margin:4px 0 8px;font-weight:800;font-size:13px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.acard{aspect-ratio:3/4;border-radius:12px;border:1.5px solid var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--surface));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;color:var(--ink)}
+.acard .ar-cal{font-size:21px;line-height:1.2;color:var(--gold)}
+.acard small{font-weight:800;font-size:11px;color:var(--muted)}
+.acard.none{border:1.5px dashed var(--line);background:none;color:var(--lock-ink)}
+.acard.none svg{width:20px;height:20px}
+.card-big{margin:0 auto;width:150px;height:190px;border-radius:16px;border:2px solid var(--gold);display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 9%,var(--surface))}
+.card-big .ar-cal{font-size:38px;color:var(--gold)}
+.fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:90}
+.fx i{position:absolute;top:-24px;width:10px;height:12px;animation:fxfall linear forwards}
+@keyframes fxfall{to{transform:translateY(calc(100vh + 40px)) rotate(420deg)}}
+:root[data-skin="emerald"]{--primary:#1F8F5F;--primary-d:#156B46}
+:root[data-skin="nile"]{--primary:#2775A8;--primary-d:#1C5880}
+:root[data-skin="teal"]{--primary:#0E8A8A;--primary-d:#096565}
+:root[data-skin="ruby"]{--primary:#C5364A;--primary-d:#912436}
+:root[data-skin="rose"]{--primary:#B93C72;--primary-d:#882A52}
+:root[data-skin="saffron"]{--primary:#A8720B;--primary-d:#7A5207}
+:root[data-skin="violet"]{--primary:#6D3FC9;--primary-d:#4F2B96}
+:root[data-skin="plum"]{--primary:#8E3362;--primary-d:#692446}
+:root[data-skin="ebony"]{--primary:#3E3A4E;--primary-d:#26233A}
 </style>
 </head>
 <body>
@@ -575,7 +650,7 @@ input[type=range]{accent-color:var(--sky);width:160px}
 <section class="lesson" id="lesson" hidden aria-label="Lesson">
   <div class="lhead"><div class="wrap">
     <button class="x" id="quit" aria-label="Quit lesson"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
-    <div class="bar" role="progressbar" aria-label="Lesson progress"><i id="bar"></i></div>
+    <div class="bar" role="progressbar" aria-label="Lesson progress"><i id="bar"></i></div><div class="tarab" id="tarab" aria-hidden="true"></div>
     <span class="kbd-hint"><kbd>Space</kbd> replay <kbd>Enter</kbd> continue</span>
   </div></div>
   <div class="lbody"><div class="wrap" id="lbody"></div></div>
@@ -724,7 +799,7 @@ const SCALE = [48,50,52,53,55,57,59,60];   // C Ajam (major) in first position: 
 const KEY = 'samaa.v1';
 const DEFAULT = { xp:0, streak:0, bestStreak:0, lastDay:null, done:{}, daily:{}, lessons:0,
   pearls:50, freezes:0, frozen:[], boostUntil:0, perfects:0, badges:[], chests:[], joined:null, player:'Oud player', goal:20,
-  q:{ date:null }, gear:{ owned:[], worn:null }, notice:null, ear:{}, onboarded:false, guest:false, owner:null, country:null, pending:[],
+  q:{ date:null }, gear:{ owned:[], worn:null }, equip:{ wood:null, theme:null, voice:null, fx:null, frame:null, title:null }, tokens:{ hint:0, try:0 }, cards:{}, dailyCh:{}, weekChest:null, rankSeen:null, lostStreak:0, boostX:2, notice:null, ear:{}, onboarded:false, guest:false, owner:null, country:null, pending:[],
   maqam:'rast', settings:{ names:'western', sens:6, tap:false, tuning:'FF', mic2:true, volume:0.8, tonic:true, theme:'system' } };
 function load(){
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return {...JSON.parse(JSON.stringify(DEFAULT)), ...s, settings:{...DEFAULT.settings, ...(s.settings||{})}}; } catch(e){}
@@ -756,7 +831,7 @@ function mergeStates(a, b){
   const [hi, lo] = (a.xp || 0) >= (b.xp || 0) ? [a, b] : [b, a];
   const m = JSON.parse(JSON.stringify(hi));
   const maxMap = k => { m[k] = m[k] || {}; for (const [x, v] of Object.entries(lo[k] || {})) m[k][x] = Math.max(m[k][x] || 0, v); };
-  maxMap('done'); maxMap('daily');
+  maxMap('done'); maxMap('daily'); maxMap('cards'); maxMap('dailyCh');
   const union = (o, k) => [...new Set([...(o[k] || []), ...((k === 'owned' ? lo.gear?.owned : lo[k]) || [])])];
   m.badges = union(m, 'badges'); m.chests = union(m, 'chests'); m.frozen = union(m, 'frozen');
   m.gear = m.gear || { owned:[], worn:null }; m.gear.owned = union(m.gear, 'owned');
@@ -768,7 +843,7 @@ function mergeStates(a, b){
 /* ---------- accounts & cloud save (Supabase) ----------
    Fill in config.js to switch accounts on. Without it the app runs in guest mode on this device. */
 const CFG = window.SAMAA_CONFIG || {};
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.2';
 const Cloud = {
   sb:null, user:null, me:null, timer:null, status:'off', flushing:false,
   enabled(){ return !!this.sb; },
@@ -847,7 +922,7 @@ function settleStreak(){
     S.freezes -= missed;
     const y = new Date(); y.setDate(y.getDate() - 1); S.lastDay = dayKey(y);
     S.notice = `${missed > 1 ? `${missed} streak freezes` : 'A streak freeze'} saved your ${S.streak}-day streak.`;
-  } else S.streak = 0;
+  } else { if (S.streak > 0) S.lostStreak = S.streak; S.streak = 0; }
   save();
 }
 /* today's counters for daily quests */
@@ -873,15 +948,17 @@ async function ensureCtx(){
   return ctx;
 }
 const pluckCache = new Map();
+const VOICES = { oud:[.45, 1], guitar:[.72, 1], harp:[.6, 1.5], buzuq:[.25, 1.25], qanun:[.15, .8], santur:[.05, 1.3] };
 function pluckBuffer(m){
-  if (pluckCache.has(m)) return pluckCache.get(m);
+  const vid = S.equip.voice || 'oud', [soft, ring] = VOICES[vid] || VOICES.oud, ck = `${vid}|${m}`;
+  if (pluckCache.has(ck)) return pluckCache.get(ck);
   const sr = ctx.sampleRate, f = mtof(m), dur = 2.4, len = Math.floor(sr * dur);
   const y = new Float32Array(len);
   const D = sr / f - 0.5;                 // averaging filter adds half a sample of delay
   const n0 = Math.ceil(D) + 2;
   let lp = 0;
-  for (let i = 0; i < n0; i++){ lp = lp * 0.45 + (Math.random()*2 - 1) * 0.55; y[i] = lp; }  // plectrum noise burst
-  const t60 = Math.max(1.2, 3.2 - (m - 36) * 0.06);
+  for (let i = 0; i < n0; i++){ lp = lp * soft + (Math.random()*2 - 1) * (1 - soft); y[i] = lp; }  // plectrum noise burst
+  const t60 = Math.max(1.2, 3.2 - (m - 36) * 0.06) * ring;
   const g = Math.pow(0.001, 1 / (f * t60));
   for (let i = n0; i < len; i++){
     const p = i - D, i0 = Math.floor(p), fr = p - i0;
@@ -893,7 +970,7 @@ function pluckBuffer(m){
   const fade = Math.floor(sr * 0.06);
   for (let i = 0; i < len; i++){ y[i] /= (peak || 1); if (i > len - fade) y[i] *= (len - i) / fade; }
   const buf = ctx.createBuffer(1, len, sr); buf.copyToChannel(y, 0);
-  pluckCache.set(m, buf); return buf;
+  pluckCache.set(ck, buf); return buf;
 }
 function playNote(m, when, dur){
   const src = ctx.createBufferSource(); src.buffer = pluckBuffer(m);
@@ -1210,6 +1287,9 @@ const ex = {
   },
   echo(notes, opts = {}){ return { type:'echo', notes, dur:opts.dur || 0.9, replays:opts.replays ?? Infinity, slow:opts.slow !== false, ...(opts.iqa ? { iqa:opts.iqa } : {}) }; },
   scale:(notes, label) => ({ type:'scale', notes, label }),
+  degree(mq){ const sc = (mq ? mq.scale : SCALE).slice(0, 6), i = 1 + rnd(sc.length - 1), others = shuffle(sc.map((_, k) => k).filter(k => k && k !== i)).slice(0, 3);
+    return { type:'degree', scale:sc, notes:[sc[0], sc[i]], choices:[i, ...others].sort((a, b) => a - b), answer:i }; },
+  answer:(mq) => ({ type:'answer', mq:mq.id, call:phrase(mq.id, 3, null, () => shuffle(mq.scale).slice(0, 3)) }),
   /* a phrase played twice; the second time one note moves to a neighbour */
   odd(notes, pool){
     const i = rnd(notes.length), alt = notes.slice();
@@ -1572,7 +1652,7 @@ function go(t){
 }
 
 /* ---------- rewards: XP, pearls, streak, quests, achievements ---------- */
-const xpMult = () => Date.now() < S.boostUntil ? 2 : 1;
+const xpMult = () => Date.now() < S.boostUntil ? (S.boostX || 2) : 1;
 function toast(text, amount, ico = 'i-pearl'){
   const t = document.createElement('div'); t.className = 'toast';
   t.innerHTML = `${icon(ico)}<span>${text}</span>${amount ? `<b>${amount}</b>` : ''}`;
@@ -1646,16 +1726,84 @@ const SHOP = {
     { id:'freeze', name:'Streak freeze', desc:'Keeps your streak alive on a day you miss. Hold up to 2.', price:100, icon:'i-freeze', c:'--sky',
       can:() => S.freezes < 2, why:'2 equipped', buy:() => { S.freezes++; }, count:() => `${S.freezes}/2 equipped` },
     { id:'boost', name:'Double XP', desc:'Earn twice the XP for the next 15 minutes.', price:80, icon:'i-bolt', c:'--violet',
-      can:() => Date.now() > S.boostUntil, why:'Active', buy:() => { S.boostUntil = Date.now() + 15 * 60e3; } },
+      can:() => Date.now() > S.boostUntil, why:'Active', buy:() => { S.boostUntil = Date.now() + 15 * 60e3; S.boostX = 2; } },
+    { id:'triple', name:'Triple XP', desc:'Earn three times the XP for the next 10 minutes.', price:160, icon:'i-bolt', c:'--plum',
+      can:() => Date.now() > S.boostUntil, why:'Active', buy:() => { S.boostUntil = Date.now() + 10 * 60e3; S.boostX = 3; } },
+    { id:'hint', name:'Hint', desc:'Crosses out one wrong answer on a question.', price:40, icon:'i-ear', c:'--good',
+      can:() => true, buy:() => { S.tokens.hint++; }, count:() => `You have ${S.tokens.hint}` },
+    { id:'hintpack', name:'Hint pack', desc:'Five hints for the price of four.', price:160, icon:'i-ear', c:'--good',
+      can:() => true, buy:() => { S.tokens.hint += 5; } },
+    { id:'extra', name:'Extra try', desc:'A third try on a question, used for you when you need it.', price:50, icon:'i-star', c:'--amber',
+      can:() => true, buy:() => { S.tokens.try++; }, count:() => `You have ${S.tokens.try}` },
+    { id:'repair', name:'Streak repair', desc:'Brings back a streak you lost.', price:300, icon:'i-fire', c:'--coral',
+      can:() => S.lostStreak > 0, why:'Nothing to repair', count:() => S.lostStreak ? `Yours was ${S.lostStreak} days` : '',
+      buy:() => { const y = new Date(); y.setDate(y.getDate() - 1); S.streak += S.lostStreak; S.lostStreak = 0; if (S.lastDay !== dayKey()) S.lastDay = dayKey(y); S.bestStreak = Math.max(S.bestStreak, S.streak); } },
+    { id:'mystery', name:'Mystery box', desc:'A card plus a surprise: pearls, hints or extra tries.', price:120, icon:'i-chest', c:'--amber',
+      can:() => true, buy:() => { dropCard(); const r = rnd(3);
+        if (r === 0){ const p = 60 + rnd(141); S.pearls += p; setTimeout(() => { toast('Mystery box', `+${p}`); renderStats(); }, 1000); }
+        else if (r === 1){ S.tokens.hint += 3; setTimeout(() => toast('Mystery box: 3 hints', ''), 1000); }
+        else { S.tokens.try += 2; setTimeout(() => toast('Mystery box: 2 extra tries', ''), 1000); } } },
   ],
   gear:[
-    { id:'tarboush', name:'Tarboush', price:150 }, { id:'shades', name:'Sunglasses', price:120 },
-    { id:'headphones', name:'Studio headphones', price:200 }, { id:'jasmine', name:'Jasmine flower', price:60 },
-    { id:'bowtie', name:'Bow tie', price:90 }, { id:'crown', name:'Golden crown', price:400 },
-  ],
+    ['jasmine', 'Jasmine flower', 60], ['rose', 'Red rose', 60], ['headband', 'Headband', 70], ['moustache', 'Moustache', 80], ['beanie', 'Beanie', 90], ['bowtie', 'Bow tie', 90],
+    ['glasses', 'Round glasses', 100], ['tie', 'Silk tie', 100], ['bandana', 'Bandana', 110], ['shades', 'Sunglasses', 120], ['party', 'Party hat', 120], ['scarf', 'Warm scarf', 130],
+    ['beret', 'Beret', 140], ['monocle', 'Monocle', 140], ['tarboush', 'Tarboush', 150], ['notes', 'Floating notes', 150], ['flowers', 'Flower crown', 170], ['strawhat', 'Straw hat', 180],
+    ['eyepatch', 'Eye patch', 180], ['headphones', 'Studio headphones', 200], ['ghutra', 'Ghutra and agal', 220], ['turban', 'Turban', 240], ['chef', 'Chef hat', 240], ['cowboy', 'Cowboy hat', 260],
+    ['beard', 'Wise beard', 260], ['gradcap', 'Graduation cap', 280], ['pearlset', 'Pearl necklace', 300], ['medal', 'Gold medal', 320], ['pirate', 'Pirate hat', 340], ['wizard', 'Wizard hat', 360],
+    ['starshades', 'Star shades', 380], ['crown', 'Golden crown', 400], ['chain', 'Gold chain', 450], ['viking', 'Viking helmet', 500], ['tiara', 'Pearl tiara', 650], ['halo', 'Halo', 900],
+  ].map(([id, name, price]) => ({ id, name, price })),
+  wood:[['walnut', 'Walnut', 150, 'sepia(.4) saturate(1.2) brightness(.8)'], ['cedar', 'Cedar', 180, 'hue-rotate(-14deg) saturate(1.5)'], ['olive', 'Olive wood', 200, 'hue-rotate(28deg) saturate(.9)'], ['rosewood', 'Rosewood', 240, 'hue-rotate(-30deg) saturate(1.6) brightness(.82)'],
+    ['ebony', 'Ebony', 300, 'grayscale(.8) brightness(.55)'], ['maple', 'Pale maple', 300, 'brightness(1.2) saturate(.75)'], ['lapis', 'Lapis inlay', 500, 'hue-rotate(185deg) saturate(1.3)'], ['emerald', 'Emerald inlay', 500, 'hue-rotate(95deg) saturate(1.2)']].map(([id, name, price, f]) => ({ id, name, price, f })),
+  theme:[['emerald', 'Emerald', 200, '#1F8F5F'], ['nile', 'Nile', 200, '#2775A8'], ['teal', 'Oasis', 200, '#0E8A8A'], ['ruby', 'Ruby', 250, '#C5364A'], ['rose', 'Damask rose', 250, '#B93C72'],
+    ['saffron', 'Saffron', 250, '#A8720B'], ['violet', 'Violet', 300, '#6D3FC9'], ['plum', 'Plum', 300, '#8E3362'], ['ebony', 'Ebony', 350, '#3E3A4E']].map(([id, name, price, hex]) => ({ id, name, price, hex })),
+  voice:[['guitar', 'Nylon guitar', 250], ['harp', 'Harp', 300], ['buzuq', 'Buzuq', 350], ['qanun', 'Qanun', 400], ['santur', 'Santur', 450]].map(([id, name, price]) => ({ id, name, price })),
+  fx:[['confetti', 'Confetti', 100], ['pearls', 'Pearl rain', 150], ['petals', 'Rose petals', 180], ['stars', 'Gold stars', 200], ['gold', 'Gold leaf', 240], ['lanterns', 'Lanterns', 280]].map(([id, name, price]) => ({ id, name, price })),
+  frame:[['gold', 'Gold', 150, '#D9B25F'], ['emerald', 'Emerald', 150, '#2EA86B'], ['ruby', 'Ruby', 150, '#E2475C'], ['lapis', 'Lapis', 150, '#3D5BD9'], ['amethyst', 'Amethyst', 180, '#8E5BE8'], ['rose', 'Rose', 180, '#D35488'], ['pearl', 'Pearl', 220, '#E8E4DA'], ['ebony', 'Ebony', 220, '#24213D']].map(([id, name, price, hex]) => ({ id, name, price, hex })),
+  title:[['patient', 'The Patient Ear', 100], ['night', 'Night Player', 120], ['strings', 'Friend of Strings', 150], ['qafla', 'Master of Qafla', 180], ['coffee', 'Coffee and Oud', 180], ['quarter', 'Quarter-tone Hunter', 220],
+    ['wanderer', 'Maqam Wanderer', 240], ['majlis', 'Star of the Majlis', 280], ['sultan', 'Pocket Sultan', 340], ['legend', 'Living Legend', 500]].map(([id, name, price]) => ({ id, name, price })),
 };
+const SHOP_TABS = [['power', 'Power-ups'], ['gear', 'Outfits'], ['wood', 'Oud wood'], ['theme', 'Colours'], ['voice', 'Sounds'], ['fx', 'Celebrate'], ['frame', 'Frames'], ['title', 'Titles']];
+const owned = (tab, id) => S.gear.owned.includes(tab === 'gear' ? id : `${tab}-${id}`);
+const isOn = (tab, id) => tab === 'gear' ? S.gear.worn === id : S.equip[tab] === id;
+function setOn(tab, id){
+  if (tab === 'gear'){ S.gear.worn = id; if (Cloud.user) Cloud.setProfile({ avatar:S.gear.worn }); }
+  else S.equip[tab] = id;
+  if (tab === 'theme') paintSkin();
+  save();
+}
+function paintSkin(){ const r = document.documentElement; if (S.equip.theme) r.dataset.skin = S.equip.theme; else delete r.dataset.skin; }
 /* outfits for Oudi, drawn over the oud mascot (120×120) */
 const GEAR_SVG = {
+  rose:`<path d="M84 44q-4 8-1 15" stroke="#3B7D3B" stroke-width="2.5" fill="none"/><circle cx="84" cy="38" r="8" fill="#C5364A"/><path d="M79 38a5 5 0 0 1 9-3M81 41a4 4 0 0 0 6 0" stroke="#8A1F2F" stroke-width="1.6" fill="none"/>`,
+  headband:`<path d="M38 36Q60 24 82 36L82 43Q60 31 38 43Z" fill="#E2475C"/><path d="M38 40Q60 28 82 40" stroke="#fff" stroke-width="1.6" fill="none" opacity=".7"/>`,
+  moustache:`<path d="M60 66C54 62 45 63 41 70C49 70 55 70 60 68C65 70 71 70 79 70C75 63 66 62 60 66Z" fill="#3A2415"/>`,
+  beanie:`<path d="M39 34C39 8 81 8 81 34Z" fill="#3B9DD6"/><rect x="36" y="30" width="48" height="9" rx="4" fill="#2775A8"/><circle cx="60" cy="9" r="5" fill="#fff"/>`,
+  glasses:`<circle cx="46" cy="57" r="10" fill="#fff" fill-opacity=".14" stroke="#2B2B3A" stroke-width="3"/><circle cx="74" cy="57" r="10" fill="#fff" fill-opacity=".14" stroke="#2B2B3A" stroke-width="3"/><path d="M56 56h8" stroke="#2B2B3A" stroke-width="3"/>`,
+  tie:`<path d="M54 32h12l-3 8 5 24-8 8-8-8 5-24Z" fill="#C5364A"/><path d="M54 32h12l-3 8h-6Z" fill="#912436"/>`,
+  bandana:`<path d="M38 36C38 14 82 14 82 36Z" fill="#C5364A"/><path d="M82 34l12 5-9 4Z" fill="#912436"/><circle cx="52" cy="26" r="2" fill="#fff"/><circle cx="66" cy="23" r="2" fill="#fff"/><circle cx="72" cy="31" r="2" fill="#fff"/>`,
+  party:`<path d="M60 2L44 36H76Z" fill="#8E5BE8"/><path d="M52 19L68 24M47 30L72 32" stroke="#F5C534" stroke-width="3"/><circle cx="60" cy="3" r="4" fill="#EBA233"/>`,
+  scarf:`<path d="M38 36Q60 48 82 36L84 45Q60 58 36 45Z" fill="#2EA86B"/><path d="M70 48l10-3 4 26-11 2Z" fill="#1D7D4E"/><path d="M74 66l9-1M74 61l8-1" stroke="#fff" stroke-width="1.4" opacity=".6"/>`,
+  beret:`<ellipse cx="58" cy="28" rx="27" ry="12" fill="#3E3A4E" transform="rotate(-8 58 28)"/><rect x="58" y="12" width="3" height="6" fill="#3E3A4E"/>`,
+  monocle:`<circle cx="74" cy="57" r="10" fill="#fff" fill-opacity=".14" stroke="#C9A24E" stroke-width="3"/><path d="M83 62q4 12 2 26" stroke="#C9A24E" stroke-width="1.6" fill="none"/>`,
+  notes:`<path d="M92 20v16a5 4 0 1 1-3-4V22l12-3v14a5 4 0 1 1-3-4V21Z" fill="#8E5BE8"/><path d="M22 34v13a4 3.4 0 1 1-3-3V34Z" fill="#14A0B4"/><path d="M22 34q7 2 7 8q-3-4-7-4Z" fill="#14A0B4"/>`,
+  flowers:[38, 49, 60, 71, 82].map((x, i) => `<circle cx="${x}" cy="${[33, 27, 25, 27, 33][i]}" r="6.5" fill="${['#D35488', '#F5C534', '#E2475C', '#fff', '#8E5BE8'][i]}"/><circle cx="${x}" cy="${[33, 27, 25, 27, 33][i]}" r="2.2" fill="#B57411"/>`).join(''),
+  strawhat:`<ellipse cx="60" cy="33" rx="38" ry="9" fill="#E7C877"/><path d="M42 33C42 8 78 8 78 33Z" fill="#EFD68F"/><path d="M42 28Q60 34 78 28V33Q60 39 42 33Z" fill="#C5364A"/>`,
+  eyepatch:`<path d="M36 42L84 64" stroke="#141B1A" stroke-width="2.5"/><ellipse cx="46" cy="57" rx="10" ry="9" fill="#141B1A"/>`,
+  ghutra:`<path d="M30 74C26 30 40 14 60 14C80 14 94 30 90 74L82 74C86 44 76 38 60 38C44 38 34 44 38 74Z" fill="#fff" stroke="#DDD5C6" stroke-width="1.4"/><ellipse cx="60" cy="22" rx="24" ry="6" fill="none" stroke="#141B1A" stroke-width="4"/><ellipse cx="60" cy="28" rx="26" ry="6" fill="none" stroke="#141B1A" stroke-width="3"/>`,
+  turban:`<path d="M34 34C30 8 90 8 86 34C80 40 40 40 34 34Z" fill="#F2E7D5" stroke="#CDBFA6" stroke-width="1.5"/><path d="M36 28Q60 10 84 22M38 34Q62 16 86 28" stroke="#CDBFA6" stroke-width="2" fill="none"/><circle cx="60" cy="24" r="4.5" fill="#2EA86B" stroke="#C9A24E" stroke-width="1.6"/>`,
+  chef:`<path d="M42 37V24C30 22 32 6 46 10C50 2 70 2 74 10C88 6 90 22 78 24V37Z" fill="#fff" stroke="#DDD5C6" stroke-width="1.5"/><path d="M42 31H78" stroke="#DDD5C6" stroke-width="1.5"/>`,
+  cowboy:`<path d="M20 30C34 40 86 40 100 30C96 38 80 42 60 42C40 42 24 38 20 30Z" fill="#8A5A2B"/><path d="M42 34C40 8 52 12 60 15C68 12 80 8 78 34C70 38 50 38 42 34Z" fill="#A36B34"/><path d="M42 31Q60 37 78 31" stroke="#5E3B1C" stroke-width="3" fill="none"/>`,
+  beard:`<path d="M42 66C42 96 78 96 78 66C72 72 66 70 60 69C54 70 48 72 42 66Z" fill="#E8E4DA" stroke="#C8C1B2" stroke-width="1.2"/>`,
+  gradcap:`<path d="M60 8L98 22L60 36L22 22Z" fill="#24213D"/><path d="M42 29V38Q60 46 78 38V29L60 36Z" fill="#35315A"/><path d="M60 22L90 26V40" stroke="#F5C534" stroke-width="2" fill="none"/><circle cx="90" cy="42" r="3" fill="#F5C534"/>`,
+  pearlset:[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => { const a = (20 + i * 17.5) * Math.PI / 180; return `<circle cx="${(60 + 25 * Math.cos(a)).toFixed(1)}" cy="${(30 + 18 * Math.sin(a)).toFixed(1)}" r="3.4" fill="#fff" stroke="#CFC6B5" stroke-width=".9"/>`; }).join(''),
+  medal:`<path d="M50 34L60 60L70 34" stroke="#E2475C" stroke-width="6" fill="none"/><circle cx="60" cy="66" r="11" fill="#F5C534" stroke="#C27A0C" stroke-width="2"/><path d="M60 59l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.4 5-.6Z" fill="#C27A0C"/>`,
+  pirate:`<path d="M26 36C36 2 84 2 94 36C78 26 42 26 26 36Z" fill="#1E1C2C"/><circle cx="60" cy="19" r="5" fill="#fff"/><path d="M53 27l14-3M53 24l14 3" stroke="#fff" stroke-width="2"/>`,
+  wizard:`<path d="M64 0L38 36H84Z" fill="#3D3A9E"/><ellipse cx="60" cy="36" rx="32" ry="6" fill="#2F2C7E"/><circle cx="58" cy="22" r="2.5" fill="#F5C534"/><circle cx="68" cy="14" r="2" fill="#F5C534"/><circle cx="66" cy="29" r="2" fill="#F5C534"/>`,
+  starshades:`<path d="${[46, 74].map(c => `M${c} 45l3.5 7.4 8 1-5.8 5.6 1.4 8-7.1-3.8-7.1 3.8 1.4-8-5.8-5.6 8-1Z`).join('')}" fill="#F5C534" stroke="#C27A0C" stroke-width="1.5"/><path d="M56 56h8" stroke="#C27A0C" stroke-width="2.5"/>`,
+  chain:`<path d="M38 36Q60 80 82 36" stroke="#F5C534" stroke-width="4" stroke-dasharray="5 2.5" fill="none"/><path d="M60 58l9 9-9 9-9-9Z" fill="#F5C534" stroke="#C27A0C" stroke-width="1.5"/>`,
+  viking:`<path d="M38 36C38 8 82 8 82 36Z" fill="#8D97A5"/><rect x="36" y="31" width="48" height="7" rx="3" fill="#6B7482"/><path d="M38 30C24 28 20 14 26 6C28 16 34 20 42 22ZM82 30C96 28 100 14 94 6C92 16 86 20 78 22Z" fill="#F2E7D5" stroke="#CDBFA6" stroke-width="1.2"/>`,
+  tiara:`<path d="M40 34L46 20L53 28L60 12L67 28L74 20L80 34Q60 27 40 34Z" fill="#E8E4DA" stroke="#B9C4CF" stroke-width="1.5"/><circle cx="60" cy="13" r="3.2" fill="#fff" stroke="#B9C4CF"/><circle cx="46" cy="21" r="2.3" fill="#fff" stroke="#B9C4CF"/><circle cx="74" cy="21" r="2.3" fill="#fff" stroke="#B9C4CF"/>`,
+  halo:`<ellipse cx="60" cy="12" rx="24" ry="7" fill="none" stroke="#F5C534" stroke-width="5"/><ellipse cx="60" cy="12" rx="24" ry="7" fill="none" stroke="#FFF3C4" stroke-width="1.5"/>`,
   tarboush:`<path d="M43 34 L77 34 L72 7 L48 7 Z" fill="#C8313A"/><rect x="41" y="30" width="38" height="7" rx="2" fill="#9E2129"/><path d="M60 7 C66 11 70 18 72 27" stroke="#1B2928" stroke-width="2.5" fill="none"/><circle cx="72" cy="28" r="3.2" fill="#1B2928"/>`,
   shades:`<rect x="35" y="50" width="22" height="15" rx="6" fill="#141B1A"/><rect x="63" y="50" width="22" height="15" rx="6" fill="#141B1A"/><rect x="56" y="54" width="8" height="3.5" fill="#141B1A"/><path d="M39 54h7M67 54h7" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/>`,
   headphones:`<path d="M21 66 C21 18 99 18 99 66" stroke="#2B3836" stroke-width="7" fill="none" stroke-linecap="round"/><rect x="12" y="56" width="16" height="25" rx="7" fill="#E5504A"/><rect x="92" y="56" width="16" height="25" rx="7" fill="#E5504A"/>`,
@@ -1669,9 +1817,11 @@ const MOUTH = {
   wow:`<ellipse cx="60" cy="74" rx="4.4" ry="5.4" fill="#5E1F2B"/><ellipse cx="60" cy="76.5" rx="2.6" ry="1.8" fill="#F28B82"/>`,
   sad:`<path d="M53.5 76Q60 70.5 66.5 76" stroke="#5E1F2B" stroke-width="2.8" stroke-linecap="round" fill="none"/><path d="M82 63q2.6 4 0 6.2q-2.6-2.2 0-6.2Z" fill="#7CC3F0"/>`,
 };
-function mascot(gear = S.gear.worn, cls = '', size, mood){
+function mascot(gear, cls = '', size, mood, wood){
+  const mine = gear === undefined; if (mine) gear = S.gear.worn;
+  const w = wood !== undefined ? wood : mine ? S.equip.wood : null, f = w && (SHOP.wood.find(x => x.id === w) || {}).f;
   mood = mood || (/bounce/.test(cls) ? 'happy' : 'calm');
-  return `<svg class="mascot ${cls}" viewBox="0 0 120 120" ${size ? `style="width:${size}px;height:${size}px"` : ''} aria-hidden="true"><use href="#oud-mini"/>${MOUTH[mood] || ''}${GEAR_SVG[gear] || ''}</svg>`;
+  return `<svg class="mascot ${cls}" viewBox="0 0 120 120" ${size ? `style="width:${size}px;height:${size}px"` : ''} aria-hidden="true"><use href="#oud-mini" ${f ? `style="filter:${f}"` : ''}/>${MOUTH[mood] || ''}${GEAR_SVG[gear] || ''}</svg>`;
 }
 function buy(it){
   if (S.pearls < it.price){ toast(`You need ${it.price - S.pearls} more pearls`, ''); return false; }
@@ -1680,28 +1830,41 @@ function buy(it){
   save(); toast(`${it.name}: yours`, `−${it.price}`); checkBadges(); renderStats();
   return true;
 }
+function shopPreview(tab, it){
+  if (tab === 'gear') return mascot(it.id, '', undefined, undefined, S.equip.wood);
+  if (tab === 'wood') return mascot(S.gear.worn, '', undefined, undefined, it.id);
+  if (tab === 'theme') return `<span class="swatch" style="background:${it.hex}"></span>`;
+  if (tab === 'frame') return `<span class="ring" style="--ring:${it.hex}">${mascot()}</span>`;
+  if (tab === 'title') return `<span class="title-prev">${it.name}</span>`;
+  return `<button class="speak small" data-try="${it.id}" aria-label="Try ${it.name}">${icon(tab === 'voice' ? 'i-speaker' : 'i-star')}</button>`;
+}
 function renderShop(){
-  const left = Math.ceil((S.boostUntil - Date.now()) / 60000);
-  $('#view').innerHTML = `<div class="stack">
-    <div class="shop-head"><h2 class="section-title" style="margin:0">Shop</h2><span class="wallet" title="Your pearls">${icon('i-pearl')}${S.pearls}</span></div>
-    <p class="ex-sub" style="margin:0">Earn pearls by finishing lessons, daily quests and achievements.</p>
-    <h3>Power-ups</h3>
-    <div class="items">${SHOP.power.map(it => { const ok = it.can();
+  const tab = S.shopTab || 'power', left = Math.ceil((S.boostUntil - Date.now()) / 60000);
+  const buyBtn = it => { const own = owned(tab, it.id), on = isOn(tab, it.id);
+    return `<button class="btn ${own ? 'ghost' : ''}" data-cos="${it.id}" ${!own && S.pearls < it.price ? 'disabled' : ''}>${on ? 'Take off' : own ? 'Use' : `${icon('i-pearl')}${it.price}`}</button>`; };
+  const grid = tab === 'power' ? `<div class="items">${SHOP.power.map(it => { const ok = it.can(), n = it.count ? it.count() : '';
       return `<div class="item" style="--c:var(${it.c})"><span class="ii">${icon(it.icon)}</span>
-        <div><b>${it.name}</b><p>${it.id === 'boost' && !ok ? `Active, ${left} min left.` : it.desc}${it.count ? ` ${it.count()}.` : ''}</p></div>
-        <button class="btn price" data-buy="${it.id}" ${ok && S.pearls >= it.price ? '' : 'disabled'}>${ok ? `${icon('i-pearl')}${it.price}` : it.why}</button></div>`; }).join('')}</div>
-    <h3>Oudi's wardrobe</h3>
-    <div class="gear-grid">${SHOP.gear.map(g => { const own = S.gear.owned.includes(g.id), worn = S.gear.worn === g.id;
-      return `<div class="gear ${worn ? 'worn' : ''}">${mascot(g.id)}<b>${g.name}</b>
-        <button class="btn ${own ? 'ghost' : ''}" data-gear="${g.id}" ${!own && S.pearls < g.price ? 'disabled' : ''}>${worn ? 'Take off' : own ? 'Wear' : `${icon('i-pearl')}${g.price}`}</button></div>`; }).join('')}</div>
+        <div><b>${it.name}</b><p>${(it.id === 'boost' || it.id === 'triple') && !ok ? `Active, ${left} min left.` : it.desc}${n ? ` ${n}.` : ''}</p></div>
+        <button class="btn price" data-buy="${it.id}" ${ok && S.pearls >= it.price ? '' : 'disabled'}>${ok ? `${icon('i-pearl')}${it.price}` : it.why}</button></div>`; }).join('')}</div>`
+    : `<div class="gear-grid">${SHOP[tab].map(it => `<div class="gear ${isOn(tab, it.id) ? 'worn' : ''}">${shopPreview(tab, it)}<b>${it.name}</b>${buyBtn(it)}</div>`).join('')}</div>`;
+  $('#view').innerHTML = `<div class="stack">
+    <div class="shop-head"><h2 class="section-title" style="margin:0">Shop <span class="ar-t">السوق</span></h2><span class="wallet" title="Your pearls">${icon('i-pearl')}${S.pearls}</span></div>
+    <p class="ex-sub" style="margin:0">Earn pearls from lessons, quests, chests and the daily challenge.</p>
+    <div class="shop-tabs" role="tablist">${SHOP_TABS.map(([k, l]) => `<button role="tab" aria-selected="${k === tab}" data-tab-s="${k}">${l}</button>`).join('')}</div>
+    ${grid}
   </div>`;
+  document.querySelectorAll('[data-tab-s]').forEach(b => b.onclick = () => { S.shopTab = b.dataset.tabS; renderShop(); });
   document.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { buy(SHOP.power.find(x => x.id === b.dataset.buy)); renderShop(); });
-  document.querySelectorAll('[data-gear]').forEach(b => b.onclick = () => {
-    const g = SHOP.gear.find(x => x.id === b.dataset.gear);
-    if (S.gear.owned.includes(g.id)){ S.gear.worn = S.gear.worn === g.id ? null : g.id; save(); }
-    else buy(g);
-    if (Cloud.user) Cloud.setProfile({ avatar:S.gear.worn });
+  document.querySelectorAll('[data-cos]').forEach(b => b.onclick = () => {
+    const it = SHOP[tab].find(x => x.id === b.dataset.cos);
+    if (owned(tab, it.id)) setOn(tab, isOn(tab, it.id) ? null : it.id);
+    else buy({ ...it, buy:() => { S.gear.owned.push(tab === 'gear' ? it.id : `${tab}-${it.id}`); setOn(tab, it.id); } });
     renderShop();
+  });
+  document.querySelectorAll('[data-try]').forEach(b => b.onclick = async () => {
+    if (tab === 'fx') return celebrate(b.dataset.try, document.body);
+    const was = S.equip.voice; S.equip.voice = b.dataset.try;
+    await playSeq([48, 52, 55, 60], 0.32); S.equip.voice = was;
   });
 }
 document.querySelectorAll('.nav button').forEach(b => b.onclick = () => go(b.dataset.tab));
@@ -1722,7 +1885,7 @@ function showAuth(html){ $('#authCard').innerHTML = html; $('#auth').hidden = fa
 function hideAuth(){ $('#auth').hidden = true; document.body.style.overflow = ''; }
 const backBtn = () => `<button class="back" id="back">${icon('i-x')} Back</button>`;
 function authWelcome(){
-  showAuth(`<div class="auth-hero">${mascot(undefined, 'bounce')}<h1>Samaa <small>سماع</small></h1><p>Learn to play the oud by ear, one note at a time.</p></div>
+  showAuth(`<div class="auth-hero"><div class="arch"><svg viewBox="0 0 200 212" aria-hidden="true"><path d="M10 212V96C10 54 64 38 100 6C136 38 190 54 190 96V212" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>${mascot(undefined, 'bounce')}</div><h1>Samaa <small>سماع</small></h1><p>Learn to play the oud by ear, one note at a time.</p></div>
     <div class="perks">
       <div class="perk"><span class="qi" style="--c:var(--sky)">${icon('i-ear')}</span>Hear a note, play it back on your oud</div>
       <div class="perk"><span class="qi" style="--c:var(--amber)">${icon('i-tuner')}</span>Samaa listens and guides you higher or lower</div>
@@ -1972,7 +2135,7 @@ let boardScope = 'week';
 async function renderLeague(){
   const now = new Date(), days = 7 - ((now.getUTCDay() + 6) % 7);
   $('#view').innerHTML = `<div class="stack">
-    <div class="league-head"><div><h2 class="section-title" style="margin:0">World leaderboard</h2>
+    <div class="league-head"><div><h2 class="section-title" style="margin:0">World leaderboard <span class="ar-t">الترتيب</span></h2>
       <p class="ex-sub" style="margin:4px 0 0">${boardScope === 'week' ? `New week in ${days} day${days > 1 ? 's' : ''}` : 'All players, all time'}</p></div>
       <div class="seg" id="scope"><button data-v="week" aria-pressed="${boardScope === 'week'}">This week</button><button data-v="all" aria-pressed="${boardScope === 'all'}">All time</button></div></div>
     <div id="myRank"></div>
@@ -2022,12 +2185,14 @@ function renderLearn(){
   const q = today(), boost = xpMult() > 1;
   let html = `<div class="today-row">
     ${S.notice ? `<div class="notice">${icon('i-freeze')}<span>${S.notice}</span></div>` : ''}
+    ${rankHtml()}
     <div class="panel"><div class="panel-head"><h3>Daily quests</h3>
-      ${boost ? `<span class="tag" style="--c:var(--violet)">Double XP · ${Math.ceil((S.boostUntil - Date.now()) / 60000)} min</span>` : `<span class="muted-line" style="font-size:13px">New quests every day</span>`}</div>
+      ${boost ? `<span class="tag" style="--c:var(--violet)">${xpMult()}× XP · ${Math.ceil((S.boostUntil - Date.now()) / 60000)} min</span>` : `<span class="muted-line" style="font-size:13px">New quests every day</span>`}</div>
       <div class="quests">${QUESTS.map(Q => { const v = Math.min(Q.val(q), Q.target()), done = q.claimed.includes(Q.id);
         return `<div class="quest ${done ? 'done' : ''}" style="--c:var(${Q.c})"><span class="qi">${icon(done ? 'i-check' : Q.icon)}</span>
           <div><b>${Q.label()}</b><div class="qbar"><i style="width:${v / Q.target() * 100}%"></i><em>${v} / ${Q.target()}</em></div></div>
-          <span class="reward">${done ? 'Done' : `${icon('i-pearl')}${Q.reward}`}</span></div>`; }).join('')}</div></div>
+          <span class="reward">${done ? 'Done' : `${icon('i-pearl')}${Q.reward}`}</span></div>`; }).join('')}${weeklyHtml()}</div></div>
+    ${dailyHtml()}
     ${Cloud.enabled() && !Cloud.user && hasProgress(S) ? `<div class="banner-cta"><div><b>Save your progress</b><p>Create a free account so your streak and lessons are safe on every device.</p></div><button class="btn" id="saveAcct">Create account</button></div>` : ''}
     ${tricky().length >= 2 ? `<div class="practice-card" style="border-color:color-mix(in srgb,var(--coral) 45%,transparent)"><span class="qi" style="--c:var(--coral);width:56px;height:56px">${icon('i-ear')}</span>
       <div><h3>Tricky notes</h3><p>Practice the notes you miss most: ${tricky().map(t => t.label).join(', ')}.</p></div>
@@ -2044,6 +2209,8 @@ function renderLearn(){
   }
   $('#view').innerHTML = html;
   $('#practice').onclick = () => startLesson(null, true);
+  if ($('#dailyGo')) $('#dailyGo').onclick = () => startLesson('daily', true);
+  if ($('#weekOpen')) $('#weekOpen').onclick = openWeekly;
   if ($('#trickyGo')) $('#trickyGo').onclick = () => startLesson('tricky', true);
   if ($('#saveAcct')) $('#saveAcct').onclick = authSignup;
   document.querySelectorAll('[data-lesson]').forEach(b => b.onclick = () => lessonCard(b.dataset.lesson));
@@ -2069,12 +2236,13 @@ function levelHtml(lv, cur){
   const open = !lv.soon && levelOpen(lv), doneN = lv.lessons ? lv.lessons.filter(l => isDone(l.id)).length : 0, total = lv.lessons ? lv.lessons.length : 10;
   let html = `<section class="level" style="--c:var(${lv.c});--c-d:var(${lv.c}-d)">
     <div class="banner ${lv.soon ? 'locked' : ''}" style="background-color:var(--c)">
-      <div class="banner-txt"><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name} ${mq.ar}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p>
+      <div class="banner-txt"><div class="eyebrow">Level ${lv.id}${mq ? ` · Maqam ${mq.name}` : ''}</div><h2>${lv.title}</h2><p>${lv.desc}</p>
         ${lv.soon ? '' : `<div class="lvbar"><i style="width:${doneN / total * 100}%"></i></div><small class="lvcount">${doneN} of ${total} mini-levels${mastered(lv) ? ' · mastered' : ''}</small>`}</div>
       <div class="banner-act">
         ${lv.soon ? `<span class="soon">Coming soon</span>` : `<button class="guide-btn" data-guide="${lv.key}" aria-label="Guidebook">${icon('i-book')}<span>Guide</span></button>`}
         ${!lv.soon && mastered(lv) ? `<span class="soon on">${icon('i-trophy', 'mini')} Mastered</span>` : ''}
         ${!lv.soon && !open && prevLevel(lv) ? `<button class="jump-btn" data-jump="${lv.key}">Jump here?</button>` : ''}
+        ${mq ? `<span class="banner-ar" aria-hidden="true">${mq.ar}</span>` : ''}
       </div>
     </div><div class="path">`;
   const items = lv.lessons ? [...lv.lessons.slice(0, CHEST_AT), { chest:true }, ...lv.lessons.slice(CHEST_AT), lv.test] : times(4, (_, i) => ({ id:`${lv.id}-${i+1}`, soon:true }));
@@ -2181,9 +2349,169 @@ function lessonCard(id){
 
 /* ---------- Lesson runner ---------- */
 let L = null;
+/* ---------- ranks: ten titles, earned with XP ---------- */
+const RANKS = [
+  [0, 'Listener', 'مستمع'], [100, 'Student', 'طالب'], [300, 'Amateur', 'هاوٍ'], [700, 'Player', 'عازف'], [1500, 'True Listener', 'سمّيع'],
+  [3000, 'Skilled Hand', 'متقن'], [6000, 'Enchanter', 'مطرب'], [10000, 'Ustadh', 'أستاذ'], [16000, 'Maestro', 'موسيقار'], [25000, 'Sultan of Tarab', 'سلطان الطرب'],
+].map(([xp, en, ar]) => ({ xp, en, ar }));
+const rankIdx = (xp = S.xp) => { let i = 0; RANKS.forEach((r, k) => { if (xp >= r.xp) i = k; }); return i; };
+function rankHtml(){
+  const i = rankIdx(), r = RANKS[i], nx = RANKS[i + 1];
+  const pct = nx ? (S.xp - r.xp) / (nx.xp - r.xp) * 100 : 100;
+  return `<div class="rank-strip"><span class="ar-cal">${r.ar}</span><div><b>${r.en}</b><div class="qbar" style="--c:var(--gold)"><i style="width:${pct}%"></i></div>
+    <small>${nx ? `${nx.xp - S.xp} XP to ${nx.en}` : 'The highest rank'}</small></div></div>`;
+}
+function checkRank(){
+  const i = rankIdx();
+  if (S.rankSeen == null) S.rankSeen = i;
+  if (i > S.rankSeen){ S.rankSeen = i; S.pearls += 50; toast(`New rank: ${RANKS[i].en} ${RANKS[i].ar}`, '+50', 'i-trophy'); save(); renderStats(); }
+}
+
+/* ---------- the card album ---------- */
+const CARD_SETS = {
+  Maqamat: () => MAQAMAT.map(m => ({ id:`m${m.id}`, en:m.name, ar:m.ar, fact:`Maqam ${m.name}, starting from ${m.tonic}. ${m.sigText}` })),
+  Instruments: () => [['oud', 'Oud', 'عود', 'The fretless lute at the heart of Arabic music.'], ['qanun', 'Qanun', 'قانون', 'A plucked zither with small levers for quarter tones.'],
+    ['nay', 'Nay', 'ناي', 'An end-blown reed flute with a breathy voice.'], ['riq', 'Riq', 'رق', 'A small tambourine that leads the rhythm.'],
+    ['darbuka', 'Darbuka', 'دربكة', 'A goblet drum: Dum in the middle, Tak at the rim.'], ['kamanja', 'Kamanja', 'كمنجة', 'The violin, played the Arabic way.'],
+    ['buzuq', 'Buzuq', 'بزق', 'A long-necked fretted lute from the Levant.'], ['mijwiz', 'Mijwiz', 'مجوز', 'A double reed pipe heard at dabke dances.']].map(([id, en, ar, fact]) => ({ id, en, ar, fact })),
+  Rhythms: () => Object.entries(IQA).map(([id, r]) => ({ id:`r${id}`, en:r.name, ar:r.ar, fact:`One bar: ${iqaWords(id)}.` })),
+  Words: () => [['tarab', 'Tarab', 'طرب', 'The joy and rapture that music can bring.'], ['taqsim', 'Taqsim', 'تقسيم', 'A free, unmeasured improvisation in a maqam.'],
+    ['qafla', 'Qafla', 'قفلة', 'The closing phrase that brings a melody home.'], ['sayr', 'Sayr', 'سير', 'The path a maqam travels through its notes.'],
+    ['ghammaz', 'Ghammaz', 'غماز', 'A maqam\'s second home, where phrases rest.'], ['jins', 'Jins', 'جنس', 'A small group of notes. Maqamat are built from them.'],
+    ['samaa', "Sama'", 'سماع', 'Deep listening, and the name of this app.'], ['takht', 'Takht', 'تخت', 'The small classic ensemble of Arabic music.']].map(([id, en, ar, fact]) => ({ id, en, ar, fact })),
+};
+const allCards = () => Object.entries(CARD_SETS).flatMap(([set, f]) => f().map(c => ({ ...c, set })));
+/* gives one random card; a duplicate turns into pearls, a finished set pays a bonus */
+function dropCard(){
+  const all = allCards(), c = pick(all), had = S.cards[c.id] || 0;
+  S.cards[c.id] = had + 1;
+  if (had){ S.pearls += 5; toast(`Duplicate card: ${c.en}`, '+5'); }
+  else {
+    toast(`New card: ${c.en} ${c.ar}`, '', 'i-star');
+    const set = all.filter(x => x.set === c.set);
+    if (set.every(x => S.cards[x.id])){ S.pearls += 100; setTimeout(() => toast(`${c.set} set complete`, '+100', 'i-trophy'), 1200); }
+  }
+  save(); renderStats();
+  return c;
+}
+function albumHtml(){
+  const all = allCards(), have = all.filter(c => S.cards[c.id]).length;
+  return `<div class="panel stack"><div class="panel-head"><h3>Card album</h3><span class="muted-line" style="font-size:13px">${have} of ${all.length}</span></div>
+    ${Object.keys(CARD_SETS).map(set => `<div><p class="set-name">${set}</p><div class="cards">${all.filter(c => c.set === set).map(c =>
+      `<button class="acard ${S.cards[c.id] ? '' : 'none'}" data-card="${c.id}" aria-label="${S.cards[c.id] ? c.en : 'Card not found yet'}">${S.cards[c.id] ? `<span class="ar-cal">${c.ar}</span><small>${c.en}</small>` : icon('i-lock')}</button>`).join('')}</div></div>`).join('')}</div>`;
+}
+function wireAlbum(){
+  document.querySelectorAll('[data-card]').forEach(b => b.onclick = () => {
+    const c = allCards().find(x => x.id === b.dataset.card);
+    openModal(S.cards[c.id] ? `<div class="card-big"><span class="ar-cal">${c.ar}</span></div><h3>${c.en}</h3><p>${c.fact}</p><button class="btn wide" onclick="closeModal()">Nice</button>`
+      : `<h3>Not found yet</h3><p>Cards drop from lessons, the weekly chest and mystery boxes.</p><button class="btn wide" onclick="closeModal()">OK</button>`);
+  });
+}
+
+/* ---------- daily challenge and weekly chest ---------- */
+const WEEK_GOAL = 150;
+const playable = e => e.type === 'echo' || !!CHOICE[e.type];
+function dailyQueue(){
+  const pool = ALL.filter(x => isDone(x.id) && x.id !== '1-1' && !x.test);
+  const src = pool.length ? pool : [ALL[1]];
+  return shuffle(shuffle(src).slice(0, 6).flatMap(x => x.gen()).filter(playable)).slice(0, 8);
+}
+function dailyHtml(){
+  const stars = S.dailyCh[dayKey()];
+  return `<div class="practice-card"><span class="qi" style="--c:var(--amber);width:56px;height:56px">${icon('i-star')}</span>
+    <div><h3>Daily challenge</h3><p>${stars ? `Done today: ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}. A new one comes tomorrow.` : 'Eight exercises from what you know. Up to 50 pearls.'}</p></div>
+    ${stars ? '' : `<button class="btn ghost" id="dailyGo">Go</button>`}</div>`;
+}
+function weeklyHtml(){
+  const v = Math.min(weekXp(), WEEK_GOAL), got = S.weekChest === weekKey();
+  return `<div class="quest ${got ? 'done' : ''}" style="--c:var(--plum)"><span class="qi">${icon(got ? 'i-check' : 'i-chest')}</span>
+    <div><b>Weekly chest</b><div class="qbar"><i style="width:${v / WEEK_GOAL * 100}%"></i><em>${v} / ${WEEK_GOAL} XP</em></div></div>
+    ${got ? `<span class="reward">Done</span>` : v >= WEEK_GOAL ? `<button class="btn ghost weekly-open" id="weekOpen">Open</button>` : `<span class="reward">${icon('i-chest')}</span>`}</div>`;
+}
+function openWeekly(){
+  if (S.weekChest === weekKey() || weekXp() < WEEK_GOAL) return;
+  S.weekChest = weekKey();
+  const gift = 60 + rnd(61); S.pearls += gift; const c = dropCard();
+  openModal(`<div class="chest-pop">${icon('i-chest-open')}</div><h3>${gift} pearls and a card</h3><p>${c.en} ${c.ar}. ${c.fact}</p><button class="btn wide" id="ok">Collect</button>`, '--plum');
+  sfx(true); $('#ok').onclick = () => { closeModal(); renderLearn(); };
+}
+
+/* ---------- better practice: how each lesson is put together ----------
+   hum first (call and response), steps of the scale, phrases built up in chunks, a little mixed review,
+   and answering a phrase with your own. Tests stay plain. */
+function ladderOf(e){
+  const n = e.notes.length, lens = n >= 6 ? [2, 4] : [2, 3];
+  return [...lens.map(k => ({ ...e, notes:e.notes.slice(0, k), ladder:'The start of a phrase. It grows next.' })), { ...e, ladder:'Now the whole phrase.' }];
+}
+function learnify(ls, q){
+  if (ls.test || ls.id === '1-1' || !ls.gen) return q;
+  const mq = ls.mq && MAQ[ls.mq];
+  const at = q.findIndex(e => e.type === 'echo' && e.notes.length >= 4 && !e.iqa);
+  if (at >= 0) q.splice(at, 1, ...ladderOf(q[at]));
+  let k = 0;
+  q = q.map(e => e.type === 'echo' && e.notes.length > 1 && !e.iqa ? (k++ % 2 === 0 ? { ...e, hum:true } : e) : e);
+  const insert = e => q.splice(1 + rnd(Math.max(1, q.length)), 0, e);
+  if (ls.kind === 'listen' && (mq || isDone('1-4'))) insert({ ...ex.degree(mq), mq:ls.mq });
+  if (mq && ls.level && ls.level.id >= 3 && ls.kind !== 'listen' && ls.kind !== 'review') q.push(ex.answer(mq));
+  const earlier = shuffle(ALL.filter(x => x.id !== ls.id && x.gen && isDone(x.id) && !x.test && x.id !== '1-1' && (!x.mq || x.mq === ls.mq))).slice(0, 2);
+  for (const x of earlier){ const opts = x.gen().filter(playable); if (opts.length) insert({ ...pick(opts), from:true }); }
+  return q;
+}
+/* ----- exercise: answer the phrase with your own notes, ending at home ----- */
+function exAnswer(e, body){
+  const mq = MAQ[e.mq], sc = mq.scale, tonic = sc[0], len = 4, tol = GRID === 1 ? 0.45 : 0.32;
+  const got = []; let finished = false;
+  const render = () => {
+    if (L.cleanup){ L.cleanup(); L.cleanup = null; }
+    body.innerHTML = `<div class="ex-grid"><div class="ex-main">
+      <h2 class="ex-title">Answer the phrase</h2>
+      <p class="ex-sub">Play ${len} notes of your own in ${mq.name}. End at home on ${name(tonic)}.</p>
+      <div class="listen-row"><button class="speak" id="play" aria-label="Play the phrase">${icon('i-speaker')}</button></div>
+      <p class="replays">Any notes of the maqam are right</p>
+      <div class="slots">${times(len, (_, i) => `<div class="slot ${i < got.length ? 'ok' : i === got.length ? 'active' : ''}" data-i="${i}">${i < got.length ? name(got[i]) : i === len - 1 ? name(tonic) : '?'}</div>`).join('')}</div>
+      <p class="hint" id="hint" aria-live="polite"></p>
+      </div><div class="ex-side">${inputPanel()}</div></div>`;
+    footer(`<button class="btn ghost" id="skip">Can't play now</button><span></span>`);
+    $('#skip').onclick = skipEx;
+    $('#play').onclick = () => playSeq(e.call, 0.7);
+    L.cleanup = wireInput(render, onNote, () => {});
+    Mic.expect(null, tol);
+  };
+  const onNote = (m, tap) => {
+    if (finished) return;
+    const v = m - (tap ? 0 : Mic.offset), near = sc.find(x => Math.abs(fold(v - x)) < (tap ? GRID / 2 : tol));
+    const h = $('#hint'), i = got.length, el = document.querySelector(`.slot[data-i="${i}"]`);
+    if (near === undefined){ h.className = 'hint bad'; h.textContent = `${name(m)} isn't in ${mq.name}. Try a neighbour.`; return; }
+    if (i === len - 1 && Math.abs(fold(near - tonic)) > 0.01){ h.className = 'hint'; h.textContent = `Lovely. Now bring it home to ${name(tonic)}.`; return; }
+    got.push(near); el.className = 'slot ok'; el.textContent = name(near);
+    document.querySelector(`.slot[data-i="${i + 1}"]`)?.classList.add('active');
+    h.className = 'hint'; h.textContent = i === len - 2 ? `Now come home to ${name(tonic)}.` : '';
+    if (got.length === len){ finished = true; verdict(true, `Your answer: ${got.map(name).join(' – ')}`); }
+  };
+  render();
+  setTimeout(() => { if (L && L.queue[L.idx] === e) playSeq(e.call, 0.7); }, 350);
+}
+
+/* ---------- celebrations after a passed lesson ---------- */
+const FX = {
+  confetti:{ colors:['#E2475C', '#EBA233', '#2EA86B', '#3B9DD6', '#8E5BE8'], css:'border-radius:2px' },
+  stars:{ colors:['#D9B25F', '#F5C534', '#FFF3C4'], css:'clip-path:var(--clip-star)' },
+  petals:{ colors:['#E2475C', '#D35488', '#F7B7C8'], css:'border-radius:60% 0 60% 0' },
+  pearls:{ colors:['#FFFFFF', '#CFE8F5', '#F2E7D5'], css:'border-radius:50%' },
+  gold:{ colors:['#D9B25F', '#B58A33', '#F5C534'], css:'border-radius:1px;height:6px' },
+  lanterns:{ colors:['#EBA233', '#E2475C', '#14A0B4'], css:'border-radius:45% 45% 20% 20%;height:18px' },
+};
+function celebrate(id = S.equip.fx, host = $('#lesson')){
+  const f = FX[id]; if (!f || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = document.createElement('div'); box.className = 'fx'; box.setAttribute('aria-hidden', 'true');
+  box.innerHTML = times(36, () => `<i style="left:${rnd(100)}%;background:${pick(f.colors)};animation-delay:${(Math.random() * 0.7).toFixed(2)}s;animation-duration:${(1.6 + Math.random()).toFixed(2)}s;${f.css}"></i>`).join('');
+  host.appendChild(box); setTimeout(() => box.remove(), 3600);
+}
 function startLesson(id, practice = false, jump = false){
   let ls, queue;
-  if (id === 'tricky'){
+  if (id === 'daily'){
+    queue = dailyQueue(); ls = { id:'daily', title:'Daily challenge', level:{ c:'--amber' } };
+  } else if (id === 'tricky'){
     queue = shuffle(tricky().flatMap(t => [ex.echo([t.m]), ex.echo([t.m])].map(e => ({ ...e, mq:t.mq || undefined }))));
     ls = { id:'tricky', title:'Tricky notes', level:{ c:'--coral' } };
   } else if (practice){
@@ -2193,12 +2521,12 @@ function startLesson(id, practice = false, jump = false){
     ls = { id:'practice', title:'Practice', level:{ c:'--sky' } };
   } else {
     ls = ALL.find(x => x.id === id);
-    queue = ls.gen();
+    queue = learnify(ls, ls.gen());
   }
   L = { ls, practice, jump, queue, idx:0, total:queue.filter(e => e.type !== 'intro' && e.type !== 'scale' && e.type !== 'iqashow').length, done:0, wrong:0, answered:0, t0:Date.now(), cleanup:null, slips:0, firstOk:0 };
   $('#lesson').hidden = false; document.body.style.overflow = 'hidden';
   keepAwake(true);
-  renderEx();
+  renderEx(); paintTarab();
 }
 /* the screen stays on during a lesson: both hands are on the oud */
 let wakeLock = null;
@@ -2232,15 +2560,23 @@ function renderEx(){
   L.curSlip = false;
   setProgress();
   $('#lbody').className = 'wrap center';
-  (CHOICE[e.type] ? exChoice : { intro:exIntro, scale:exScale, tune:exTune, echo:exEcho, iqashow:exIqaShow }[e.type])(e, $('#lbody'));
+  (CHOICE[e.type] ? exChoice : { intro:exIntro, scale:exScale, tune:exTune, echo:exEcho, iqashow:exIqaShow, answer:exAnswer }[e.type])(e, $('#lbody'));
   $('.lbody').scrollTop = 0;
 }
 const PRAISE = ['Ahsant! أحسنت', 'Nice ear!', 'Spot on!', 'Tarab! طرب', 'Exactly right', 'Beautiful'];
+/* five clean answers in a row fill the tarab meter and pay out */
+function paintTarab(){ const t = $('#tarab'); if (t) t.innerHTML = times(5, (_, i) => `<i class="${i < (L.heat || 0) ? 'on' : ''}"></i>`).join(''); }
+function feedTarab(clean){
+  L.heat = clean ? (L.heat || 0) + 1 : 0;
+  if (L.heat >= 5){ L.heat = 0; L.tarabs = (L.tarabs || 0) + 1; S.pearls += 3; toast('Tarab! طرب', '+3'); renderStats(); }
+  paintTarab();
+}
 function verdict(ok, detail, replay){
   if (L.cleanup){ L.cleanup(); L.cleanup = null; }
   const e = L.queue[L.idx];
   sfx(ok);
   L.answered++;
+  feedTarab(ok && !e.retry && !L.curSlip);
   if (ok){
     if (!e.retry && !L.curSlip) L.firstOk++;   // mastery counts first-try answers only
     L.done++; L.combo = L.curSlip ? 0 : (L.combo || 0) + 1;
@@ -2273,8 +2609,10 @@ function complete(){
   const rate = L.total ? L.firstOk / L.total : 1, need = L.ls.test ? 0.9 : 0.8;
   const passed = L.practice || L.ls.id === '1-1' || rate >= need;
   const newlyMastered = L.ls.test && passed && !again;
-  const xp = (L.practice || again || !passed ? 5 : L.ls.test ? 30 : 10 + (perfect ? 5 : 0)) * mult;
-  const pearls = L.practice ? 5 : 10 + (perfect ? 5 : 0);
+  let xp = (L.practice || again || !passed ? 5 : L.ls.test ? 30 : 10 + (perfect ? 5 : 0)) * mult;
+  let pearls = L.practice ? 5 : 10 + (perfect ? 5 : 0);
+  const dayStars = L.ls.id === 'daily' && !S.dailyCh[dayKey()] ? (rate >= 0.9 ? 3 : rate >= 0.7 ? 2 : 1) : 0;
+  if (dayStars){ S.dailyCh[dayKey()] = dayStars; pearls = 20 + 10 * dayStars; xp = 15 * mult; }
   S.xp += xp; S.pearls += pearls; S.lessons = (S.lessons || 0) + 1;
   Cloud.award(L.ls.id, xp);
   if (perfect && !L.practice) S.perfects++;
@@ -2288,6 +2626,8 @@ function complete(){
     if (S.streak % 7 === 0){ S.pearls += 25; setTimeout(() => toast(`${S.streak}-day streak bonus`, '+25'), 900); }
   }
   if (!L.practice && passed) S.done[L.ls.id] = (S.done[L.ls.id] || 0) + 1;
+  if (!L.practice && passed && Math.random() < 0.35) setTimeout(dropCard, 1500);
+  if (passed) celebrate();
   if (L.jump && passed) jumpDone(L.ls.level);
   if (newlyMastered){ S.pearls += 40; setTimeout(() => toast(`Level ${L.ls.level.id} mastered`, '+40', 'i-trophy'), 700); }
   save();
@@ -2295,20 +2635,21 @@ function complete(){
   $('#lbody').className = 'wrap complete';
   const pct = Math.round(rate * 100), firstTry = `${L.firstOk} of ${L.total} right on the first try (${pct}%)`;
   $('#lbody').innerHTML = `${mascot(undefined, passed ? 'bounce' : '', undefined, passed ? 'happy' : 'sad')}
-    <h2 style="${passed ? '' : 'color:var(--coral)'}">${!passed ? 'Almost there' : L.practice ? 'Practice complete!' : L.ls.test ? `Level ${L.ls.level.id} mastered!` : 'Lesson passed!'}</h2>
+    ${passed ? `<span class="done-ar" aria-hidden="true">أحسنت</span>` : ''}
+    <h2 style="${passed ? '' : 'color:var(--coral)'}">${!passed ? 'Almost there' : L.ls.id === 'daily' ? 'Challenge done!' : L.practice ? 'Practice complete!' : L.ls.test ? `Level ${L.ls.level.id} mastered!` : 'Lesson passed!'}</h2>
     <p>${!passed ? `${firstTry}. You need ${need * 100}% to pass${L.ls.test ? ' the mastery test' : ''}. Each try trains your ear.`
       : L.practice ? 'Your ear is staying sharp.' : L.ls.test ? `${firstTry}. You've truly got this level.` : perfect ? 'A perfect lesson. Your ear is waking up.' : `${firstTry}. Your ear gets sharper every time.`}</p>
     <div class="result-tiles">
-      <div class="rt" style="--c:var(--violet)"><b>${icon('i-bolt')}${xp}</b><span>XP${mult > 1 ? ' ×2' : ''}</span></div>
+      <div class="rt" style="--c:var(--violet)"><b>${icon('i-bolt')}${xp}</b><span>XP${mult > 1 ? ` ×${mult}` : ''}</span></div>
       <div class="rt" style="--c:var(--pearl)"><b>${icon('i-pearl')}${pearls}</b><span>Pearls</span></div>
-      <div class="rt" style="--c:var(${passed ? '--good' : '--coral'})"><b>${L.practice ? acc : pct}%</b><span>${L.practice ? 'Accuracy' : 'First try'}</span></div>
+      <div class="rt" style="--c:var(${passed ? '--good' : '--coral'})"><b>${L.practice ? acc : pct}%</b><span>${dayStars ? '★'.repeat(dayStars) : L.practice ? 'Accuracy' : 'First try'}</span></div>
       <div class="rt" style="--c:var(--sky)"><b>${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</b><span>Time</span></div>
     </div>`;
   const retryId = L.ls.id;
   footer(passed ? `<span></span><button class="btn" id="fin">Continue</button>`
     : `<button class="btn ghost" id="fin">Later</button><button class="btn" id="again">Try again</button>`);
   sfx(passed);
-  setTimeout(() => { checkQuests(); checkBadges(); }, 500);
+  setTimeout(() => { checkQuests(); checkBadges(); checkRank(); }, 500);
   $('#fin').onclick = extended ? streakScreen : endLesson;
   const retryJump = L.jump;
   if ($('#again')) $('#again').onclick = () => { if (L.cleanup) L.cleanup(); startLesson(retryId, false, retryJump); };
@@ -2411,7 +2752,7 @@ function exEcho(e, body){
     if (L.cleanup){ L.cleanup(); L.cleanup = null; }
     body.innerHTML = `<div class="ex-grid"><div class="ex-main">
       <h2 class="ex-title">${n === 1 ? 'Play the note you hear' : `Play these ${n} notes back`}</h2>
-      ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : e.iqa ? `<p class="ex-sub">On ${IQA[e.iqa].name}: one bar of drum, then the phrase.</p>` : e.mq && S.settings.tonic ? `<p class="ex-sub">You'll hear the tonic, ${name(MAQ[e.mq].scale[0])}, first.</p>` : ''}
+      ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : e.from ? `<p class="ex-sub">From an earlier lesson.</p>` : e.ladder ? `<p class="ex-sub">${e.ladder}</p>` : e.iqa ? `<p class="ex-sub">On ${IQA[e.iqa].name}: one bar of drum, then the phrase.</p>` : e.mq && S.settings.tonic ? `<p class="ex-sub">You'll hear the tonic, ${name(MAQ[e.mq].scale[0])}, first.</p>` : ''}
       <div class="listen-row">
         <button class="speak" id="play" aria-label="Play again">${icon('i-speaker')}</button>
         ${e.slow && n > 1 ? `<button class="speak small" id="slow" aria-label="Play slowly">${icon('i-slow')}</button>` : ''}
@@ -2493,8 +2834,15 @@ function exEcho(e, body){
     $('#hint').textContent = `You played ${name(m)}. That's ${gapText(gap)} too ${d > 0 ? 'high' : 'low'}. Go ${dir}`;
     if (mistakes >= 3 && !revealed && !e.test) $('#reveal').hidden = false;
   };
+  // hum it before the hands get involved: what you can sing, you can find
+  const humGap = () => {
+    const h = $('#hint'), ms = 1500 + n * 400; if (!h || !(L && L.queue[L.idx] === e)) return;
+    Mic.muteFor(ms); h.className = 'hint';
+    h.innerHTML = `Hum it now, out loud or in your head<span class="humbar"><i style="animation-duration:${ms}ms"></i></span>`;
+    setTimeout(() => { const t = $('#hint'); if (t && L && L.queue[L.idx] === e && !finished && slot === 0){ t.className = 'hint'; t.textContent = 'Now find it on your oud'; } }, ms);
+  };
   render();
-  setTimeout(() => { if (L && L.queue[L.idx] === e) listen(e.dur, false); }, 350);
+  setTimeout(async () => { if (L && L.queue[L.idx] === e){ await listen(e.dur, false); if (e.hum) humGap(); } }, 350);
 }
 
 /* ----- exercise: tune one string ----- */
@@ -2563,6 +2911,7 @@ function setNeedle(cents){
 
 /* ----- exercise: listening choices ----- */
 const CHOICE = {
+  degree:    e => ({ title:'Home first, then one note. Which step of the scale?', opts:e.choices.map(i => [i, `Step ${i + 1}`, name(e.scale[i])]), play:d => playSeq(e.notes, d || 1) }),
   compare:   e => ({ title:'Which note was higher?', opts:[['first','First note'],['second','Second note']], play:d => playSeq(e.notes, d || 1) }),
   same:      e => ({ title:'Same note, or different?', opts:[['same','Same'],['different','Different']], play:d => playSeq(e.notes, d || 1) }),
   direction: e => ({ title:'Did it go up or down?', opts:[['up','Up ↗'],['down','Down ↘']], play:d => playSeq(e.notes, d || 0.9) }),
@@ -2629,10 +2978,11 @@ function exChoice(e, body){
   let sel = null, tries = spec.opts.length > 2 ? 2 : 1;   // with only two answers a second try would just give it away
   body.innerHTML = `<div class="ex-grid"><div class="ex-main">
     <h2 class="ex-title">${spec.title}</h2>
-    ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : ''}
+    ${e.retry ? `<p class="ex-sub">One more try at this one.</p>` : e.from ? `<p class="ex-sub">From an earlier lesson.</p>` : ''}
     <div class="listen-row"><button class="speak" id="play" aria-label="Play again">${icon('i-speaker')}</button>
       <button class="speak small" id="slow" aria-label="Play slowly">${icon('i-slow')}</button></div>
     <p class="replays">Tap to hear it again</p>
+    ${S.tokens.hint > 0 && spec.opts.length > 2 && !e.test ? `<button class="link" id="useHint">Use a hint (${S.tokens.hint})</button>` : ''}
     </div><div class="ex-side">
     <div class="choices">${spec.opts.map(([v, l, s], i) => `<button class="choice" data-v="${v}" aria-pressed="false">${l}${s ? `<small>${s}</small>` : ''}<span class="kbd-hint"><kbd>${i + 1}</kbd></span></button>`).join('')}</div>
     </div></div>`;
@@ -2645,8 +2995,17 @@ function exChoice(e, body){
     b.setAttribute('aria-pressed', 'true'); sel = b.dataset.v; $('#check').disabled = false;
   });
   $('#skip').onclick = skipEx;
+  const open = () => [...document.querySelectorAll('.choice:not(:disabled)')];
+  if ($('#useHint')) $('#useHint').onclick = () => {
+    const w = open().filter(b => b.dataset.v !== String(e.answer)); if (!w.length) return;
+    const b = pick(w); b.disabled = true; b.classList.add('gone');
+    if (b.getAttribute('aria-pressed') === 'true'){ b.setAttribute('aria-pressed', 'false'); sel = null; $('#check').disabled = true; }
+    S.tokens.hint--; save(); $('#useHint').remove();
+  };
+  let usedExtra = false;
   $('#check').onclick = () => {
     const ok = String(sel) === String(e.answer);
+    if (!ok && tries === 1 && !usedExtra && !e.test && S.tokens.try > 0 && open().length > 2){ usedExtra = true; S.tokens.try--; tries = 2; toast('Extra try used', ''); save(); }
     if (!ok && --tries > 0){
       const b = document.querySelector('.choice[aria-pressed="true"]');
       b.classList.add('miss'); b.disabled = true; b.setAttribute('aria-pressed', 'false');
@@ -2675,7 +3034,7 @@ function exChoice(e, body){
 function renderTuner(){
   const OUD = oudStrings();
   $('#view').innerHTML = `<div class="stack">
-    <h2 class="section-title">Oud tuner</h2>
+    <h2 class="section-title">Oud tuner <span class="ar-t">دوزان العود</span></h2>
     <div class="panel stack">
       <div class="big-note" id="bn"><b>–</b><p>Pluck a string</p></div>
       ${gaugeSvg()}
@@ -2752,6 +3111,8 @@ function xpChart(){
   return `<div class="bars"><div class="goal-line" style="bottom:${20 + S.goal / max * H}px"><span>Goal ${S.goal}</span></div>
     ${days.map((x, i) => `<div class="bar-col ${i === 6 ? 'today' : ''}"><em>${x.v || ''}</em><i style="height:${Math.max(4, x.v / max * H)}px"></i><em>${i === 6 ? 'Today' : 'SMTWTFS'[x.d.getDay()]}</em></div>`).join('')}</div>`;
 }
+const FRAME_OF = () => (SHOP.frame.find(x => x.id === S.equip.frame) || {}).hex;
+const TITLE_OF = () => (SHOP.title.find(x => x.id === S.equip.title) || {}).name;
 function renderProfile(){
   const doneCount = ALL.filter(x => !x.test && isDone(x.id)).length;
   const explored = MAQAMAT.filter(m => routeIds(m.id).some(isDone)).length;
@@ -2761,10 +3122,11 @@ function renderProfile(){
   const tile = (ico, c, v, label) => `<div class="tile" style="color:var(${c})">${icon(ico)}<div><b style="color:var(--ink)">${v}</b><span>${label}</span></div></div>`;
   $('#view').innerHTML = `<div class="stack">
     <div class="panel hero">
-      <div class="avatar">${mascot()}<button id="dress" aria-label="Change Oudi's outfit">${icon('i-shop')}</button></div>
+      <div class="avatar" ${FRAME_OF() ? `style="border-color:${FRAME_OF()};box-shadow:0 0 0 3px var(--bg),0 0 0 5px ${FRAME_OF()}"` : ''}>${mascot()}<button id="dress" aria-label="Change Oudi's outfit">${icon('i-shop')}</button></div>
       <div class="hero-info">
         <input class="name-input" id="pname" maxlength="20" aria-label="Your name">
-        <p>Learning oud by ear since ${since}</p>
+        ${TITLE_OF() ? `<span class="ptitle">${TITLE_OF()}</span>` : ''}
+        <p>${RANKS[rankIdx()].en} · ${RANKS[rankIdx()].ar} · learning oud by ear since ${since}</p>
         <div class="chips"><span class="chip">${(TUNINGS[S.settings.tuning] || TUNINGS.FF).label} tuning</span><span class="chip">Route: ${MAQ[S.maqam].name}</span><span class="chip">${S.badges.length} of ${BADGES.length} achievements</span></div>
       </div>
     </div>
@@ -2803,6 +3165,8 @@ function renderProfile(){
     <div class="badges">${BADGES.map(b => { const v = Math.min(b.val(), b.goal), got = S.badges.includes(b.id) || v >= b.goal;
       return `<div class="bdg ${got ? '' : 'locked'}" style="--c:var(${b.c});--c-d:var(${b.c}-d)"><span class="bi">${icon(b.icon)}</span>
         <div><b>${b.name}</b><p>${b.desc}</p>${got ? '' : `<div class="qbar"><i style="width:${v / b.goal * 100}%"></i></div><p>${v} / ${b.goal}</p>`}</div></div>`; }).join('')}</div>
+
+    ${albumHtml()}
 
     <h3>Your ear map</h3>
     <div class="panel stack">${earMap()}</div>
@@ -2859,6 +3223,7 @@ function renderProfile(){
     $('#chPass').onclick = changePassword; $('#chMail').onclick = changeEmail; $('#delAcct').onclick = deleteAccount;
   }
   $('#dress').onclick = () => go('shop');
+  wireAlbum();
   $('#getFreeze').onclick = () => go('shop');
   document.querySelectorAll('#goal button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderProfile(); });
   document.querySelectorAll('#tuning button').forEach(b => b.onclick = () => { S.settings.tuning = b.dataset.v; save(); renderProfile(); });
@@ -2915,6 +3280,7 @@ document.addEventListener('keydown', ev => {
 
 /* ---------- start-up ---------- */
 function applyTheme(){
+  paintSkin();
   let t = S.settings.theme;
   if (!t || t === 'system'){
     if (!window.SamaaNative){ delete document.documentElement.dataset.theme; return; }
