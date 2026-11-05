@@ -21,19 +21,22 @@ modulation to sister maqamat, and phrases over the iqa'at (Maqsum, Baladi, Saidi
 - Mic check that calibrates to your room, tuner for F-to-F and C-to-C tuning
 - Keyboard shortcuts on laptops, installable on phones, works offline
 
-## Switch on accounts (about 5 minutes)
+## Switch on accounts and the world leaderboard (about 5 minutes)
 
-The site runs in guest mode until it is connected to a free Supabase project.
+The site and app run in guest mode until they are connected to a free Supabase project.
 
 1. Create a project at [supabase.com](https://supabase.com) (free plan).
 2. In the project, open **SQL Editor → New query**, paste the contents of [`supabase.sql`](supabase.sql) and press **Run**.
-3. Open **Authentication → URL Configuration** and set **Site URL** to the address of your live site
-   (for example `https://<your-username>.github.io/samaa/`). Add the same address under **Redirect URLs**.
+3. Open **Authentication → URL Configuration** and set **Site URL** to `https://osalhaddad1.github.io/samaa/`.
+   Add the same address under **Redirect URLs**.
 4. Open **Project Settings → API**. Copy the **Project URL** and the **anon public** key into [`config.js`](config.js).
-5. Commit and push. Sign-up, log-in, password reset and the league are now live.
+5. Commit and push. The site updates, and GitHub builds a new APK.
 
-By default Supabase asks new players to confirm their email. You can turn that off under
-**Authentication → Providers → Email** if you want people to start right away.
+Before launch, set up custom SMTP under **Authentication → Emails**: Supabase's built-in email sender is limited to a
+few messages an hour. To hide a cheater, set `banned` to true on their row in **Table Editor → profiles**.
+
+XP on the leaderboard is written only by the database function `award_xp`, which limits each lesson, hour and day.
+A modified app could still claim XP up to those limits, because the listening happens on the player's device.
 
 ## Android app
 

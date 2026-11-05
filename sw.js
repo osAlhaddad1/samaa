@@ -1,7 +1,7 @@
 /* Offline support: the app shell is cached, and the page itself is fetched fresh when online
    so updates show up right away. Account requests (Supabase) are never cached. */
-const CACHE = 'samaa-v3';
-const SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const CACHE = 'samaa-v4';
+const SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'vendor/supabase.js', 'vendor/fonts.css', 'privacy.html', 'terms.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -18,8 +18,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
-  const cdn = /fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net/.test(url.host);
-  if (!sameOrigin && !cdn) return;
+  if (!sameOrigin) return;
 
   if (req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('config.js')){
     // network first, so a new version is picked up immediately

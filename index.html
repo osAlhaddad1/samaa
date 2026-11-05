@@ -10,10 +10,8 @@
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap">
+<script src="vendor/supabase.js"></script>
+<link rel="stylesheet" href="vendor/fonts.css">
 <style>
 /* Layout: one centered learning column, chunky tactile buttons, a winding lesson path per level. */
 :root{
@@ -264,9 +262,9 @@ span.deco .mascot{width:96px;height:96px}
 .mq{border:2px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:0 4px 0 var(--line);padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px}
 .mq[aria-pressed="true"]{border-color:var(--c);box-shadow:0 4px 0 var(--c);background:color-mix(in srgb,var(--c) 9%,var(--surface))}
 .mq:active{transform:translateY(4px);box-shadow:0 0 0 var(--line)}
-.mq-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.mq-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 6px;min-width:0}
 .mq b{font-size:17px}
-.mq .ar{font-family:var(--f-display);font-size:22px;color:var(--c);font-weight:800;line-height:1}
+.mq .ar{font-family:var(--f-display);font-size:20px;color:var(--c);font-weight:800;line-height:1}
 .mq .meta{font-size:12px;color:var(--muted);font-weight:700;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .tag{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
 .pbar{height:6px;background:var(--lock);border-radius:9px;overflow:hidden}
@@ -454,13 +452,29 @@ button.stat:hover{background:color-mix(in srgb,currentColor 12%,transparent)}
 .banner-cta p{margin:2px 0 0;color:var(--muted);font-size:14px}
 .league-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .rows{display:flex;flex-direction:column}
-.lrow{display:grid;grid-template-columns:36px 40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 6px;border-bottom:2px solid var(--line)}
+.lrow{display:grid;grid-template-columns:32px 44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 6px;border-bottom:2px solid var(--line);width:100%;text-align:left}
+.lrow .mascot.lav{width:44px;height:44px}
+.lname{min-width:0;display:flex;flex-direction:column}
+.lname small{color:var(--muted);font-weight:700;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lname b{white-space:nowrap}
+.rank.t1{color:#D9A30B}.rank.t2{color:#8E98A8}.rank.t3{color:#B8713A}
+.ghost-row{height:60px;grid-template-columns:32px 44px 1fr}
+.ghost-row span{height:16px;border-radius:8px;background:var(--lock)}
+.rank-card{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px;border-radius:var(--r);background:var(--primary);color:#fff;box-shadow:0 4px 0 var(--primary-d);text-align:center}
+.rank-card small{display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.rank-card b{font:800 24px/1.2 var(--f-display);font-variant-numeric:tabular-nums}
+.rank-card.solo{grid-template-columns:1fr}.rank-card.solo p{margin:0;font-weight:700}
+.pcard{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.pcard .pstats{width:100%;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px}
+.pstats .tile{padding:10px 6px;justify-content:center;text-align:center}
+.legal{text-align:center;color:var(--muted);font-size:13px;font-weight:700;margin:4px 0}
+.legal a,.form-note a{color:inherit;text-decoration:underline}
 .lrow:last-child{border-bottom:0}
 .lrow.me{background:color-mix(in srgb,var(--sky) 12%,transparent);border-radius:12px}
 .lrow .rank{font:800 18px var(--f-display);text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
-.lrow .rank.top{color:var(--amber)}
+.lrow .rank.podium{font-size:22px}
 .ini{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--c)}
-.lrow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow b{overflow:hidden;text-overflow:ellipsis}
 .lrow .xpv{font-weight:800;color:var(--violet);font-variant-numeric:tabular-nums}
 .ear-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
 .ear{border-radius:12px;padding:8px;text-align:center;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
@@ -699,7 +713,7 @@ const SCALE = [48,50,52,53,55,57,59,60];   // C Ajam (major) in first position: 
 const KEY = 'samaa.v1';
 const DEFAULT = { xp:0, streak:0, bestStreak:0, lastDay:null, done:{}, daily:{}, lessons:0,
   pearls:50, freezes:0, frozen:[], boostUntil:0, perfects:0, badges:[], chests:[], joined:null, player:'Oud player', goal:20,
-  q:{ date:null }, gear:{ owned:[], worn:null }, notice:null, ear:{}, onboarded:false, guest:false, owner:null,
+  q:{ date:null }, gear:{ owned:[], worn:null }, notice:null, ear:{}, onboarded:false, guest:false, owner:null, country:null, pending:[],
   maqam:'rast', settings:{ names:'western', sens:6, tap:false, tuning:'FF', mic2:true, volume:0.8, tonic:true, theme:'system' } };
 function load(){
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) return {...JSON.parse(JSON.stringify(DEFAULT)), ...s, settings:{...DEFAULT.settings, ...(s.settings||{})}}; } catch(e){}
@@ -743,8 +757,9 @@ function mergeStates(a, b){
 /* ---------- accounts & cloud save (Supabase) ----------
    Fill in config.js to switch accounts on. Without it the app runs in guest mode on this device. */
 const CFG = window.SAMAA_CONFIG || {};
+const APP_VERSION = '1.1';
 const Cloud = {
-  sb:null, user:null, timer:null, status:'off',
+  sb:null, user:null, me:null, timer:null, status:'off', flushing:false,
   enabled(){ return !!this.sb; },
   init(){
     if (CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase){
@@ -752,18 +767,56 @@ const Cloud = {
     }
   },
   queue(){ if (!this.user) return; clearTimeout(this.timer); this.timer = setTimeout(() => this.push(), 1200); },
+  /* saved progress; XP on the leaderboard travels separately, through award() */
   async push(){
     if (!this.user) return;
-    const { error } = await this.sb.from('profiles').upsert({
-      id:this.user.id, display_name:(S.player || 'Oud player').slice(0, 24), state:S,
-      week_xp:weekXp(), week_key:weekKey(), updated_at:new Date().toISOString(),
-    });
+    const { error } = await this.sb.from('profiles').update({ state:S, updated_at:new Date().toISOString() }).eq('id', this.user.id);
     this.status = error ? 'error' : 'saved'; paintSync();
+    this.flush();
   },
   async pull(){
-    const { data, error } = await this.sb.from('profiles').select('state').eq('id', this.user.id).maybeSingle();
+    const { data, error } = await this.sb.from('profiles').select('state,display_name,country,avatar,xp_total,streak').eq('id', this.user.id).maybeSingle();
     if (error) throw error;
+    this.me = data;
     return data && data.state && Object.keys(data.state).length ? data.state : null;
+  },
+  /* finished lessons wait in S.pending until the server has counted them, so nothing is lost offline.
+     Each has its own id, so a retry after a dropped connection can't pay twice. */
+  award(lesson, xp){
+    if (!this.user || xp <= 0) return;
+    S.pending.push({ id:crypto.randomUUID(), lesson:String(lesson).slice(0, 32), xp });
+    this.flush();
+  },
+  async flush(){
+    if (!this.user || this.flushing || !navigator.onLine) return;
+    this.flushing = true;
+    try {
+      while (S.pending.length){
+        const a = S.pending[0];
+        const { data, error } = await this.sb.rpc('award_xp', { p_id:a.id, p_lesson:a.lesson, p_xp:a.xp });
+        if (error && !error.code) break;          // no connection: try again later
+        if (data && data[0] && this.me){ this.me.xp_total = data[0].xp_total; this.me.streak = data[0].streak; }
+        S.pending.shift();
+      }
+      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+    } finally { this.flushing = false; }
+  },
+  async setProfile(fields){
+    const { error } = await this.sb.from('profiles').update(fields).eq('id', this.user.id);
+    if (!error && this.me) Object.assign(this.me, fields);
+    return error;
+  },
+  /* back in the app: pick up what another device saved */
+  async refresh(){
+    if (!this.user || !navigator.onLine || L) return;
+    try {
+      const remote = await this.pull();
+      if (remote && (remote.savedAt || 0) > (S.savedAt || 0)){
+        const settings = S.settings, owner = S.owner;
+        replaceState({ ...mergeStates(remote, S), settings, owner, guest:false });
+        if ($('#auth').hidden && !L) go(tab);
+      }
+    } catch(e){}
   },
 };
 function paintSync(){
@@ -1636,6 +1689,7 @@ function renderShop(){
     const g = SHOP.gear.find(x => x.id === b.dataset.gear);
     if (S.gear.owned.includes(g.id)){ S.gear.worn = S.gear.worn === g.id ? null : g.id; save(); }
     else buy(g);
+    if (Cloud.user) Cloud.setProfile({ avatar:S.gear.worn });
     renderShop();
   });
 }
@@ -1679,31 +1733,43 @@ async function busy(fn){
   try { await fn(); } catch(err){ $('#aErr').textContent = friendly(err); }
   finally { if ($('#aSubmit')){ b.disabled = false; b.textContent = label; } }
 }
+const NAME_RULE = 'Names are 3 to 20 letters or numbers. Spaces, dots, dashes and underscores are fine inside a name.';
+const validName = n => /^[\p{L}\p{N}._-][\p{L}\p{N} ._-]{1,18}[\p{L}\p{N}._-]$/u.test(n);
+const legal = () => `<p class="form-note">By continuing you agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>`;
 function friendly(err){
   const m = (err && (err.message || err.error_description)) || 'Something went wrong. Check your connection and try again.';
   if (/invalid login/i.test(m)) return 'That email and password don\'t match an account.';
   if (/already registered/i.test(m)) return 'There is already an account with this email. Log in instead.';
+  if (/failed to fetch|network|load failed/i.test(m)) return 'No connection. Check your internet and try again.';
+  if (/rate limit|too many/i.test(m)) return 'Too many tries. Wait a minute and try again.';
+  if (/profiles_name_unique/.test(m)) return 'That name is taken. Try another one.';
+  if (/profiles_name_format/.test(m)) return NAME_RULE;
   if (/email not confirmed/i.test(m)) return 'Confirm your email first: open the link we sent you.';
   if (/password/i.test(m) && /6|8|characters|weak/i.test(m)) return 'Use a password of at least 8 characters.';
   return m;
 }
 function authSignup(){
   formView('Create your account', 'Your progress, streak and outfits are saved to your account, on every device.',
-    `<label>Your name<input id="fName" autocomplete="nickname" maxlength="24" value="${esc(S.player === 'Oud player' ? '' : S.player)}" placeholder="Oud player"></label>
+    `<label>Player name (shown on the world leaderboard)<input id="fName" autocomplete="nickname" maxlength="20" value="${esc(S.player === 'Oud player' ? '' : S.player)}" placeholder="Your name"></label>
      <label>Email<input id="fEmail" type="email" autocomplete="email" required></label>
      <label>Password<input id="fPass" type="password" autocomplete="new-password" minlength="8" required></label>`,
-    'Create account', `<p class="form-note">Have an account? <button class="link" id="toLogin">Log in</button></p>`);
+    'Create account', `${legal()}<p class="form-note">Have an account? <button class="link" id="toLogin">Log in</button></p>`);
   $('#toLogin').onclick = authLogin;
   $('#aForm').onsubmit = ev => { ev.preventDefault(); busy(async () => {
     const email = $('#fEmail').value.trim(), password = $('#fPass').value, nm = $('#fName').value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('Enter a valid email address.');
     if (password.length < 8) throw new Error('Use a password of at least 8 characters.');
-    if (nm) S.player = nm;
+    if (!validName(nm)) throw new Error(NAME_RULE);
+    S.player = nm;
     const { data, error } = await Cloud.sb.auth.signUp({ email, password, options:{ data:{ display_name:S.player }, emailRedirectTo:here() } });
     if (error) throw error;
     if (data.session){ Cloud.user = data.session.user; await afterLogin(); }
-    else showAuth(`<div class="auth-hero">${mascot()}<h2>Check your email</h2><p>We sent a link to <b>${esc(email)}</b>. Open it to confirm your account, then you're in.</p></div>
-      <button class="btn ghost wide" id="toLogin2">Back to log in</button>`), $('#toLogin2').onclick = authLogin;
+    else {
+      showAuth(`<div class="auth-hero">${mascot()}<h2>Check your email</h2><p>We sent a link to <b>${esc(email)}</b>. Open it to confirm your account, then log in here.</p></div>
+        <button class="btn wide" id="toLogin2">Log in</button><button class="link" id="resend" style="align-self:center">Send the email again</button>`);
+      $('#toLogin2').onclick = authLogin;
+      $('#resend').onclick = async () => { const { error } = await Cloud.sb.auth.resend({ type:'signup', email, options:{ emailRedirectTo:here() } }); toast(error ? friendly(error) : 'Sent again', '', 'i-check'); };
+    }
   }); };
 }
 function authLogin(){
@@ -1742,26 +1808,66 @@ function authNewPassword(){
 async function afterLogin(){
   const local = JSON.parse(JSON.stringify(S));
   let remote = null;
-  try { remote = await Cloud.pull(); } catch(e){ toast('Could not load your progress. Using this device for now.', '', 'i-x'); }
+  try { remote = await Cloud.pull(); } catch(e){ if (navigator.onLine) toast('Could not load your progress. Using this device for now.', '', 'i-x'); }
   const guestHere = local.guest && !local.owner && hasProgress(local);
   const sameUser = local.owner === Cloud.user.id;
   let next = remote ? (guestHere ? mergeStates(remote, local) : sameUser && (local.savedAt || 0) > (remote.savedAt || 0) ? local : remote)
                     : (guestHere || sameUser ? local : { settings:local.settings });
   replaceState(next);
   S.owner = Cloud.user.id; S.guest = false;
-  if (!remote && S.player === 'Oud player') S.player = Cloud.user.user_metadata?.display_name || S.player;
+  if (Cloud.me){ S.player = Cloud.me.display_name; S.country = Cloud.me.country; }
   if (!S.joined) S.joined = dayKey();
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
-  await Cloud.push();
+  Cloud.push();
   S.onboarded ? enterApp() : onboarding(0);
 }
 async function logOut(){
+  clearTimeout(Cloud.timer);
   await Cloud.push();
   await Cloud.sb.auth.signOut();
-  Cloud.user = null;
+  wipeLocal();
+}
+function wipeLocal(){
+  Cloud.user = null; Cloud.me = null;
   const st = S.settings; replaceState({ settings:st }); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
   authWelcome();
 }
+/* account dialogs, opened from the profile */
+function changePassword(){
+  openModal(`<h3>Change password</h3><form class="form" id="mForm" novalidate><label>New password<input id="mPass" type="password" autocomplete="new-password"></label>
+    <p class="form-err" id="mErr" role="alert"></p><div class="row"><button class="btn">Save</button><button type="button" class="btn ghost" onclick="closeModal()">Cancel</button></div></form>`);
+  $('#mForm').onsubmit = async ev => { ev.preventDefault();
+    if ($('#mPass').value.length < 8){ $('#mErr').textContent = 'Use a password of at least 8 characters.'; return; }
+    const { error } = await Cloud.sb.auth.updateUser({ password:$('#mPass').value });
+    if (error){ $('#mErr').textContent = friendly(error); return; }
+    closeModal(); toast('Password changed', '', 'i-check'); };
+}
+function changeEmail(){
+  openModal(`<h3>Change email</h3><p>We'll send a confirmation link to the new address.</p><form class="form" id="mForm" novalidate><label>New email<input id="mMail" type="email" autocomplete="email"></label>
+    <p class="form-err" id="mErr" role="alert"></p><div class="row"><button class="btn">Send link</button><button type="button" class="btn ghost" onclick="closeModal()">Cancel</button></div></form>`);
+  $('#mForm').onsubmit = async ev => { ev.preventDefault();
+    const email = $('#mMail').value.trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)){ $('#mErr').textContent = 'Enter a valid email address.'; return; }
+    const { error } = await Cloud.sb.auth.updateUser({ email }, { emailRedirectTo:here() });
+    if (error){ $('#mErr').textContent = friendly(error); return; }
+    closeModal(); toast('Check your new inbox for the link', '', 'i-check'); };
+}
+function deleteAccount(){
+  openModal(`<h3>Delete your account?</h3><p>This removes your login, progress and leaderboard place for good. It can't be undone. Type <b>DELETE</b> to confirm.</p>
+    <form class="form" id="mForm" novalidate><input id="mConfirm" autocomplete="off" aria-label="Type DELETE to confirm">
+    <p class="form-err" id="mErr" role="alert"></p><div class="row"><button class="btn bad">Delete forever</button><button type="button" class="btn ghost" onclick="closeModal()">Keep it</button></div></form>`);
+  $('#mForm').onsubmit = async ev => { ev.preventDefault();
+    if ($('#mConfirm').value.trim() !== 'DELETE'){ $('#mErr').textContent = 'Type DELETE to confirm.'; return; }
+    const { error } = await Cloud.sb.rpc('delete_account');
+    if (error){ $('#mErr').textContent = friendly(error); return; }
+    clearTimeout(Cloud.timer); closeModal();
+    await Cloud.sb.auth.signOut({ scope:'local' }).catch(() => {});
+    wipeLocal(); toast('Your account was deleted', '', 'i-check'); };
+}
+/* ISO country codes; names and flags come from the device */
+const COUNTRIES = 'AD AE AF AG AL AM AO AR AT AU AZ BA BB BD BE BF BG BH BI BJ BN BO BR BS BT BW BY BZ CA CD CF CG CH CI CL CM CN CO CR CU CV CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FM FR GA GB GD GE GH GM GN GQ GR GT GW GY HK HN HR HT HU ID IE IL IN IQ IR IS IT JM JO JP KE KG KH KI KM KN KP KR KW KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MG MH MK ML MM MN MR MT MU MV MW MX MY MZ NA NE NG NI NL NO NP NR NZ OM PA PE PG PH PK PL PS PT PW PY QA RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SY SZ TD TG TH TJ TL TM TN TO TR TT TV TW TZ UA UG US UY UZ VA VC VE VN VU WS XK YE ZA ZM ZW'.split(' ');
+const flag = c => c ? [...c].map(x => String.fromCodePoint(0x1F1A5 + x.charCodeAt(0))).join('') : '';
+function countryName(c){ try { return new Intl.DisplayNames(undefined, { type:'region' }).of(c) || c; } catch(e){ return c; } }
 
 /* ---------- first-run setup ---------- */
 const OB = {};
@@ -1851,28 +1957,51 @@ async function micCheck(done){
 }
 
 /* ---------- League: weekly XP ---------- */
+let boardScope = 'week';
 async function renderLeague(){
-  const days = 7 - ((new Date().getDay() + 6) % 7);
+  const now = new Date(), days = 7 - ((now.getUTCDay() + 6) % 7);
   $('#view').innerHTML = `<div class="stack">
-    <div class="league-head"><div><h2 class="section-title" style="margin:0">Weekly league</h2><p class="ex-sub" style="margin:4px 0 0">${weekKey()} · ends in ${days} day${days > 1 ? 's' : ''}</p></div>
-      <span class="wallet" style="color:var(--violet)">${icon('i-bolt')}${weekXp()} XP</span></div>
-    <div class="panel" id="board"><p class="ex-sub" style="margin:0">Loading…</p></div></div>`;
+    <div class="league-head"><div><h2 class="section-title" style="margin:0">World leaderboard</h2>
+      <p class="ex-sub" style="margin:4px 0 0">${boardScope === 'week' ? `New week in ${days} day${days > 1 ? 's' : ''}` : 'All players, all time'}</p></div>
+      <div class="seg" id="scope"><button data-v="week" aria-pressed="${boardScope === 'week'}">This week</button><button data-v="all" aria-pressed="${boardScope === 'all'}">All time</button></div></div>
+    <div id="myRank"></div>
+    <div class="panel" id="board">${times(6, () => `<div class="lrow ghost-row"><span></span><span></span><span></span></div>`).join('')}</div></div>`;
+  document.querySelectorAll('#scope button').forEach(b => b.onclick = () => { boardScope = b.dataset.v; renderLeague(); });
   const board = $('#board');
-  if (!Cloud.enabled()){ board.innerHTML = `<p style="margin:0">The league needs accounts, which aren't switched on for this site yet.</p>`; return; }
-  if (!Cloud.user){
-    board.innerHTML = `<div class="acct"><div><b>Join the league</b><p>Create a free account to compete with other oud players every week.</p></div><button class="btn" id="lgJoin">Sign up</button></div>`;
-    $('#lgJoin').onclick = authSignup; return;
+  if (!Cloud.enabled()){ board.innerHTML = `<p style="margin:0">The world leaderboard opens soon. Keep practising: your streak and XP are safe on this device.</p>`; return; }
+  const scope = boardScope;
+  await Cloud.flush();
+  const [top, mine] = await Promise.all([
+    Cloud.sb.rpc('leaderboard', { scope, max_rows:100 }),
+    Cloud.user ? Cloud.sb.rpc('my_rank', { scope }) : Promise.resolve({ data:null }),
+  ]);
+  if (!$('#board') || scope !== boardScope) return;
+  if (top.error){
+    board.innerHTML = `<div class="acct"><div><b>${navigator.onLine ? "Couldn't load the leaderboard" : "You're offline"}</b><p>Your XP is saved and will count when you're back.</p></div><button class="btn ghost" id="lgRetry">Retry</button></div>`;
+    $('#lgRetry').onclick = renderLeague; return;
   }
-  await Cloud.push();
-  const { data, error } = await Cloud.sb.rpc('leaderboard', { wk:weekKey() });
-  if (!$('#board')) return;
-  if (error){ board.innerHTML = `<p style="margin:0">Couldn't load the league. Check your connection and try again.</p>`; return; }
-  const colors = ['--primary', '--violet', '--coral', '--sky', '--plum', '--amber', '--olive'];
-  board.innerHTML = data.length ? `<div class="rows">${data.map((r, i) => `<div class="lrow ${r.id === Cloud.user.id ? 'me' : ''}">
-      <span class="rank ${i < 3 ? 'top' : ''}">${i + 1}</span>
-      <span class="ini" style="--c:var(${colors[(r.display_name || '?').charCodeAt(0) % colors.length]})">${esc((r.display_name || '?').trim().charAt(0).toUpperCase())}</span>
-      <b>${esc(r.display_name || 'Oud player')}${r.id === Cloud.user.id ? ' (you)' : ''}</b><span class="xpv">${r.week_xp} XP</span></div>`).join('')}</div>`
-    : `<p style="margin:0">Nobody has earned XP this week yet. Finish a lesson to take first place.</p>`;
+  const me = mine.data && mine.data[0], myId = Cloud.user && Cloud.user.id;
+  $('#myRank').innerHTML = me ? `<div class="rank-card"><div><small>Your rank</small><b>#${me.place}</b></div><div><small>Players</small><b>${me.players}</b></div><div><small>XP</small><b>${me.xp}</b></div></div>`
+    : Cloud.user ? `<div class="rank-card solo"><p>Finish a lesson to join the board.</p></div>`
+    : `<div class="banner-cta"><div><b>Join the world leaderboard</b><p>Create a free account to rank against oud players everywhere.</p></div><button class="btn" id="lgJoin">Sign up</button></div>`;
+  if ($('#lgJoin')) $('#lgJoin').onclick = authSignup;
+  const row = r => `<button class="lrow ${r.id === myId ? 'me' : ''}" data-player="${esc(r.id)}">
+      <span class="rank ${r.place <= 3 ? `podium t${r.place}` : ''}">${r.place}</span>
+      ${mascot(r.avatar, 'lav')}
+      <span class="lname"><b>${esc(r.display_name)}${r.id === myId ? ' (you)' : ''}</b>${r.country ? `<small>${flag(r.country)} ${esc(countryName(r.country))}</small>` : ''}</span>
+      <span class="xpv">${r.xp} XP</span></button>`;
+  board.innerHTML = top.data.length ? `<div class="rows">${top.data.map(row).join('')}</div>`
+    : `<p style="margin:0">Nobody is on the board ${scope === 'week' ? 'this week' : 'yet'}. Finish a lesson to take first place.</p>`;
+  document.querySelectorAll('[data-player]').forEach(b => b.onclick = () => playerCard(b.dataset.player));
+}
+async function playerCard(id){
+  const { data, error } = await Cloud.sb.rpc('player_card', { player:id });
+  const p = data && data[0]; if (error || !p) return;
+  openModal(`<div class="pcard">${mascot(p.avatar, '', 96, 'happy')}<h3>${esc(p.display_name)}</h3>
+    ${p.country ? `<p>${flag(p.country)} ${esc(countryName(p.country))}</p>` : ''}
+    <p>Playing since ${new Date(p.joined).toLocaleDateString(undefined, { month:'long', year:'numeric' })}</p>
+    <div class="tiles t3 pstats"><div class="tile"><div><b>${p.xp}</b><span>Total XP</span></div></div><div class="tile"><div><b>${p.week_xp}</b><span>This week</span></div></div><div class="tile"><div><b>${p.streak}</b><span>Day streak</span></div></div></div></div>
+    <button class="btn wide" onclick="closeModal()">Close</button>`);
 }
 
 /* ---------- Learn ---------- */
@@ -1953,7 +2082,7 @@ function levelHtml(lv, cur){
     const kindIco = ls.test ? 'i-trophy' : ls.kind === 'listen' ? 'i-headphones' : ls.kind === 'review' ? 'i-dumbbell' : ls.id === '1-1' ? 'i-tuner' : 'i-star';
     const ico = ls.soon ? 'i-lock' : !isOpen ? (ls.test ? 'i-trophy' : 'i-lock') : done && !ls.test ? 'i-check' : kindIco;
     const style = ls.test && isOpen ? '--c:var(--amber);--c-d:var(--amber-d)' : '';
-    html += `<div class="node-wrap ${here ? 'here' : ''}" style="transform:translateX(${OFF[i % 8]}px)">${deco}
+    html += `<div class="node-wrap ${here ? 'here' : ''}" style="transform:translateX(${ls.test ? 0 : OFF[i % 8]}px)">${deco}
       ${here ? `<span class="start-tag">${done ? 'AGAIN' : 'START'}</span>` : ''}
       <button class="node ${ls.test ? 'test' : ''} ${done ? 'done' : ''} ${isOpen ? '' : 'locked'} ${here ? 'current' : ''}" style="${style}" data-lesson="${ls.soon ? '' : ls.id}" ${isOpen ? '' : 'aria-disabled="true"'} aria-label="${ls.title || 'Locked lesson'}">${icon(ico)}</button>
       ${done && S.done[ls.id] > 1 ? `<span class="done-count">×${S.done[ls.id]}</span>` : ''}
@@ -2136,6 +2265,7 @@ function complete(){
   const xp = (L.practice || again || !passed ? 5 : L.ls.test ? 30 : 10 + (perfect ? 5 : 0)) * mult;
   const pearls = L.practice ? 5 : 10 + (perfect ? 5 : 0);
   S.xp += xp; S.pearls += pearls; S.lessons = (S.lessons || 0) + 1;
+  Cloud.award(L.ls.id, xp);
   if (perfect && !L.practice) S.perfects++;
   const day = dayKey(); S.daily[day] = (S.daily[day] || 0) + xp;
   const q = today(); q.xp += xp; q.lessons++;
@@ -2612,7 +2742,7 @@ function renderProfile(){
     <div class="panel hero">
       <div class="avatar">${mascot()}<button id="dress" aria-label="Change Oudi's outfit">${icon('i-shop')}</button></div>
       <div class="hero-info">
-        <input class="name-input" id="pname" maxlength="24" aria-label="Your name">
+        <input class="name-input" id="pname" maxlength="20" aria-label="Your name">
         <p>Learning oud by ear since ${since}</p>
         <div class="chips"><span class="chip">${(TUNINGS[S.settings.tuning] || TUNINGS.FF).label} tuning</span><span class="chip">Route: ${MAQ[S.maqam].name}</span><span class="chip">${S.badges.length} of ${BADGES.length} achievements</span></div>
       </div>
@@ -2682,9 +2812,31 @@ function renderProfile(){
         <div class="seg" id="theme">${[['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(S.settings.theme || 'system') === v}">${l}</button>`).join('')}</div></div>
       <div class="field"><div><label>Reset progress</label><p>Clears XP, pearls, streak and finished lessons</p></div>
         <button class="btn ghost" id="reset">Reset</button></div>
-    </div></div>`;
+    </div>
+    ${Cloud.user ? `<h3>Account</h3>
+    <div class="panel">
+      <div class="field"><div><label for="country">Country</label><p>Shown next to your name on the leaderboard</p></div><select id="country" class="sel"></select></div>
+      <div class="field"><div><label>Password</label></div><button class="btn ghost" id="chPass">Change</button></div>
+      <div class="field"><div><label>Email</label><p>${esc(Cloud.user.email)}</p></div><button class="btn ghost" id="chMail">Change</button></div>
+      <div class="field"><div><label>Delete account</label><p>Removes your login, progress and leaderboard place</p></div><button class="btn bad" id="delAcct">Delete</button></div>
+    </div>` : ''}
+    <p class="legal"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a> · Version ${APP_VERSION}</p>
+    </div>`;
   const nameEl = $('#pname'); nameEl.value = S.player;
-  nameEl.onchange = () => { S.player = nameEl.value.trim() || 'Oud player'; nameEl.value = S.player; save(); };
+  nameEl.onchange = async () => {
+    const nm = nameEl.value.trim();
+    if (!Cloud.user){ S.player = nm || 'Oud player'; nameEl.value = S.player; save(); return; }
+    if (!validName(nm)){ toast(NAME_RULE, '', 'i-x'); nameEl.value = S.player; return; }
+    const err = await Cloud.setProfile({ display_name:nm });
+    if (err){ toast(friendly(err), '', 'i-x'); nameEl.value = S.player; return; }
+    S.player = nm; save(); toast('Name changed', '', 'i-check');
+  };
+  if ($('#country')){
+    $('#country').innerHTML = `<option value="">Not shown</option>${COUNTRIES.map(c => [countryName(c), c]).sort((a, b) => a[0].localeCompare(b[0])).map(([n, c]) => `<option value="${c}">${esc(n)}</option>`).join('')}`;
+    $('#country').value = S.country || '';
+    $('#country').onchange = async ev => { const c = ev.target.value || null; const err = await Cloud.setProfile({ country:c }); if (err) toast(friendly(err), '', 'i-x'); else { S.country = c; save(); } };
+    $('#chPass').onclick = changePassword; $('#chMail').onclick = changeEmail; $('#delAcct').onclick = deleteAccount;
+  }
   $('#dress').onclick = () => go('shop');
   $('#getFreeze').onclick = () => go('shop');
   document.querySelectorAll('#goal button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderProfile(); });
@@ -2741,7 +2893,15 @@ document.addEventListener('keydown', ev => {
 });
 
 /* ---------- start-up ---------- */
-function applyTheme(){ const t = S.settings.theme; if (!t || t === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t; }
+function applyTheme(){
+  let t = S.settings.theme;
+  if (!t || t === 'system'){
+    if (!window.SamaaNative){ delete document.documentElement.dataset.theme; return; }
+    t = window.SamaaNative.isNight() ? 'dark' : 'light';           // the Android app asks the phone directly
+  }
+  document.documentElement.dataset.theme = t;
+  if (window.SamaaNative) window.SamaaNative.setDark(t === 'dark');   // status bar and navigation bar follow
+}
 function enterApp(){ hideAuth(); if (!S.joined){ S.joined = dayKey(); save(); } settleStreak(); go('learn'); }
 async function boot(){
   applyTheme();
@@ -2751,7 +2911,11 @@ async function boot(){
     if (/type=recovery/.test(location.hash)) return;   // the recovery event above takes over
     try {
       const { data } = await Cloud.sb.auth.getSession();
-      if (data.session){ Cloud.user = data.session.user; return afterLogin(); }
+      if (data.session){
+        Cloud.user = data.session.user;
+        if (S.owner === Cloud.user.id && S.onboarded){ enterApp(); Cloud.refresh(); Cloud.flush(); return; }   // straight in; sync behind the scenes
+        return afterLogin();
+      }
     } catch(e){}
   }
   if (S.onboarded && (S.guest || !Cloud.enabled())) return enterApp();
@@ -2759,7 +2923,8 @@ async function boot(){
 }
 if (!S.settings.mic3){ S.settings.sens = 6; S.settings.mic3 = true; save(); }   // new listening engine: new default sensitivity
 if ('serviceWorker' in navigator && location.protocol === 'https:' && !NATIVE) navigator.serviceWorker.register('sw.js').catch(() => {});
-document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) return; if (ctx && ctx.state !== 'running') ctx.resume(); Cloud.refresh(); });
+window.addEventListener('online', () => { Cloud.flush(); Cloud.queue(); });
 /* Android back button: returns true if the app handled it, false to leave the app */
 window.samaaBack = () => {
   if (!$('#modal').hidden){ closeModal(); return true; }
